@@ -11,8 +11,15 @@ interface QuizAttributes {
 
 type QuizCreationAttributes = Optional<QuizAttributes, 'id' | 'question' | 'options' | 'correct_option'>
 
-const Quiz = sequelize.define<Model<QuizAttributes, QuizCreationAttributes>>(
-  'Quiz',
+class Quiz extends Model<QuizAttributes, QuizCreationAttributes> implements QuizAttributes {
+  public id!: number
+  public lesson_id!: number
+  public question?: string
+  public options?: string[]
+  public correct_option?: string
+}
+
+Quiz.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -38,8 +45,9 @@ const Quiz = sequelize.define<Model<QuizAttributes, QuizCreationAttributes>>(
     }
   },
   {
+    sequelize,
     tableName: 'quizzes',
-    timestamps: false
+    timestamps: true
   }
 )
 

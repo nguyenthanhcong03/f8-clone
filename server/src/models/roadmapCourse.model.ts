@@ -10,8 +10,17 @@ interface RoadmapCourseAttributes {
 
 type RoadmapCourseCreationAttributes = Optional<RoadmapCourseAttributes, 'id' | 'order'>
 
-const RoadmapCourse = sequelize.define<Model<RoadmapCourseAttributes, RoadmapCourseCreationAttributes>>(
-  'RoadmapCourse',
+class RoadmapCourse
+  extends Model<RoadmapCourseAttributes, RoadmapCourseCreationAttributes>
+  implements RoadmapCourseAttributes
+{
+  public id!: number
+  public roadmap_id!: number
+  public course_id!: number
+  public order?: number
+}
+
+RoadmapCourse.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -39,8 +48,9 @@ const RoadmapCourse = sequelize.define<Model<RoadmapCourseAttributes, RoadmapCou
     }
   },
   {
+    sequelize,
     tableName: 'roadmap_courses',
-    timestamps: false
+    timestamps: true
   }
 )
 

@@ -6,14 +6,27 @@ interface LessonAttributes {
   section_id: number
   title?: string
   video_url?: string
+  video_public_id?: string
   content?: string
   order?: number
 }
 
-type LessonCreationAttributes = Optional<LessonAttributes, 'id' | 'title' | 'video_url' | 'content' | 'order'>
+type LessonCreationAttributes = Optional<
+  LessonAttributes,
+  'id' | 'title' | 'video_url' | 'video_public_id' | 'content' | 'order'
+>
 
-const Lesson = sequelize.define<Model<LessonAttributes, LessonCreationAttributes>>(
-  'Lesson',
+class Lesson extends Model<LessonAttributes, LessonCreationAttributes> implements LessonAttributes {
+  public id!: number
+  public section_id!: number
+  public title?: string
+  public video_url?: string
+  public video_public_id?: string
+  public content?: string
+  public order?: number
+}
+
+Lesson.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -34,6 +47,9 @@ const Lesson = sequelize.define<Model<LessonAttributes, LessonCreationAttributes
     video_url: {
       type: DataTypes.STRING(255)
     },
+    video_public_id: {
+      type: DataTypes.STRING(255)
+    },
     content: {
       type: DataTypes.TEXT
     },
@@ -42,8 +58,9 @@ const Lesson = sequelize.define<Model<LessonAttributes, LessonCreationAttributes
     }
   },
   {
+    sequelize,
     tableName: 'lessons',
-    timestamps: false
+    timestamps: true
   }
 )
 

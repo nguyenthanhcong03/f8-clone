@@ -8,7 +8,6 @@ import RoadmapCourse from './roadmapCourse.model'
 import Enrollment from './enrollment.model'
 import Blog from './blog.model'
 import BlogComment from './blogComment.model'
-import Assignment from './assignment.model'
 
 // Define associations
 // User - Course (One-to-Many: User can create many courses)
@@ -26,10 +25,6 @@ Lesson.belongsTo(Section, { foreignKey: 'section_id', as: 'section' })
 // Lesson - Quiz (One-to-Many: Lesson can have many quizzes)
 Lesson.hasMany(Quiz, { foreignKey: 'lesson_id', as: 'quizzes' })
 Quiz.belongsTo(Lesson, { foreignKey: 'lesson_id', as: 'lesson' })
-
-// Lesson - Assignment (One-to-Many: Lesson can have many assignments)
-Lesson.hasMany(Assignment, { foreignKey: 'lesson_id', as: 'assignments' })
-Assignment.belongsTo(Lesson, { foreignKey: 'lesson_id', as: 'lesson' })
 
 // Roadmap - Course (Many-to-Many through RoadmapCourse)
 Roadmap.belongsToMany(Course, {
@@ -71,4 +66,4 @@ BlogComment.belongsTo(Blog, { foreignKey: 'blog_id', as: 'blog' })
 User.hasMany(BlogComment, { foreignKey: 'user_id', as: 'comments' })
 BlogComment.belongsTo(User, { foreignKey: 'user_id', as: 'user' })
 
-export { User, Course, Section, Lesson, Quiz, Roadmap, RoadmapCourse, Enrollment, Blog, BlogComment, Assignment }
+export { User, Course, Section, Lesson, Quiz, Roadmap, RoadmapCourse, Enrollment, Blog, BlogComment }

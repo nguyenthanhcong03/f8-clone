@@ -4,17 +4,28 @@ import sequelize from '../config/database'
 interface UserAttributes {
   id: number
   name: string
+  phone?: string
   email: string
   password: string
   avatar?: string
+  avatar_public_id?: string
   role?: 'admin' | 'student'
-  created_at?: Date
 }
 
-type UserCreationAttributes = Optional<UserAttributes, 'id' | 'avatar' | 'role' | 'created_at'>
+type UserCreationAttributes = Optional<UserAttributes, 'id' | 'phone' | 'avatar' | 'avatar_public_id' | 'role'>
 
-const User = sequelize.define<Model<UserAttributes, UserCreationAttributes>>(
-  'User',
+class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+  public id!: number
+  public name!: string
+  public phone?: string
+  public email!: string
+  public password!: string
+  public avatar?: string
+  public avatar_public_id?: string
+  public role?: 'admin' | 'student'
+}
+
+User.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -24,6 +35,10 @@ const User = sequelize.define<Model<UserAttributes, UserCreationAttributes>>(
     name: {
       type: DataTypes.STRING(100),
       allowNull: false
+    },
+    phone: {
+      type: DataTypes.STRING(15),
+      allowNull: true
     },
     email: {
       type: DataTypes.STRING(100),
@@ -37,18 +52,18 @@ const User = sequelize.define<Model<UserAttributes, UserCreationAttributes>>(
     avatar: {
       type: DataTypes.STRING(255)
     },
+    avatar_public_id: {
+      type: DataTypes.STRING(255)
+    },
     role: {
       type: DataTypes.ENUM('admin', 'student'),
       defaultValue: 'student'
-    },
-    created_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
     }
   },
   {
+    sequelize,
     tableName: 'users',
-    timestamps: false
+    timestamps: true
   }
 )
 

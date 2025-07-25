@@ -6,13 +6,18 @@ interface BlogCommentAttributes {
   blog_id: number
   user_id: number
   content?: string
-  created_at?: Date
 }
 
-type BlogCommentCreationAttributes = Optional<BlogCommentAttributes, 'id' | 'content' | 'created_at'>
+type BlogCommentCreationAttributes = Optional<BlogCommentAttributes, 'id' | 'content'>
 
-const BlogComment = sequelize.define<Model<BlogCommentAttributes, BlogCommentCreationAttributes>>(
-  'BlogComment',
+class BlogComment extends Model<BlogCommentAttributes, BlogCommentCreationAttributes> implements BlogCommentAttributes {
+  public id!: number
+  public blog_id!: number
+  public user_id!: number
+  public content?: string
+}
+
+BlogComment.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -37,15 +42,12 @@ const BlogComment = sequelize.define<Model<BlogCommentAttributes, BlogCommentCre
     },
     content: {
       type: DataTypes.TEXT
-    },
-    created_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
     }
   },
   {
+    sequelize,
     tableName: 'blog_comments',
-    timestamps: false
+    timestamps: true
   }
 )
 

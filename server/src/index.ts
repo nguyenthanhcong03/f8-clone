@@ -5,7 +5,7 @@ import helmet from 'helmet'
 import morgan from 'morgan'
 import sequelize from './config/database'
 import routes from './routes'
-import { errorHandler, notFound } from './middleware/error.middleware'
+import { errorConverter, errorHandler, notFound } from '@/middleware/error.middleware'
 
 // Load environment variables
 dotenv.config()
@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3000
 
 // Middleware
 app.use(helmet()) // Security headers
-app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000' }))
+app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:5173', credentials: true }))
 app.use(morgan('combined')) // Logging
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
@@ -25,6 +25,7 @@ app.use('/api/v1', routes)
 
 // Error handling middleware
 app.use(notFound)
+app.use(errorConverter)
 app.use(errorHandler)
 
 // Database connection and server start
@@ -35,7 +36,7 @@ const startServer = async () => {
     console.log('Database connected successfully')
 
     // Sync database (creates tables if they don't exist)
-    await sequelize.sync({ force: false })
+    await sequelize.sync() // hoặc sync({ force: true }) nếu muốn reset DB
     console.log('Database synchronized')
 
     // Start server

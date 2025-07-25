@@ -10,8 +10,14 @@ interface EnrollmentAttributes {
 
 type EnrollmentCreationAttributes = Optional<EnrollmentAttributes, 'id' | 'enrolled_at'>
 
-const Enrollment = sequelize.define<Model<EnrollmentAttributes, EnrollmentCreationAttributes>>(
-  'Enrollment',
+class Enrollment extends Model<EnrollmentAttributes, EnrollmentCreationAttributes> implements EnrollmentAttributes {
+  public id!: number
+  public user_id!: number
+  public course_id!: number
+  public enrolled_at?: Date
+}
+
+Enrollment.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -40,8 +46,9 @@ const Enrollment = sequelize.define<Model<EnrollmentAttributes, EnrollmentCreati
     }
   },
   {
+    sequelize,
     tableName: 'enrollments',
-    timestamps: false
+    timestamps: true
   }
 )
 

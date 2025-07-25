@@ -6,12 +6,23 @@ interface RoadmapAttributes {
   title?: string
   description?: string
   image?: string
+  image_public_id?: string
 }
 
-type RoadmapCreationAttributes = Optional<RoadmapAttributes, 'id' | 'title' | 'description' | 'image'>
+type RoadmapCreationAttributes = Optional<
+  RoadmapAttributes,
+  'id' | 'title' | 'description' | 'image' | 'image_public_id'
+>
 
-const Roadmap = sequelize.define<Model<RoadmapAttributes, RoadmapCreationAttributes>>(
-  'Roadmap',
+class Roadmap extends Model<RoadmapAttributes, RoadmapCreationAttributes> implements RoadmapAttributes {
+  public id!: number
+  public title?: string
+  public description?: string
+  public image?: string
+  public image_public_id?: string
+}
+
+Roadmap.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -26,11 +37,15 @@ const Roadmap = sequelize.define<Model<RoadmapAttributes, RoadmapCreationAttribu
     },
     image: {
       type: DataTypes.STRING(255)
+    },
+    image_public_id: {
+      type: DataTypes.STRING(255)
     }
   },
   {
+    sequelize,
     tableName: 'roadmaps',
-    timestamps: false
+    timestamps: true
   }
 )
 

@@ -8,16 +8,25 @@ interface BlogAttributes {
   content?: string
   author_id?: number
   thumbnail?: string
-  created_at?: Date
+  thumbnail_public_id?: string
 }
 
 type BlogCreationAttributes = Optional<
   BlogAttributes,
-  'id' | 'title' | 'slug' | 'content' | 'author_id' | 'thumbnail' | 'created_at'
+  'id' | 'title' | 'slug' | 'content' | 'author_id' | 'thumbnail' | 'thumbnail_public_id'
 >
 
-const Blog = sequelize.define<Model<BlogAttributes, BlogCreationAttributes>>(
-  'Blog',
+class Blog extends Model<BlogAttributes, BlogCreationAttributes> implements BlogAttributes {
+  public id!: number
+  public title?: string
+  public slug?: string
+  public content?: string
+  public author_id?: number
+  public thumbnail?: string
+  public thumbnail_public_id?: string
+}
+
+Blog.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -43,14 +52,14 @@ const Blog = sequelize.define<Model<BlogAttributes, BlogCreationAttributes>>(
     thumbnail: {
       type: DataTypes.STRING(255)
     },
-    created_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
+    thumbnail_public_id: {
+      type: DataTypes.STRING(255)
     }
   },
   {
+    sequelize,
     tableName: 'blogs',
-    timestamps: false
+    timestamps: true
   }
 )
 

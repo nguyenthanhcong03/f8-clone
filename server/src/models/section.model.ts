@@ -10,8 +10,14 @@ interface SectionAttributes {
 
 type SectionCreationAttributes = Optional<SectionAttributes, 'id' | 'order'>
 
-const Section = sequelize.define<Model<SectionAttributes, SectionCreationAttributes>>(
-  'Section',
+class Section extends Model<SectionAttributes, SectionCreationAttributes> implements SectionAttributes {
+  public id!: number
+  public title!: string
+  public course_id!: number
+  public order?: number
+}
+
+Section.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -35,8 +41,9 @@ const Section = sequelize.define<Model<SectionAttributes, SectionCreationAttribu
     }
   },
   {
+    sequelize,
     tableName: 'sections',
-    timestamps: false
+    timestamps: true
   }
 )
 
