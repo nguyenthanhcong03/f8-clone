@@ -1,13 +1,21 @@
 import { useAppSelector } from '@/store/hook'
 import { Navigate, useLocation } from 'react-router-dom'
 
+interface IProps {
+  children: React.ReactNode
+  requireAuth?: boolean
+  roles?: string[]
+  redirectPath?: string
+  fallbackComponent?: React.ReactNode
+}
+
 const ProtectedRoute = ({
   children,
   requireAuth = true,
   roles = [],
   redirectPath = '/login',
   fallbackComponent = null
-}) => {
+}: IProps) => {
   const location = useLocation()
   const { user, isAuthenticated, isLoading } = useAppSelector((state) => state.auth)
 

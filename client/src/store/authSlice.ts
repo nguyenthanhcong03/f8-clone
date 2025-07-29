@@ -41,14 +41,14 @@ export const register = createAsyncThunk('auth/register', async (userData: Regis
 
 export const login = createAsyncThunk('auth/login', async (credentials: LoginInput, { rejectWithValue }) => {
   try {
-    const data = await authAPI.login(credentials)
+    const response = await authAPI.login(credentials)
+    console.log('first response:', response)
 
     // Save to localStorage
-    localStorage.setItem('accessToken', data.accessToken)
-    localStorage.setItem('refreshToken', data.refreshToken)
-    localStorage.setItem('user', JSON.stringify(data.user))
+    localStorage.setItem('accessToken', response.data.accessToken)
+    localStorage.setItem('user', JSON.stringify(response.data.user))
 
-    return data
+    return response
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Đăng nhập thất bại'
     return rejectWithValue(errorMessage)
@@ -122,8 +122,8 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.isLoading = false
         state.isAuthenticated = true
-        state.user = action.payload.user
-        state.accessToken = action.payload.accessToken
+        state.user = action.payload.data.user
+        state.accessToken = action.payload.data.accessToken
       })
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false

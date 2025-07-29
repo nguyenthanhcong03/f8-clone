@@ -4,6 +4,8 @@ import NotFound from '@/components/ui/auth/NotFound/NotFound'
 import HomePage from '@/pages/public/HomePage/HomePage'
 import ProtectedRoute from './guards/ProtectedRoute'
 import AdminLayout from './layouts/AdminLayout'
+import CoursePage from '@/pages/admin/CoursePage/CoursePage'
+import AddCourse from '@/pages/admin/CoursePage/AddCourse'
 
 const publicRoutes: RouteObject[] = [{ index: true, element: <HomePage /> }]
 
@@ -11,7 +13,10 @@ const publicRoutes: RouteObject[] = [{ index: true, element: <HomePage /> }]
 const customerProtectedRoutes: RouteObject[] = []
 
 // Admin
-const adminRoutes: RouteObject[] = []
+const adminRoutes: RouteObject[] = [
+  { path: 'courses', element: <CoursePage /> },
+  { path: 'courses/add', element: <AddCourse /> }
+]
 
 // Main router configuration
 const routes: RouteObject[] = [

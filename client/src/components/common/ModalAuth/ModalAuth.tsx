@@ -3,6 +3,7 @@ import { login, register } from '@/store/authSlice'
 import { useAppDispatch } from '@/store/hook'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowBack, Close, Visibility, VisibilityOff } from '@mui/icons-material'
+import WarningIcon from '@mui/icons-material/Warning'
 import {
   Box,
   Button,
@@ -11,7 +12,6 @@ import {
   IconButton,
   Input,
   InputAdornment,
-  InputLabel,
   Link,
   Modal,
   Typography
@@ -76,7 +76,6 @@ const ModalAuth = ({ open, onClose, type: initialType }: ModalAuthProps) => {
     formState: { errors: loginErrors },
     reset: resetLoginForm
   } = useForm<LoginFormValues>({
-    mode: 'onChange',
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
@@ -208,7 +207,12 @@ const ModalAuth = ({ open, onClose, type: initialType }: ModalAuthProps) => {
                     placeholder='Email'
                     {...registerLogin('email')}
                   />
-                  {loginErrors.email && <FormHelperText sx={{ ml: 1 }}>{loginErrors.email.message}</FormHelperText>}
+                  {loginErrors.email && (
+                    <FormHelperText sx={{ ml: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <WarningIcon fontSize='inherit' />
+                      {loginErrors.email.message}
+                    </FormHelperText>
+                  )}
                 </FormControl>
 
                 <FormControl fullWidth margin='normal' error={!!loginErrors.password} variant='standard'>
@@ -234,7 +238,10 @@ const ModalAuth = ({ open, onClose, type: initialType }: ModalAuthProps) => {
                     }
                   />
                   {loginErrors.password && (
-                    <FormHelperText sx={{ ml: 1 }}>{loginErrors.password.message}</FormHelperText>
+                    <FormHelperText sx={{ ml: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <WarningIcon fontSize='inherit' />
+                      {loginErrors.password.message}
+                    </FormHelperText>
                   )}
                 </FormControl>
 

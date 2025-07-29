@@ -40,9 +40,10 @@ const login = async (loginData: LoginAccountInput['body']) => {
   if (!user) {
     throw new ApiError(401, 'Thông tin đăng nhập không hợp lệ')
   }
-  console.log('user:', user)
 
   const currentPassword = user.password
+  // const currentPassword = user.getDataValue('password')
+  console.log('đến đây:', currentPassword)
 
   // Kiểm tra mật khẩu
   const isMatch = await bcrypt.compare(password, currentPassword)

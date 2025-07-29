@@ -217,32 +217,56 @@ const Header = () => {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem
-        onClick={() => {
-          handleMenuClose()
-          navigate('/profile')
-        }}
-      >
-        Trang cá nhân
-      </MenuItem>
-      <MenuItem
-        onClick={() => {
-          handleMenuClose()
-          navigate('/dashboard')
-        }}
-      >
-        Bảng điều khiển
-      </MenuItem>
-      <MenuItem
-        onClick={() => {
-          handleMenuClose()
-          navigate('/settings')
-        }}
-      >
-        Cài đặt
-      </MenuItem>
-      <Divider />
-      <MenuItem onClick={handleMenuClose}>Đăng xuất</MenuItem>
+      <Box sx={{ px: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 1 }}>
+          {user?.avatar ? (
+            <Avatar alt={user.name} src={user.avatar} sx={{ width: 60, height: 60 }} />
+          ) : (
+            <AccountCircle sx={{ fontSize: 60 }} />
+          )}
+          <Typography variant='subtitle1' sx={{ fontWeight: 500 }}>
+            {user?.name}
+          </Typography>
+        </Box>
+        <MenuItem
+          sx={{ borderRadius: 1 }}
+          onClick={() => {
+            handleMenuClose()
+            navigate('/profile')
+          }}
+        >
+          Trang cá nhân
+        </MenuItem>
+        <MenuItem
+          sx={{ borderRadius: 1 }}
+          onClick={() => {
+            handleMenuClose()
+            navigate('/dashboard')
+          }}
+        >
+          Bảng điều khiển
+        </MenuItem>
+        <MenuItem
+          sx={{ borderRadius: 1 }}
+          onClick={() => {
+            handleMenuClose()
+            navigate('/settings')
+          }}
+        >
+          Cài đặt
+        </MenuItem>
+        <Divider />
+        <MenuItem
+          sx={{ borderRadius: 1 }}
+          onClick={() => {
+            handleMenuClose()
+            localStorage.removeItem('accessToken')
+            localStorage.removeItem('user')
+          }}
+        >
+          Đăng xuất
+        </MenuItem>
+      </Box>
     </Menu>
   )
 
@@ -320,7 +344,7 @@ const Header = () => {
           <ThemeToggle />
 
           {/* Notification icon */}
-          <IconButton size='large' aria-label='show notifications' color='inherit'>
+          <IconButton size='medium' aria-label='show notifications' color='inherit'>
             <Badge badgeContent={5} color='error'>
               <NotificationsIcon />
             </Badge>
@@ -329,7 +353,7 @@ const Header = () => {
           {/* User section */}
           {isAuthenticated ? (
             <IconButton
-              size='large'
+              size='small'
               edge='end'
               aria-label='account of current user'
               aria-haspopup='true'
@@ -339,7 +363,7 @@ const Header = () => {
               {user?.avatar ? (
                 <Avatar alt={user.name} src={user.avatar} sx={{ width: 32, height: 32 }} />
               ) : (
-                <AccountCircle />
+                <AccountCircle fontSize='large' />
               )}
             </IconButton>
           ) : (

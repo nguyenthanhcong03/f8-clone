@@ -1,0 +1,67 @@
+/* Course Page Styles */
+.course-thumbnail {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.course-level-chip {
+  text-transform: capitalize;
+  font-size: 0.75rem;
+}
+
+.course-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.course-form-container {
+  padding: 16px 0;
+}
+
+.course-form-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.course-description {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .course-form-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .course-description {
+    max-width: 200px;
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+.table-container {
+  margin-top: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}

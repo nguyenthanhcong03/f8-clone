@@ -1,133 +1,124 @@
 import { Request, Response } from 'express'
 import courseService from '../services/course.service'
+import uploadService from '../services/upload.service'
+import catchAsync from '@/utils/catchAsync'
 
-const createCourse = async (req: Request, res: Response) => {
-  try {
-    const course = await courseService.createCourse(req.body)
-    res.status(201).json({
-      success: true,
-      data: course,
-      message: 'Course created successfully'
-    })
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'An error occurred'
-    })
-  }
+interface CreateCourseData {
+  title: string
+  slug?: string
+  description?: string
+  level?: 'beginner' | 'intermediate' | 'advanced'
+  is_paid: boolean
+  price?: number
+  thumbnail?: string
+  thumbnail_public_id?: string
 }
 
-const getAllCourses = async (req: Request, res: Response) => {
-  try {
-    const courses = await courseService.getAllCourses()
-    res.status(200).json({
-      success: true,
-      data: courses,
-      count: courses.length
-    })
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'An error occurred'
-    })
+const createCourse = catchAsync(async (req: Request, res: Response) => {
+  console.log('hello')
+  const { title, slug, description, level, is_paid, price } = req.body
+
+  // Tạo object course data
+  const courseData: CreateCourseData = {
+    title,
+    slug,
+    description,
+    level,
+    is_paid: is_paid === 'true' || is_paid === true,
+    price: is_paid === 'true' || is_paid === true ? parseFloat(price) : undefined
   }
-}
 
-const getCourseById = async (req: Request, res: Response) => {
-  try {
-    const courseId = parseInt(req.params.id)
-    const course = await courseService.getCourseById(courseId)
-    res.status(200).json({
-      success: true,
-      data: course
-    })
-  } catch (error) {
-    const statusCode = error instanceof Error && error.message === 'Course not found' ? 404 : 500
-    res.status(statusCode).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'An error occurred'
-    })
-  }
-}
+  console.log('course.controller.ts - createCourse - courseData:', courseData)
+  console.log('course.controller.ts - createCourse - req.file:', req.file)
 
-const updateCourse = async (req: Request, res: Response) => {
-  try {
-    const courseId = parseInt(req.params.id)
-    const course = await courseService.updateCourse(courseId, req.body)
-    res.status(200).json({
-      success: true,
-      data: course,
-      message: 'Course updated successfully'
-    })
-  } catch (error) {
-    const statusCode = error instanceof Error && error.message === 'Course not found' ? 404 : 500
-    res.status(statusCode).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'An error occurred'
-    })
-  }
-}
-
-const deleteCourse = async (req: Request, res: Response) => {
-  try {
-    const courseId = parseInt(req.params.id)
-    const result = await courseService.deleteCourse(courseId)
-    res.status(200).json({
-      success: true,
-      message: result.message
-    })
-  } catch (error) {
-    const statusCode = error instanceof Error && error.message === 'Course not found' ? 404 : 500
-    res.status(statusCode).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'An error occurred'
-    })
-  }
-}
-
-const uploadThumbnail = async (req: Request, res: Response) => {
-  try {
-    const courseId = parseInt(req.params.id)
-
-    if (!req.file) {
+  // Nếu có file thumbnail được upload
+  if (req.file) {
+    try {
+      const uploadResult = await uploadService.uploadImage(req.file.buffer, 'course-thumbnails')
+      courseData.thumbnail = uploadResult.url
+      courseData.thumbnail_public_id = uploadResult.public_id
+    } catch (error) {
       return res.status(400).json({
         success: false,
-        error: 'No file uploaded'
+        message: 'Failed to upload thumbnail',
+        error: error instanceof Error ? error.message : 'Unknown error'
       })
     }
+  }
 
-    const course = await courseService.uploadThumbnail(courseId, req.file.buffer)
-    res.status(200).json({
-      success: true,
-      data: course,
-      message: 'Thumbnail uploaded successfully'
-    })
-  } catch (error) {
-    const statusCode = error instanceof Error && error.message === 'Course not found' ? 404 : 500
-    res.status(statusCode).json({
+  const course = await courseService.createCourse(courseData)
+  res.status(201).json({
+    success: true,
+    message: 'Tạo khóa học thành công',
+    data: course
+  })
+})
+
+const getAllCourses = catchAsync(async (req: Request, res: Response) => {
+  console.log('Fetching all courses...')
+  const courses = await courseService.getAllCourses()
+  res.status(200).json({
+    success: true,
+    data: courses,
+    count: courses.length
+  })
+})
+
+const getCourseById = catchAsync(async (req: Request, res: Response) => {
+  const courseId = parseInt(req.params.id)
+  const course = await courseService.getCourseById(courseId)
+  res.status(200).json({
+    success: true,
+    data: course
+  })
+})
+
+const updateCourse = catchAsync(async (req: Request, res: Response) => {
+  const courseId = parseInt(req.params.id)
+  const course = await courseService.updateCourse(courseId, req.body)
+  res.status(200).json({
+    success: true,
+    data: course,
+    message: 'Course updated successfully'
+  })
+})
+
+const deleteCourse = catchAsync(async (req: Request, res: Response) => {
+  const courseId = parseInt(req.params.id)
+  const result = await courseService.deleteCourse(courseId)
+  res.status(200).json({
+    success: true,
+    message: result.message
+  })
+})
+
+const uploadThumbnail = catchAsync(async (req: Request, res: Response) => {
+  const courseId = parseInt(req.params.id)
+
+  if (!req.file) {
+    return res.status(400).json({
       success: false,
-      error: error instanceof Error ? error.message : 'An error occurred'
+      error: 'No file uploaded'
     })
   }
-}
 
-const deleteThumbnail = async (req: Request, res: Response) => {
-  try {
-    const courseId = parseInt(req.params.id)
-    const course = await courseService.deleteThumbnail(courseId)
-    res.status(200).json({
-      success: true,
-      data: course,
-      message: 'Thumbnail deleted successfully'
-    })
-  } catch (error) {
-    const statusCode = error instanceof Error && error.message === 'Course not found' ? 404 : 500
-    res.status(statusCode).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'An error occurred'
-    })
-  }
-}
+  const course = await courseService.uploadThumbnail(courseId, req.file.buffer)
+  res.status(200).json({
+    success: true,
+    data: course,
+    message: 'Thumbnail uploaded successfully'
+  })
+})
+
+const deleteThumbnail = catchAsync(async (req: Request, res: Response) => {
+  const courseId = parseInt(req.params.id)
+  const course = await courseService.deleteThumbnail(courseId)
+  res.status(200).json({
+    success: true,
+    data: course,
+    message: 'Thumbnail deleted successfully'
+  })
+})
 
 export default {
   createCourse,

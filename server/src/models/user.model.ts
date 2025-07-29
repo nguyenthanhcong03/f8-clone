@@ -15,14 +15,14 @@ interface UserAttributes {
 type UserCreationAttributes = Optional<UserAttributes, 'id' | 'phone' | 'avatar' | 'avatar_public_id' | 'role'>
 
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
-  public id!: number
-  public name!: string
-  public phone?: string
-  public email!: string
-  public password!: string
-  public avatar?: string
-  public avatar_public_id?: string
-  public role?: 'admin' | 'student'
+  declare id: number
+  declare name: string
+  declare phone?: string
+  declare email: string
+  declare password: string
+  declare avatar?: string
+  declare avatar_public_id?: string
+  declare role?: 'admin' | 'student'
 }
 
 User.init(

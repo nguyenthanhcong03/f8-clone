@@ -1,9 +1,40 @@
 import Course from '../models/course.model'
 import uploadService from './upload.service'
 
+interface CreateCourseData {
+  title: string
+  slug?: string
+  description?: string
+  level?: 'beginner' | 'intermediate' | 'advanced'
+  is_paid: boolean
+  price?: number
+  thumbnail?: string
+  thumbnail_public_id?: string
+}
+
 export class CourseService {
-  async createCourse(courseData: any) {
-    const course = await Course.create(courseData)
+  // Helper function to generate slug from title
+  private generateSlug(title: string): string {
+    return title
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+      .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+  }
+
+  async createCourse(courseData: CreateCourseData) {
+    // Generate slug if not provided
+    const slug = courseData.slug || this.generateSlug(courseData.title)
+
+    // Prepare data for course creation
+    const courseCreateData = {
+      ...courseData,
+      slug
+    }
+
+    const course = await Course.create(courseCreateData)
     return course
   }
 
