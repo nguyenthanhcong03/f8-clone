@@ -1,6 +1,6 @@
 import axiosInstance from '../config/axios'
 import type { ApiResponse } from '@/types/api'
-import type { Course } from '@/types/course'
+import type { Course, Section, Lesson } from '@/types/course'
 import type { CreateCourseInput, UpdateCourseInput } from '@/schemas/course.schema'
 
 const API_ENDPOINT = '/courses'
@@ -52,8 +52,19 @@ export const createCourse = async (courseData: CreateCourseInput) => {
   return response
 }
 
-export const updateCourse = async (id: number, courseData: UpdateCourseInput) => {
-  const response = await axiosInstance.put<ApiResponse<Course>>(`${API_ENDPOINT}/${id}`, courseData)
+export const updateCourse = async (id: number, courseData: UpdateCourseInput | FormData) => {
+  let response
+
+  if (courseData instanceof FormData) {
+    response = await axiosInstance.put<ApiResponse<Course>>(`${API_ENDPOINT}/${id}`, courseData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  } else {
+    response = await axiosInstance.put<ApiResponse<Course>>(`${API_ENDPOINT}/${id}`, courseData)
+  }
+
   return response
 }
 
@@ -62,20 +73,10 @@ export const deleteCourse = async (id: number) => {
   return response
 }
 
-export const uploadThumbnail = async (id: number, thumbnailFile: File) => {
-  const formData = new FormData()
-  formData.append('thumbnail', thumbnailFile)
-
-  const response = await axiosInstance.post<ApiResponse<Course>>(`${API_ENDPOINT}/${id}/thumbnail`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
+export const updateLessonOrder = async (sectionId: number, lessonIds: number[]) => {
+  const response = await axiosInstance.put<ApiResponse<Lesson[]>>(`/sections/${sectionId}/lessons/reorder`, {
+    lessonIds
   })
-  return response
-}
-
-export const deleteThumbnail = async (id: number) => {
-  const response = await axiosInstance.delete<ApiResponse<Course>>(`${API_ENDPOINT}/${id}/thumbnail`)
   return response
 }
 
@@ -85,8 +86,7 @@ const courseAPI = {
   createCourse,
   updateCourse,
   deleteCourse,
-  uploadThumbnail,
-  deleteThumbnail
+  updateLessonOrder
 }
 
 export default courseAPI

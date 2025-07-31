@@ -7,6 +7,9 @@ import sequelize from './config/database'
 import routes from './routes'
 import { errorConverter, errorHandler, notFound } from '@/middleware/error.middleware'
 
+// Import models to set up associations
+import './models/index'
+
 // Load environment variables
 dotenv.config()
 

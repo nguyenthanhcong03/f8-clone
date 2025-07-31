@@ -10,10 +10,11 @@ router.get('/', courseController.getAllCourses)
 // GET /courses/:id - Get course by ID
 router.get('/:id', courseController.getCourseById)
 
+// GET /courses/:id/sections - Get sections of a course
+router.get('/:id/sections', courseController.getCourseSections)
+
 // POST /courses - Create new course with optional thumbnail
-router.post('/', (req, res) => {
-  console.log('first')
-})
+router.post('/', upload.single('thumbnail'), courseController.createCourse)
 
 // PUT /courses/:id - Update course
 router.put('/:id', courseController.updateCourse)

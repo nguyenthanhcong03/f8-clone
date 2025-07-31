@@ -1,21 +1,21 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
-import courseAPI from '@/services/courseAPI'
-import type { Course } from '@/types/course'
 import type { CreateCourseInput, UpdateCourseInput } from '@/schemas/course.schema'
+import courseAPI from '@/services/courseAPI'
+import { getCourseSections } from '@/services/sectionAPI'
+import type { Course, Section } from '@/types/course'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 interface CourseState {
   courses: Course[]
   loading: boolean
   error: string | null
-  selectedCourse: Course | null
+  currentCourse: Course | null
 }
 
 const initialState: CourseState = {
   courses: [],
   loading: false,
   error: null,
-  selectedCourse: null
+  currentCourse: null
 }
 
 // Async thunks
@@ -25,6 +25,16 @@ export const fetchCourses = createAsyncThunk('courses/fetchCourses', async (_, {
     return response.data
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Failed to fetch courses'
+    return rejectWithValue(message)
+  }
+})
+
+export const fetchCourseById = createAsyncThunk('courses/fetchCourseById', async (id: number, { rejectWithValue }) => {
+  try {
+    const response = await courseAPI.getCourseById(id)
+    return response.data
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : `Failed to fetch course with ID ${id}`
     return rejectWithValue(message)
   }
 })
@@ -44,7 +54,7 @@ export const createCourse = createAsyncThunk(
 
 export const updateCourse = createAsyncThunk(
   'courses/updateCourse',
-  async ({ id, data }: { id: number; data: UpdateCourseInput }, { rejectWithValue }) => {
+  async ({ id, data }: { id: number; data: FormData | UpdateCourseInput }, { rejectWithValue }) => {
     try {
       const response = await courseAPI.updateCourse(id, data)
       return response.data
@@ -65,28 +75,31 @@ export const deleteCourse = createAsyncThunk('courses/deleteCourse', async (id: 
   }
 })
 
-export const uploadThumbnail = createAsyncThunk(
-  'courses/uploadThumbnail',
-  async ({ id, file }: { id: number; file: File }, { rejectWithValue }) => {
+export const fetchCourseSections = createAsyncThunk(
+  'courses/fetchCourseSections',
+  async (courseId: number, { rejectWithValue }) => {
     try {
-      const response = await courseAPI.uploadThumbnail(id, file)
+      const response = await getCourseSections(courseId)
       return response.data
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Failed to upload thumbnail'
+      const message = error instanceof Error ? error.message : `Failed to fetch sections for course ${courseId}`
       return rejectWithValue(message)
     }
   }
 )
 
-export const deleteThumbnail = createAsyncThunk('courses/deleteThumbnail', async (id: number, { rejectWithValue }) => {
-  try {
-    const response = await courseAPI.deleteThumbnail(id)
-    return response.data
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to delete thumbnail'
-    return rejectWithValue(message)
+export const updateLessonOrder = createAsyncThunk(
+  'courses/updateLessonOrder',
+  async ({ sectionId, lessonIds }: { sectionId: number; lessonIds: number[] }, { rejectWithValue }) => {
+    try {
+      const response = await courseAPI.updateLessonOrder(sectionId, lessonIds)
+      return { sectionId, lessons: response.data }
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to update lesson order'
+      return rejectWithValue(message)
+    }
   }
-})
+)
 
 const courseSlice = createSlice({
   name: 'courses',
@@ -95,11 +108,8 @@ const courseSlice = createSlice({
     clearError: (state) => {
       state.error = null
     },
-    setSelectedCourse: (state, action: PayloadAction<Course | null>) => {
-      state.selectedCourse = action.payload
-    },
-    clearSelectedCourse: (state) => {
-      state.selectedCourse = null
+    clearCurrentCourse: (state) => {
+      state.currentCourse = null
     }
   },
   extraReducers: (builder) => {
@@ -111,9 +121,24 @@ const courseSlice = createSlice({
       })
       .addCase(fetchCourses.fulfilled, (state, action) => {
         state.loading = false
-        state.courses = action.payload
+        state.courses = action.payload.courses
       })
       .addCase(fetchCourses.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+      })
+
+    // Fetch course by ID
+    builder
+      .addCase(fetchCourseById.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchCourseById.fulfilled, (state, action) => {
+        state.loading = false
+        state.currentCourse = action.payload
+      })
+      .addCase(fetchCourseById.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
       })
@@ -126,7 +151,7 @@ const courseSlice = createSlice({
       })
       .addCase(createCourse.fulfilled, (state, action) => {
         state.loading = false
-        state.courses.push(action.payload)
+        state.courses.push(action.payload.data)
       })
       .addCase(createCourse.rejected, (state, action) => {
         state.loading = false
@@ -141,9 +166,10 @@ const courseSlice = createSlice({
       })
       .addCase(updateCourse.fulfilled, (state, action) => {
         state.loading = false
-        const index = state.courses.findIndex((course) => course.id === action.payload.id)
+        const index = state.courses.findIndex((course) => course.id === action.payload.data.id)
         if (index !== -1) {
-          state.courses[index] = action.payload
+          state.courses[index] = action.payload.data
+          state.currentCourse = action.payload.data
         }
       })
       .addCase(updateCourse.rejected, (state, action) => {
@@ -159,38 +185,35 @@ const courseSlice = createSlice({
       })
       .addCase(deleteCourse.fulfilled, (state, action) => {
         state.loading = false
-        state.courses = state.courses.filter((course) => course.id !== action.payload)
+        state.courses = state.courses.filter((course) => course.id !== action.meta.arg)
+        if (state.currentCourse && state.currentCourse.id === action.meta.arg) {
+          state.currentCourse = null
+        }
       })
       .addCase(deleteCourse.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
       })
 
-    // Upload thumbnail
-    builder
-      .addCase(uploadThumbnail.fulfilled, (state, action) => {
-        const index = state.courses.findIndex((course) => course.id === action.payload.id)
-        if (index !== -1) {
-          state.courses[index] = action.payload
-        }
-      })
-      .addCase(uploadThumbnail.rejected, (state, action) => {
-        state.error = action.payload as string
-      })
-
-    // Delete thumbnail
-    builder
-      .addCase(deleteThumbnail.fulfilled, (state, action) => {
-        const index = state.courses.findIndex((course) => course.id === action.payload.id)
-        if (index !== -1) {
-          state.courses[index] = action.payload
-        }
-      })
-      .addCase(deleteThumbnail.rejected, (state, action) => {
-        state.error = action.payload as string
-      })
+    // // Update lesson order
+    // builder
+    //   .addCase(updateLessonOrder.pending, (state) => {
+    //     state.lessonsLoading = true
+    //   })
+    //   .addCase(updateLessonOrder.fulfilled, (state, action) => {
+    //     state.lessonsLoading = false
+    //     const { sectionId, lessons } = action.payload
+    //     const sectionIndex = state.sections.findIndex((section) => section.id === sectionId)
+    //     if (sectionIndex !== -1) {
+    //       state.sections[sectionIndex].lessons = lessons.data
+    //     }
+    //   })
+    //   .addCase(updateLessonOrder.rejected, (state, action) => {
+    //     state.lessonsLoading = false
+    //     state.lessonsError = action.payload as string
+    //   })
   }
 })
 
-export const { clearError, setSelectedCourse, clearSelectedCourse } = courseSlice.actions
+export const { clearError, clearCurrentCourse } = courseSlice.actions
 export default courseSlice.reducer

@@ -87,6 +87,14 @@ export class LessonService {
 
     return lesson
   }
+
+  async getLessonsBySectionId(sectionId: number) {
+    const lessons = await Lesson.findAll({
+      where: { section_id: sectionId },
+      order: [['order', 'ASC']]
+    })
+    return lessons
+  }
 }
 
 export default new LessonService()

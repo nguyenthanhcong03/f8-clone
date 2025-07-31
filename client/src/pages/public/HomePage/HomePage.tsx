@@ -8,9 +8,9 @@ const HomePage = () => {
   const handleRegister = async () => {
     dispatch(
       register({
-        name: 'JohnDoe',
-        email: 'user1234567@gamil.com',
-        password: 'password@123'
+        name: 'Nguyen Thanh Cong',
+        email: 'user1@gmail.com',
+        password: '123456'
       } as any)
     )
   }

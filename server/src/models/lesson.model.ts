@@ -17,13 +17,13 @@ type LessonCreationAttributes = Optional<
 >
 
 class Lesson extends Model<LessonAttributes, LessonCreationAttributes> implements LessonAttributes {
-  public id!: number
-  public section_id!: number
-  public title?: string
-  public video_url?: string
-  public video_public_id?: string
-  public content?: string
-  public order?: number
+  declare id: number
+  declare section_id: number
+  declare title?: string
+  declare video_url?: string
+  declare video_public_id?: string
+  declare content?: string
+  declare order?: number
 }
 
 Lesson.init(

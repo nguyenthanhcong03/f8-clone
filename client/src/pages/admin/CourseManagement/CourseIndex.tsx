@@ -23,7 +23,7 @@ import {
   DialogContent,
   DialogActions
 } from '@mui/material'
-import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material'
+import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Visibility } from '@mui/icons-material'
 import { fetchCourses, deleteCourse, clearError } from '@/store/courseSlice'
 import type { Course, CourseLevel } from '@/types/course'
 
@@ -33,7 +33,7 @@ const levelColors: Record<CourseLevel, 'success' | 'warning' | 'error'> = {
   advanced: 'error'
 }
 
-const CoursePage = () => {
+const CourseIndex = () => {
   const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
   const { courses, loading, error } = useSelector((state: RootState) => state.courses)
@@ -65,9 +65,12 @@ const CoursePage = () => {
     navigate('/admin/courses/add')
   }
 
+  const handleViewCourse = (course: Course) => {
+    navigate(`/admin/courses/${course.id}`)
+  }
+
   const handleEditCourse = (course: Course) => {
-    // TODO: Navigate to edit page when created
-    showSnackbar('Edit functionality coming soon', 'info' as any)
+    navigate(`/admin/courses/${course.id}`)
   }
 
   const handleDeleteClick = (course: Course) => {
@@ -101,10 +104,10 @@ const CoursePage = () => {
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant='h4' component='h1'>
-          Course Management
+          Quản lý khóa học
         </Typography>
         <Button variant='contained' startIcon={<AddIcon />} onClick={handleAddCourse} sx={{ minWidth: 150 }}>
-          Add Course
+          Thêm khóa học
         </Button>
       </Box>
 
@@ -114,24 +117,25 @@ const CoursePage = () => {
           <Table stickyHeader>
             <TableHead>
               <TableRow>
-                <TableCell>Title</TableCell>
-                <TableCell>Slug</TableCell>
+                <TableCell>Tên</TableCell>
                 <TableCell>Level</TableCell>
-                <TableCell>Type</TableCell>
-                <TableCell>Price</TableCell>
-                <TableCell align='right'>Actions</TableCell>
+                <TableCell>Loại</TableCell>
+                <TableCell>Giá tiền</TableCell>
+                <TableCell align='right'>Thao tác</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {courses.length === 0 ? (
+              {courses && courses.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} align='center' sx={{ py: 4 }}>
                     <Typography variant='body1' color='text.secondary'>
-                      No courses found. Click "Add Course" to create your first course.
+                      Không có khóa học nào. Nhấn "Thêm khóa học" để tạo khóa học đầu tiên.
                     </Typography>
                   </TableCell>
                 </TableRow>
               ) : (
+                courses &&
+                courses.length > 0 &&
                 courses.map((course) => (
                   <TableRow key={course.id} hover>
                     <TableCell>
@@ -147,14 +151,9 @@ const CoursePage = () => {
                       </Box>
                     </TableCell>
                     <TableCell>
-                      <Typography variant='body2' fontFamily='monospace'>
-                        {course.slug}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
                       <Chip
-                        label={course.level}
-                        color={levelColors[course.level]}
+                        label={course.level || 'beginner'}
+                        color={levelColors[course.level || 'beginner']}
                         size='small'
                         sx={{ textTransform: 'capitalize' }}
                       />
@@ -179,11 +178,14 @@ const CoursePage = () => {
                       )}
                     </TableCell>
                     <TableCell align='right'>
-                      <IconButton onClick={() => handleEditCourse(course)} color='primary' size='small'>
+                      {/* <IconButton onClick={() => handleEditCourse(course)} color='primary' size='small'>
                         <EditIcon />
-                      </IconButton>
+                      </IconButton> */}
                       <IconButton onClick={() => handleDeleteClick(course)} color='error' size='small'>
                         <DeleteIcon />
+                      </IconButton>
+                      <IconButton onClick={() => handleViewCourse(course)} color='error' size='small'>
+                        <Visibility />
                       </IconButton>
                     </TableCell>
                   </TableRow>
@@ -224,4 +226,4 @@ const CoursePage = () => {
   )
 }
 
-export default CoursePage
+export default CourseIndex

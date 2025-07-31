@@ -20,16 +20,16 @@ type CourseCreationAttributes = Optional<
 >
 
 class Course extends Model<CourseAttributes, CourseCreationAttributes> implements CourseAttributes {
-  public id!: number
-  public title!: string
-  public slug!: string
-  public description?: string
-  public thumbnail?: string
-  public thumbnail_public_id?: string
-  public level?: 'beginner' | 'intermediate' | 'advanced'
-  public is_paid?: boolean
-  public price?: number
-  public created_by?: number
+  declare id: number
+  declare title: string
+  declare slug: string
+  declare description?: string
+  declare thumbnail?: string
+  declare thumbnail_public_id?: string
+  declare level?: 'beginner' | 'intermediate' | 'advanced'
+  declare is_paid?: boolean
+  declare price?: number
+  declare created_by?: number
 }
 
 Course.init(

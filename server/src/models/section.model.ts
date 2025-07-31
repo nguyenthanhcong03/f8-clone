@@ -11,10 +11,10 @@ interface SectionAttributes {
 type SectionCreationAttributes = Optional<SectionAttributes, 'id' | 'order'>
 
 class Section extends Model<SectionAttributes, SectionCreationAttributes> implements SectionAttributes {
-  public id!: number
-  public title!: string
-  public course_id!: number
-  public order?: number
+  declare id: number
+  declare title: string
+  declare course_id: number
+  declare order?: number
 }
 
 Section.init(

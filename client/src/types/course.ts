@@ -1,4 +1,27 @@
 export type CourseLevel = 'beginner' | 'intermediate' | 'advanced'
+export type CourseStatus = 'draft' | 'published'
+
+export interface Lesson {
+  id: number
+  section_id: number
+  title?: string
+  video_url?: string
+  video_public_id?: string
+  content?: string
+  order?: number
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface Section {
+  id: number
+  title: string
+  course_id: number
+  order?: number
+  createdAt?: string
+  updatedAt?: string
+  lessons?: Lesson[]
+}
 
 export interface Course {
   id: number
@@ -10,9 +33,11 @@ export interface Course {
   level?: CourseLevel
   is_paid?: boolean
   price?: number
+  status?: CourseStatus
   created_by?: number
   createdAt?: string
   updatedAt?: string
+  sections?: Section[]
 }
 
 export interface CourseCreateInput {

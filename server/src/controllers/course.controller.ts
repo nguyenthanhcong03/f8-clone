@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import courseService from '../services/course.service'
+import sectionService from '../services/section.service'
 import uploadService from '../services/upload.service'
 import catchAsync from '@/utils/catchAsync'
 
@@ -15,7 +16,6 @@ interface CreateCourseData {
 }
 
 const createCourse = catchAsync(async (req: Request, res: Response) => {
-  console.log('hello')
   const { title, slug, description, level, is_paid, price } = req.body
 
   // Tạo object course data
@@ -27,9 +27,6 @@ const createCourse = catchAsync(async (req: Request, res: Response) => {
     is_paid: is_paid === 'true' || is_paid === true,
     price: is_paid === 'true' || is_paid === true ? parseFloat(price) : undefined
   }
-
-  console.log('course.controller.ts - createCourse - courseData:', courseData)
-  console.log('course.controller.ts - createCourse - req.file:', req.file)
 
   // Nếu có file thumbnail được upload
   if (req.file) {
@@ -47,6 +44,7 @@ const createCourse = catchAsync(async (req: Request, res: Response) => {
   }
 
   const course = await courseService.createCourse(courseData)
+  console.log('course.controller.ts - createCourse - course:', course)
   res.status(201).json({
     success: true,
     message: 'Tạo khóa học thành công',
@@ -55,12 +53,14 @@ const createCourse = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getAllCourses = catchAsync(async (req: Request, res: Response) => {
-  console.log('Fetching all courses...')
   const courses = await courseService.getAllCourses()
   res.status(200).json({
     success: true,
-    data: courses,
-    count: courses.length
+    data: {
+      courses,
+      total: courses.length
+    },
+    message: 'Lấy danh sách khóa học thành công'
   })
 })
 
@@ -120,6 +120,18 @@ const deleteThumbnail = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const getCourseSections = catchAsync(async (req: Request, res: Response) => {
+  const courseId = parseInt(req.params.id)
+
+  const sections = await sectionService.getCourseSectionsById(courseId)
+
+  res.status(200).json({
+    success: true,
+    message: 'Lấy danh sách sections thành công',
+    data: sections
+  })
+})
+
 export default {
   createCourse,
   getAllCourses,
@@ -127,5 +139,6 @@ export default {
   updateCourse,
   deleteCourse,
   uploadThumbnail,
-  deleteThumbnail
+  deleteThumbnail,
+  getCourseSections
 }
