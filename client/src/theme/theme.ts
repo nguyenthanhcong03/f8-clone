@@ -15,28 +15,6 @@ const colors = {
     dark: '#2CCEFB',
     // dark: '#0097a7',
     contrastText: '#ffffff'
-  },
-  background: {
-    light: {
-      default: '#fafafa',
-      paper: '#ffffff'
-      // sidebar: '#ffffff',
-    },
-    dark: {
-      default: '#121212',
-      paper: '#1e1e1e'
-      // sidebar: '#2a2a2a',
-    }
-  },
-  text: {
-    light: {
-      primary: '#212121',
-      secondary: '#666666'
-    },
-    dark: {
-      primary: '#ffffff',
-      secondary: '#b3b3b3'
-    }
   }
 }
 
@@ -107,15 +85,7 @@ export const lightTheme = createTheme({
   palette: {
     mode: 'light',
     primary: colors.primary,
-    secondary: colors.secondary,
-    background: {
-      default: colors.background.light.default,
-      paper: colors.background.light.paper
-    },
-    text: {
-      primary: colors.text.light.primary,
-      secondary: colors.text.light.secondary
-    }
+    secondary: colors.secondary
   }
 })
 
@@ -125,15 +95,7 @@ export const darkTheme = createTheme({
   palette: {
     mode: 'dark',
     primary: colors.primary,
-    secondary: colors.secondary,
-    background: {
-      default: colors.background.dark.default,
-      paper: colors.background.dark.paper
-    },
-    text: {
-      primary: colors.text.dark.primary,
-      secondary: colors.text.dark.secondary
-    }
+    secondary: colors.secondary
   }
 })
 

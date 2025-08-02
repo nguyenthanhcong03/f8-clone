@@ -19,7 +19,7 @@ export const fetchCourseSections = createAsyncThunk(
   async (courseId: number, { rejectWithValue }) => {
     try {
       const response = await getCourseSections(courseId)
-      return response
+      return response.data
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : `Failed to fetch sections for course ${courseId}`
       return rejectWithValue(message)
@@ -98,6 +98,7 @@ const sectionSlice = createSlice({
         state.sectionsError = null
       })
       .addCase(fetchCourseSections.fulfilled, (state, action) => {
+        console.log('action.payload', action.payload)
         state.sectionsLoading = false
         state.sections = action.payload
       })

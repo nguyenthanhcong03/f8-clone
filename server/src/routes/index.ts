@@ -4,6 +4,7 @@ import userRoutes from './user.routes'
 import courseRoutes from './course.routes'
 import sectionRoutes from './section.routes'
 import lessonRoutes from './lesson.routes'
+import enrollmentRoutes from './enrollment.routes'
 
 const router = Router()
 
@@ -13,6 +14,7 @@ router.use('/users', userRoutes)
 router.use('/courses', courseRoutes)
 router.use('/sections', sectionRoutes)
 router.use('/lessons', lessonRoutes)
+router.use('/enrollments', enrollmentRoutes)
 
 // Health check route
 router.get('/health', (req, res) => {

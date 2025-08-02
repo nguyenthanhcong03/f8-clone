@@ -9,13 +9,17 @@ interface CourseState {
   loading: boolean
   error: string | null
   currentCourse: Course | null
+  totalSections: number
+  totalLessons: number
 }
 
 const initialState: CourseState = {
   courses: [],
   loading: false,
   error: null,
-  currentCourse: null
+  currentCourse: null,
+  totalSections: 0,
+  totalLessons: 0
 }
 
 // Async thunks
@@ -75,19 +79,6 @@ export const deleteCourse = createAsyncThunk('courses/deleteCourse', async (id: 
   }
 })
 
-export const fetchCourseSections = createAsyncThunk(
-  'courses/fetchCourseSections',
-  async (courseId: number, { rejectWithValue }) => {
-    try {
-      const response = await getCourseSections(courseId)
-      return response.data
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : `Failed to fetch sections for course ${courseId}`
-      return rejectWithValue(message)
-    }
-  }
-)
-
 export const updateLessonOrder = createAsyncThunk(
   'courses/updateLessonOrder',
   async ({ sectionId, lessonIds }: { sectionId: number; lessonIds: number[] }, { rejectWithValue }) => {
@@ -135,8 +126,11 @@ const courseSlice = createSlice({
         state.error = null
       })
       .addCase(fetchCourseById.fulfilled, (state, action) => {
+        console.log('action.payload', action.payload)
         state.loading = false
-        state.currentCourse = action.payload
+        state.currentCourse = action.payload.course
+        state.totalSections = action.payload.totalSections
+        state.totalLessons = action.payload.totalLessons
       })
       .addCase(fetchCourseById.rejected, (state, action) => {
         state.loading = false

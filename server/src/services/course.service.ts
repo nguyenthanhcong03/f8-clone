@@ -1,3 +1,4 @@
+import { Lesson, Section } from '@/models'
 import Course from '../models/course.model'
 import uploadService from './upload.service'
 
@@ -44,11 +45,49 @@ export class CourseService {
   }
 
   async getCourseById(id: number) {
-    const course = await Course.findByPk(id)
+    const course = await Course.findByPk(id, {
+      include: [
+        {
+          model: Section,
+          as: 'sections',
+          include: [
+            {
+              model: Lesson,
+              as: 'lessons'
+            }
+          ]
+        }
+      ]
+    })
+
     if (!course) {
       throw new Error('Course not found')
     }
-    return course
+    // Tính tổng số chương của khóa học
+    const totalSections = await Section.count({
+      where: { course_id: id }
+    })
+
+    // Tìm tất cả section_id của khóa học này
+    const sections = await Section.findAll({
+      where: { course_id: id },
+      attributes: ['id']
+    })
+
+    const sectionIds = sections.map((section) => section.id)
+
+    // Đếm số bài học trong tất cả chương
+    const totalLessons = await Lesson.count({
+      where: { section_id: sectionIds }
+    })
+
+    const response = {
+      course: course.toJSON(),
+      totalSections,
+      totalLessons
+    }
+
+    return response
   }
 
   async updateCourse(id: number, courseData: any) {

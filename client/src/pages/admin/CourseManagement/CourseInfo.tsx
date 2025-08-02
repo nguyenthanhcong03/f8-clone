@@ -1,6 +1,6 @@
-import { fetchCourseById, fetchCourseSections, updateLessonOrder } from '@/store/courseSlice'
+import { fetchCourseById, updateLessonOrder } from '@/store/courseSlice'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
-import { addSection, editSection, removeSection, updateSectionOrder } from '@/store/sectionSlice'
+import { addSection, editSection, fetchCourseSections, removeSection, updateSectionOrder } from '@/store/sectionSlice'
 import { deleteLesson } from '@/store/lessonSlice'
 import type { Lesson, Section } from '@/types/course'
 import { Add as AddIcon, ArrowBack as ArrowBackIcon, Delete, Edit } from '@mui/icons-material'
@@ -26,7 +26,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import FolderIcon from '@mui/icons-material/Folder'
 
-const CourseDetail = () => {
+const CourseInfo = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
@@ -468,4 +468,4 @@ const CourseDetail = () => {
   )
 }
 
-export default CourseDetail
+export default CourseInfo

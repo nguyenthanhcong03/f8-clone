@@ -11,10 +11,10 @@ interface EnrollmentAttributes {
 type EnrollmentCreationAttributes = Optional<EnrollmentAttributes, 'id' | 'enrolled_at'>
 
 class Enrollment extends Model<EnrollmentAttributes, EnrollmentCreationAttributes> implements EnrollmentAttributes {
-  public id!: number
-  public user_id!: number
-  public course_id!: number
-  public enrolled_at?: Date
+  declare id: number
+  declare user_id: number
+  declare course_id: number
+  declare enrolled_at?: Date
 }
 
 Enrollment.init(

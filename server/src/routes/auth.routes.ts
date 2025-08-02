@@ -11,5 +11,9 @@ router.post('/register', authController.registerAccount)
 router.post('/login', authController.loginAccount)
 // PUT /users/:id/password - Change password
 router.put('/:id/password', validate(changePasswordSchema), authController.changePassword)
+// POST /auth/logout - Logout from the account
+router.post('/logout', authController.logout)
+// POST /auth/refresh-token - Refresh access token
+router.post('/refresh-token', authController.refreshToken)
 
 export default router

@@ -23,9 +23,9 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
 
   try {
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string)
 
-    const currentUser = await User.findByPk(decoded._id, {
+    const currentUser = await User.findByPk(decoded.id, {
       attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
     })
 
@@ -39,21 +39,8 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     // Add user to request
     req.user = currentUser
     next()
-  } catch (error: Error) {
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({
-        success: false,
-        message: 'Access token expired',
-        expired: true
-      })
-    }
-    if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({
-        success: false,
-        message: 'Token invalid'
-      })
-    }
-    res.status(500).json({
+  } catch (error: unknown) {
+    res.status(401).json({
       success: false,
       message: 'Lỗi xác thực',
       error: error.message
@@ -61,12 +48,8 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
-/**
- * Check if user has one of the allowed roles
- * @param {...string} allowedRoles - Roles that are allowed to access
- */
-const checkRole = (...allowedRoles) => {
-  return (req, res, next) => {
+const checkRole = (...allowedRoles: string[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
@@ -85,4 +68,4 @@ const checkRole = (...allowedRoles) => {
   }
 }
 
-module.exports = { verifyToken, checkRole }
+export default { verifyToken, checkRole }

@@ -31,6 +31,11 @@ export const logout = async (): Promise<void> => {
   localStorage.removeItem('user')
 }
 
+export const refreshToken = async () => {
+  const response = await axiosInstance.get(`${API_ENDPOINT}/refresh-token`)
+  return response.data
+}
+
 const authAPI = {
   register,
   login,

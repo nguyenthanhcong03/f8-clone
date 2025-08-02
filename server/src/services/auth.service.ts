@@ -3,6 +3,7 @@ import User from '../models/user.model'
 import { LoginAccountInput, RegisterAccountInput } from '../schemas/auth.schema'
 import ApiError from '../utils/ApiError'
 import { generateAccessToken, generateRefreshToken } from '../utils/jwt'
+import jwt from 'jsonwebtoken'
 
 const register = async (userData: RegisterAccountInput['body']) => {
   const { name, email, password } = userData
@@ -100,8 +101,47 @@ const changePassword = async (id: number, currentPassword: string, newPassword: 
   return { message: 'Password changed successfully' }
 }
 
+const refreshToken = async (refreshToken: string) => {
+  if (!refreshToken) {
+    throw new ApiError(401, 'Refresh token is required')
+  }
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET as string)
+    const user = await User.findByPk(decoded.id, {
+      attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
+    })
+    if (!user) {
+      throw new ApiError(401, 'User not found')
+    }
+    // Create new tokens
+    const newAccessToken = generateAccessToken({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      avatar: user.avatar,
+      role: user.role
+    })
+    return {
+      accessToken: newAccessToken,
+      user: {
+        id: user.id,
+        name: user.name,
+        phone: user.phone,
+        email: user.email,
+        avatar: user.avatar,
+        role: user.role
+      }
+    }
+  } catch (error) {
+    console.log('Error refreshing token:', error)
+    throw new ApiError(401, 'Invalid refresh token')
+  }
+}
+
 export default {
   register,
   login,
-  changePassword
+  changePassword,
+  refreshToken
 }

@@ -66,10 +66,14 @@ const getAllCourses = catchAsync(async (req: Request, res: Response) => {
 
 const getCourseById = catchAsync(async (req: Request, res: Response) => {
   const courseId = parseInt(req.params.id)
-  const course = await courseService.getCourseById(courseId)
+  const response = await courseService.getCourseById(courseId)
   res.status(200).json({
     success: true,
-    data: course
+    data: {
+      course: response.course,
+      totalSections: response.totalSections,
+      totalLessons: response.totalLessons
+    }
   })
 })
 

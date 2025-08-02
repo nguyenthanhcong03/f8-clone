@@ -4,6 +4,7 @@ import authReducer from './authSlice'
 import courseReducer from './courseSlice'
 import sectionReducer from './sectionSlice'
 import lessonReducer from './lessonSlice'
+import enrollmentReducer from './enrollmentSlice'
 
 export const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ export const store = configureStore({
     auth: authReducer,
     courses: courseReducer,
     sections: sectionReducer,
-    lessons: lessonReducer
+    lessons: lessonReducer,
+    enrollment: enrollmentReducer
   }
 })
 

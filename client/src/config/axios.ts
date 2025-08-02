@@ -1,92 +1,92 @@
+// api.ts
 import axios from 'axios'
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
-const axiosInstance = axios.create({
+const api = axios.create({
   baseURL: API_URL,
-  // timeout: 10000,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json'
-  }
+  withCredentials: true // để gửi cookie refresh token
 })
 
-const axiosInstanceWithCredentials = axios.create({
-  baseURL: API_URL,
-  timeout: 10000,
-  withCredentials: true
+// Thêm access token vào mỗi request
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('accessToken')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+    console.log('Request with token:', `Bearer ${token.substring(0, 15)}...`)
+  } else {
+    console.log('Request without token')
+  }
+  return config
 })
 
-// Request interceptor - KHÔNG CẦN THÊM TOKEN VÀO HEADER
-axiosInstance.interceptors.request.use(
-  (config) => {
-    // Cookie sẽ tự động được gửi với withCredentials: true
-    return config
-  },
-  (error) => {
-    return Promise.reject(error)
-  }
-)
+let isRefreshing = false
+let failedQueue: any[] = []
 
-// Response interceptor cho httpOnly cookies
-axiosInstance.interceptors.response.use(
-  (response) => {
-    return response?.data || response
-  },
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error)
+    } else {
+      prom.resolve(token)
+    }
+  })
+  failedQueue = []
+}
+
+api.interceptors.response.use(
+  (response) => response.data,
   async (error) => {
     const originalRequest = error.config
 
-    // Xử lý 401 với httpOnly cookies
     if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true
+      if (isRefreshing) {
+        return new Promise(function (resolve, reject) {
+          failedQueue.push({ resolve, reject })
+        })
+          .then((token) => {
+            originalRequest.headers['Authorization'] = 'Bearer ' + token
+            return api(originalRequest)
+          })
+          .catch((err) => {
+            return Promise.reject(err)
+          })
+      }
 
-      // Kiểm tra xem có phải lỗi do access token hết hạn không
-      const errorMessage = error.response?.data?.message || ''
-      if (errorMessage.includes('expired') || errorMessage.includes('invalid')) {
-        try {
-          // Thử refresh token (cookie sẽ tự động được gửi)
-          await axiosInstanceWithCredentials.post(`${API_URL}/api/auth/refresh-token`)
-          // Refresh thành công, retry request gốc
-          return axiosInstance(originalRequest)
-        } catch (refreshError) {
-          // Refresh thất bại - token thực sự hết hạn
-          handleSessionExpired()
-          return Promise.reject(refreshError)
+      originalRequest._retry = true
+      isRefreshing = true
+      console.log('refreshing token...')
+      try {
+        const res = await axios.post(`${API_URL}/auth/refresh-token`, {}, { withCredentials: true })
+        console.log('Refresh token response:', res.data)
+        // Điều chỉnh cách truy cập token từ response theo đúng cấu trúc server trả về
+        const newAccessToken = res.data.data?.accessToken
+
+        if (!newAccessToken) {
+          console.error('No access token returned from refresh token request')
+          throw new Error('No access token in response')
         }
-      } else {
-        // 401 nhưng không phải do token hết hạn (user chưa đăng nhập)
-        redirectToLoginIfNeeded()
+
+        localStorage.setItem('accessToken', newAccessToken)
+
+        // Cập nhật token cho request hiện tại
+        originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`
+        // Cập nhật token mặc định cho các request tiếp theo
+        api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`
+
+        processQueue(null, newAccessToken)
+
+        return api(originalRequest)
+      } catch (err) {
+        processQueue(err, null)
+        localStorage.removeItem('accessToken')
+        // Optionally: redirect to login
+        return Promise.reject(err)
+      } finally {
+        isRefreshing = false
       }
     }
 
     return Promise.reject(error)
   }
 )
-
-// Xử lý session hết hạn
-const handleSessionExpired = () => {
-  console.log('Session expired, redirecting to login...')
-  logoutAndRedirect()
-}
-
-const logoutAndRedirect = async () => {
-  try {
-    // Gọi logout API để xóa httpOnly cookies
-    await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {}, { withCredentials: true })
-  } catch (error) {
-    console.error('Logout error:', error)
-  } finally {
-    // window.location.href = '/login';
-  }
-}
-
-const redirectToLoginIfNeeded = () => {
-  const currentPath = window.location.pathname
-  const publicPaths = ['/login', '/register', '/forgot-password', '/']
-
-  if (!publicPaths.includes(currentPath)) {
-    // window.location.href = '/login';
-  }
-}
-
-export default axiosInstance
+export default api

@@ -39,6 +39,8 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import ThemeToggle from '../ThemeToggle/ThemeToggle'
 
+export const HEADER_HEIGHT = '66px'
+
 // Styled components
 const Search = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -125,82 +127,6 @@ const Header = () => {
     setAnchorEl(null)
   }
 
-  // Handle navigation
-  const handleNavigation = (path: string) => {
-    navigate(path)
-    setMobileOpen(false)
-  }
-
-  // Drawer content for mobile
-  const drawer = (
-    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center', width: 240 }}>
-      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <img src={Logo} alt='Logo' width={32} height={32} style={{ marginRight: 8 }} />
-        <Typography variant='subtitle1' fontWeight='bold'>
-          F8 Clone
-        </Typography>
-      </Box>
-      <Divider />
-      <List>
-        <ListItem disablePadding>
-          <ListItemButton onClick={() => handleNavigation('/')}>
-            <ListItemIcon>
-              <HomeIcon />
-            </ListItemIcon>
-            <ListItemText primary='Trang chủ' />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton onClick={() => handleNavigation('/learning-paths')}>
-            <ListItemIcon>
-              <RouteIcon />
-            </ListItemIcon>
-            <ListItemText primary='Lộ trình' />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton onClick={() => handleNavigation('/courses')}>
-            <ListItemIcon>
-              <SchoolIcon />
-            </ListItemIcon>
-            <ListItemText primary='Khóa học' />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton onClick={() => handleNavigation('/blog')}>
-            <ListItemIcon>
-              <BookIcon />
-            </ListItemIcon>
-            <ListItemText primary='Blog' />
-          </ListItemButton>
-        </ListItem>
-      </List>
-      <Divider />
-
-      <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}>
-        {isAuthenticated ? (
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-            <Avatar alt={user?.name} src={user?.avatar || undefined} />
-            <Typography>{user?.name}</Typography>
-            <Button variant='outlined' fullWidth onClick={() => handleNavigation('/dashboard')}>
-              Bảng điều khiển
-            </Button>
-          </Box>
-        ) : (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            <Button variant='contained' fullWidth onClick={() => handleNavigation('/login')}>
-              Đăng nhập
-            </Button>
-
-            <Button variant='outlined' fullWidth onClick={() => handleNavigation('/register')}>
-              Đăng ký
-            </Button>
-          </Box>
-        )}
-      </Box>
-    </Box>
-  )
-
   // User menu for desktop
   const userMenu = (
     <Menu
@@ -276,29 +202,18 @@ const Header = () => {
       sx={{
         backgroundColor: 'background.paper',
         color: 'text.primary',
-        boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
-        borderBottom: `1px solid ${theme.palette.divider}`
+        boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
       }}
     >
       <Container maxWidth='xl'>
-        <Toolbar disableGutters sx={{ minHeight: '66px' }}>
-          {/* Mobile hamburger menu */}
-          {isMobile && (
-            <IconButton
-              color='inherit'
-              aria-label='open drawer'
-              edge='start'
-              onClick={handleDrawerToggle}
-              sx={{ mr: 1 }}
-            >
-              <MenuIcon />
-            </IconButton>
-          )}
-
+        <Toolbar
+          disableGutters
+          sx={{ height: '66px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+        >
           {/* Logo */}
           <StyledLink to='/'>
             <Box sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>
-              <Box sx={{ borderRadius: 1, width: 38, height: 38, overflow: 'hidden' }}>
+              <Box sx={{ borderRadius: 2, width: 38, height: 38, overflow: 'hidden' }}>
                 <img src={Logo} alt='Logo' width={38} height={38} />
               </Box>
               {!isMobile && (
@@ -315,7 +230,7 @@ const Header = () => {
           </StyledLink>
 
           {/* Desktop navigation */}
-          {!isMobile && (
+          {/* {!isMobile && (
             <Box sx={{ display: 'flex', flexGrow: 1 }}>
               <Button color='inherit' component={Link} to='/'>
                 Trang chủ
@@ -330,7 +245,7 @@ const Header = () => {
                 Blog
               </Button>
             </Box>
-          )}
+          )} */}
 
           {/* Search bar */}
           <Search>
@@ -340,73 +255,59 @@ const Header = () => {
             <StyledInputBase placeholder='Tìm kiếm khóa học, bài viết...' inputProps={{ 'aria-label': 'search' }} />
           </Search>
 
-          {/* Theme toggle */}
-          <ThemeToggle />
+          <Box>
+            {/* Theme toggle */}
+            <ThemeToggle />
 
-          {/* Notification icon */}
-          <IconButton size='medium' aria-label='show notifications' color='inherit'>
-            <Badge badgeContent={5} color='error'>
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-
-          {/* User section */}
-          {isAuthenticated ? (
-            <IconButton
-              size='small'
-              edge='end'
-              aria-label='account of current user'
-              aria-haspopup='true'
-              onClick={handleProfileMenuOpen}
-              color='inherit'
-            >
-              {user?.avatar ? (
-                <Avatar alt={user.name} src={user.avatar} sx={{ width: 32, height: 32 }} />
-              ) : (
-                <AccountCircle fontSize='large' />
-              )}
+            {/* Notification icon */}
+            <IconButton size='medium' aria-label='show notifications' color='inherit'>
+              <Badge badgeContent={5} color='error'>
+                <NotificationsIcon />
+              </Badge>
             </IconButton>
-          ) : (
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button
-                color='inherit'
-                disableRipple
-                sx={{
-                  backgroundColor: 'transparent'
-                }}
-                onClick={() => handleOpenModalAuth('register')}
-              >
-                Đăng ký
-              </Button>
 
-              <Button
-                variant='contained'
-                color='primary'
-                sx={{ borderRadius: 8, fontWeight: '600' }}
-                onClick={() => handleOpenModalAuth('login')}
+            {/* User section */}
+            {isAuthenticated ? (
+              <IconButton
+                size='small'
+                edge='end'
+                aria-label='account of current user'
+                aria-haspopup='true'
+                onClick={handleProfileMenuOpen}
+                color='inherit'
               >
-                Đăng nhập
-              </Button>
-            </Box>
-          )}
+                {user?.avatar ? (
+                  <Avatar alt={user.name} src={user.avatar} sx={{ width: 32, height: 32 }} />
+                ) : (
+                  <AccountCircle fontSize='large' />
+                )}
+              </IconButton>
+            ) : (
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  color='inherit'
+                  disableRipple
+                  sx={{
+                    backgroundColor: 'transparent'
+                  }}
+                  onClick={() => handleOpenModalAuth('register')}
+                >
+                  Đăng ký
+                </Button>
+
+                <Button
+                  variant='contained'
+                  color='primary'
+                  sx={{ borderRadius: 8, fontWeight: '600' }}
+                  onClick={() => handleOpenModalAuth('login')}
+                >
+                  Đăng nhập
+                </Button>
+              </Box>
+            )}
+          </Box>
         </Toolbar>
       </Container>
-
-      {/* Mobile drawer */}
-      <Drawer
-        variant='temporary'
-        open={mobileOpen}
-        onClose={handleDrawerToggle}
-        ModalProps={{
-          keepMounted: true // Better open performance on mobile
-        }}
-        sx={{
-          display: { xs: 'block', md: 'none' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 240 }
-        }}
-      >
-        {drawer}
-      </Drawer>
 
       {/* User menu */}
       {userMenu}

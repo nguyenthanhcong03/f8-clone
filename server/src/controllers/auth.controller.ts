@@ -23,10 +23,10 @@ const loginAccount = catchAsync(async (req: Request, res: Response) => {
 
   // Lưu refreshToken vào cookie
   res.cookie('refreshToken', response.refreshToken, {
-    httpOnly: true
+    httpOnly: true,
     // secure: true,
     // sameSite: "Strict",
-    // maxAge: process.env.REFRESH_TOKEN_COOKIE_EXPIRES,
+    maxAge: process.env.REFRESH_TOKEN_COOKIE_EXPIRES
   })
 
   res.status(200).json({
@@ -58,8 +58,46 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const logout = catchAsync(async (req: Request, res: Response) => {
+  // Xoá cookie refreshToken
+  res.clearCookie('refreshToken', {
+    httpOnly: true
+    // secure: true,
+    // sameSite: "Strict",
+    // maxAge: process.env.REFRESH_TOKEN_COOKIE_EXPIRES,
+  })
+  res.status(200).json({
+    success: true,
+    message: 'Đăng xuất thành công'
+  })
+})
+
+const refreshToken = catchAsync(async (req: Request, res: Response) => {
+  console.log('Req.cookies:', req.cookies)
+  const refreshToken = req.cookies.refreshToken
+
+  if (!refreshToken) {
+    return res.status(401).json({
+      success: false,
+      message: 'No refresh token provided'
+    })
+  }
+  const newTokens = await authService.refreshToken(refreshToken)
+
+  res.status(200).json({
+    success: true,
+    message: 'Refresh token thành công',
+    data: {
+      accessToken: newTokens.accessToken,
+      user: newTokens.user
+    }
+  })
+})
+
 export default {
   registerAccount,
   loginAccount,
-  changePassword
+  logout,
+  changePassword,
+  refreshToken
 }
