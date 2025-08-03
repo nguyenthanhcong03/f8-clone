@@ -6,19 +6,42 @@ import DevicesIcon from '@mui/icons-material/Devices'
 import SchoolIcon from '@mui/icons-material/School'
 import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt'
 import { Box, Button, Typography } from '@mui/material'
-import { useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import CourseContent from './components/CourseContent'
 
 const CourseDetail = () => {
   const courseId = useParams().id
+  const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const { currentCourse, totalSections, totalLessons } = useAppSelector((state) => state.courses)
-  const { loading } = useAppSelector((state) => state.enrollment)
+  const { loading, enrolled, checkingEnrollment } = useAppSelector((state) => state.enrollment)
   const { isAuthenticated, user } = useAppSelector((state) => state.auth)
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean
+    message: string
+    severity: 'success' | 'error'
+  }>({ open: false, message: '', severity: 'success' })
 
   const handleEnrollCourse = (courseId: number) => {
     dispatch(enrollCourse(courseId))
+  }
+
+  const handleNavigateToStudy = async (courseId: number) => {
+    try {
+      const result = await dispatch(checkEnrollment(courseId)).unwrap()
+      const isEnrolled = result.enrolled
+
+      if (isEnrolled) {
+        navigate(`/learning/${courseId}`)
+      }
+    } catch (error: any) {
+      setSnackbar({
+        open: true,
+        message: error?.message || 'Bạn chưa đăng ký khóa học này!',
+        severity: 'error'
+      })
+    }
   }
 
   useEffect(() => {
@@ -111,15 +134,27 @@ const CourseDetail = () => {
           {currentCourse?.is_paid === true ? `${(currentCourse?.price || 0).toLocaleString('vi-VN')} ₫` : 'Miễn phí'}
         </Typography>
 
-        <Button
-          variant='contained'
-          color='secondary'
-          sx={{ width: 200 }}
-          loading={loading}
-          onClick={() => courseId && handleEnrollCourse(parseInt(courseId))}
-        >
-          ĐĂNG KÝ HỌC
-        </Button>
+        {enrolled ? (
+          <Button
+            variant='contained'
+            color='secondary'
+            sx={{ width: 200 }}
+            loading={checkingEnrollment}
+            onClick={() => courseId && handleNavigateToStudy(parseInt(courseId))}
+          >
+            VÀO HỌC
+          </Button>
+        ) : (
+          <Button
+            variant='contained'
+            color='secondary'
+            sx={{ width: 200 }}
+            loading={loading}
+            onClick={() => courseId && handleEnrollCourse(parseInt(courseId))}
+          >
+            ĐĂNG KÝ HỌC
+          </Button>
+        )}
 
         {/* Course stats */}
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 2 }}>

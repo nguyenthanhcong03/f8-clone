@@ -1,16 +1,6 @@
 import Logo from '@/assets/images/logo.png'
 import { useAppSelector } from '@/store/hook'
-import ModalAuth from '../ModalAuth'
-import {
-  AccountCircle,
-  Book as BookIcon,
-  Home as HomeIcon,
-  Menu as MenuIcon,
-  Notifications as NotificationsIcon,
-  Route as RouteIcon,
-  School as SchoolIcon,
-  Search as SearchIcon
-} from '@mui/icons-material'
+import { AccountCircle, Notifications as NotificationsIcon, Search as SearchIcon } from '@mui/icons-material'
 import {
   AppBar,
   Avatar,
@@ -19,14 +9,8 @@ import {
   Button,
   Container,
   Divider,
-  Drawer,
   IconButton,
   InputBase,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   Menu,
   MenuItem,
   Toolbar,
@@ -37,6 +21,7 @@ import {
 import { styled } from '@mui/material/styles'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import ModalAuth from '../ModalAuth'
 import ThemeToggle from '../ThemeToggle/ThemeToggle'
 
 export const HEADER_HEIGHT = '66px'
@@ -208,7 +193,7 @@ const Header = () => {
       <Container maxWidth='xl'>
         <Toolbar
           disableGutters
-          sx={{ height: '66px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+          sx={{ height: HEADER_HEIGHT, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
         >
           {/* Logo */}
           <StyledLink to='/'>

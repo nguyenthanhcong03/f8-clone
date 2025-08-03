@@ -62,7 +62,7 @@ const enrollmentSlice = createSlice({
       })
       .addCase(enrollCourse.fulfilled, (state, action) => {
         state.loading = false
-        // state.courses = action.payload.courses
+        state.enrolled = true
       })
       .addCase(enrollCourse.rejected, (state, action) => {
         state.loading = false
@@ -74,7 +74,6 @@ const enrollmentSlice = createSlice({
         state.error = null
       })
       .addCase(checkEnrollment.fulfilled, (state, action) => {
-        console.log('action.payload', action.payload)
         state.checkingEnrollment = false
         state.enrolled = action.payload.enrolled
       })

@@ -11,6 +11,7 @@ export interface Lesson {
   order?: number
   createdAt?: string
   updatedAt?: string
+  type?: string
 }
 
 export interface Section {

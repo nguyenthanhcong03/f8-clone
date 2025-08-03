@@ -12,9 +12,6 @@ api.interceptors.request.use((config) => {
   const token = localStorage.getItem('accessToken')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
-    console.log('Request with token:', `Bearer ${token.substring(0, 15)}...`)
-  } else {
-    console.log('Request without token')
   }
   return config
 })

@@ -3,14 +3,12 @@ import lessonAPI from '@/services/lessonAPI'
 import type { Lesson } from '@/types/course'
 
 interface LessonState {
-  lessons: Lesson[]
   currentLesson: Lesson | null
   lessonLoading: boolean
   lessonError: string | null
 }
 
 const initialState: LessonState = {
-  lessons: [],
   currentLesson: null,
   lessonLoading: false,
   lessonError: null
@@ -145,24 +143,9 @@ const lessonSlice = createSlice({
       })
       .addCase(fetchLessonById.fulfilled, (state, action) => {
         state.lessonLoading = false
-        state.currentLesson = action.payload.data
+        state.currentLesson = action.payload
       })
       .addCase(fetchLessonById.rejected, (state, action) => {
-        state.lessonLoading = false
-        state.lessonError = action.payload as string
-      })
-
-    // Fetch section lessons
-    builder
-      .addCase(fetchSectionLessons.pending, (state) => {
-        state.lessonLoading = true
-        state.lessonError = null
-      })
-      .addCase(fetchSectionLessons.fulfilled, (state, action) => {
-        state.lessonLoading = false
-        state.lessons = action.payload.data
-      })
-      .addCase(fetchSectionLessons.rejected, (state, action) => {
         state.lessonLoading = false
         state.lessonError = action.payload as string
       })
@@ -204,18 +187,19 @@ const lessonSlice = createSlice({
     // Delete lesson
     builder
       .addCase(deleteLesson.pending, (state) => {
-        state.lessonLoading = true
+        state.loading = true
+        state.error = null
       })
       .addCase(deleteLesson.fulfilled, (state, action) => {
-        state.lessonLoading = false
+        state.loading = false
         state.lessons = state.lessons.filter((lesson) => lesson.id !== action.payload.lessonId)
         if (state.currentLesson && state.currentLesson.id === action.payload.lessonId) {
           state.currentLesson = null
         }
       })
       .addCase(deleteLesson.rejected, (state, action) => {
-        state.lessonLoading = false
-        state.lessonError = action.payload as string
+        state.loading = false
+        state.error = action.payload as string
       })
   }
 })

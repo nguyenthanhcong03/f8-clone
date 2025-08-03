@@ -36,19 +36,19 @@ const createLesson = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
-const getLessonsBySectionId = catchAsync(async (req: Request, res: Response) => {
-  const sectionId = parseInt(req.params.id)
+const getLessonById = catchAsync(async (req: Request, res: Response) => {
+  const lessonId = parseInt(req.params.id)
 
-  const lessons = await lessonService.getLessonsBySectionId(sectionId)
+  const response = await lessonService.getLessonById(lessonId)
 
   res.status(200).json({
     success: true,
     message: 'Lấy danh sách bài học thành công',
-    data: lessons
+    data: response
   })
 })
 
 export default {
   createLesson,
-  getLessonsBySectionId
+  getLessonById
 }

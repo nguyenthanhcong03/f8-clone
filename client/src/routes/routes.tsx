@@ -3,13 +3,14 @@ import AddCourse from '@/pages/admin/CourseManagement/AddCourse'
 import CourseIndex from '@/pages/admin/CourseManagement/CourseIndex'
 import CourseInfo from '@/pages/admin/CourseManagement/CourseInfo'
 import LessonForm from '@/pages/admin/CourseManagement/LessonForm'
+import CourseDetail from '@/pages/public/CourseDetail/CourseDetail'
 import CoursePage from '@/pages/public/CoursePage/CoursePage'
 import HomePage from '@/pages/public/HomePage/HomePage'
+import LearningPage from '@/pages/student/StudyPage/LearningPage'
 import { createBrowserRouter, type RouteObject } from 'react-router-dom'
 import ProtectedRoute from './guards/ProtectedRoute'
 import AdminLayout from './layouts/AdminLayout'
 import MainLayout from './layouts/MainLayout'
-import CourseDetail from '@/pages/public/CourseDetail/CourseDetail'
 
 const publicRoutes: RouteObject[] = [
   { index: true, element: <HomePage /> },
@@ -18,7 +19,7 @@ const publicRoutes: RouteObject[] = [
 ]
 
 // Khách hàng đã đăng nhập
-const customerProtectedRoutes: RouteObject[] = []
+// const customerProtectedRoutes: RouteObject[] = [{ path: 'learning/:courseId', element: <StudyPage /> }]
 
 // Admin
 const adminRoutes: RouteObject[] = [
@@ -35,7 +36,12 @@ const routes: RouteObject[] = [
     path: '/',
     element: <MainLayout />,
     errorElement: <NotFound />,
-    children: [...publicRoutes, ...customerProtectedRoutes]
+    children: [...publicRoutes]
+  },
+  {
+    path: '/learning/:courseId',
+    element: <LearningPage />,
+    errorElement: <NotFound />
   },
   {
     path: 'admin',

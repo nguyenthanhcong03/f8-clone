@@ -1,3 +1,4 @@
+import { Op } from 'sequelize'
 import Lesson from '../models/lesson.model'
 import uploadService from './upload.service'
 
@@ -17,7 +18,27 @@ export class LessonService {
     if (!lesson) {
       throw new Error('Lesson not found')
     }
-    return lesson
+    const previousLesson = await Lesson.findOne({
+      where: {
+        section_id: lesson.section_id,
+        order: { [Op.lt]: lesson.order }
+      },
+      order: [['order', 'DESC']]
+    })
+
+    const nextLesson = await Lesson.findOne({
+      where: {
+        section_id: lesson.section_id,
+        order: { [Op.gt]: lesson.order }
+      },
+      order: [['order', 'ASC']]
+    })
+
+    return {
+      ...lesson.toJSON(),
+      previousLessonId: previousLesson?.id || null,
+      nextLessonId: nextLesson?.id || null
+    }
   }
 
   async updateLesson(id: number, lessonData: any) {

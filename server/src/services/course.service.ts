@@ -53,9 +53,15 @@ export class CourseService {
           include: [
             {
               model: Lesson,
-              as: 'lessons'
+              as: 'lessons',
+              // Sắp xếp bài học trong mỗi chương theo 'order'
+              separate: true,
+              order: [['order', 'ASC']]
             }
-          ]
+          ],
+          // Sắp xếp chương theo 'order'
+          separate: true,
+          order: [['order', 'ASC']]
         }
       ]
     })

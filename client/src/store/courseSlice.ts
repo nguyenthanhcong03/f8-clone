@@ -126,7 +126,6 @@ const courseSlice = createSlice({
         state.error = null
       })
       .addCase(fetchCourseById.fulfilled, (state, action) => {
-        console.log('action.payload', action.payload)
         state.loading = false
         state.currentCourse = action.payload.course
         state.totalSections = action.payload.totalSections
