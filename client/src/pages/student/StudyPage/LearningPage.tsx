@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import LessonArea from './components/LessonArea'
 import SidebarLesson from './components/SidebarLesson'
+import Logo from '@/assets/images/logo.png'
 
 const LearningPage = () => {
   const dispatch = useAppDispatch()
@@ -66,12 +67,9 @@ const LearningPage = () => {
             <ArrowBackIcon />
           </IconButton>
 
-          <Box
-            component='img'
-            src='/src/assets/images/logo.png'
-            alt='Logo'
-            sx={{ height: 30, borderRadius: 2, mx: 2 }}
-          />
+          <Box component={Link} to={'/'} sx={{ borderRadius: 2, width: 30, height: 30, overflow: 'hidden', mx: 2 }}>
+            <img src={Logo} alt='Logo' width={30} height={30} />
+          </Box>
 
           <Typography
             variant='h6'
@@ -81,7 +79,7 @@ const LearningPage = () => {
             {currentCourse?.title || 'Khóa học'}
           </Typography>
 
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1, mr: 2, cursor: 'pointer' }}>
             <Avatar alt='User avatar' src='/path-to-avatar.jpg' sx={{ width: 32, height: 32 }} />
           </Box>
 
