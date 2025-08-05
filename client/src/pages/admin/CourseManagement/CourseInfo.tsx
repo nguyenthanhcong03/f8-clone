@@ -10,7 +10,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 // Import components
 import CourseHeader from '@/pages/admin/CourseManagement/components/CourseHeader'
 import CourseDetails from '@/pages/admin/CourseManagement/components/CourseDetails'
-import CourseSections from '@/pages/admin/CourseManagement/components/CourseSections'
+import CourseSections from '@/pages/admin/CourseManagement/components/CourseStructure'
 import SectionForm from '@/pages/admin/CourseManagement/components/SectionForm'
 
 const CourseInfo = () => {
