@@ -58,6 +58,20 @@ const baseTheme = {
           // borderRadius: 8
         }
       }
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          boxShadow: 'none'
+        }
+      }
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          boxShadow: 'none'
+        }
+      }
     }
   }
 }

@@ -1,11 +1,10 @@
-import { DragIndicator, Edit, Delete, Add as AddIcon, Height } from '@mui/icons-material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Chip, IconButton, Typography } from '@mui/material'
+import type { Section } from '@/types/course'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import type { Section } from '@/types/course'
+import { Add as AddIcon, Delete, DragIndicator, Edit } from '@mui/icons-material'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import FolderIcon from '@mui/icons-material/Folder'
-import { useEffect, useRef, useState } from 'react'
+import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Chip, IconButton, Typography } from '@mui/material'
 
 interface SortableSectionProps {
   section: Section
@@ -13,10 +12,17 @@ interface SortableSectionProps {
   onDelete: (sectionId: number) => void
   onAddLesson: (sectionId: number) => void
   children: React.ReactNode
-  isDraggingId?: number
+  onToggleExpand?: () => void
 }
 
-const SortableSection: React.FC<SortableSectionProps> = ({ section, onEdit, onDelete, onAddLesson, children }) => {
+const SortableSection: React.FC<SortableSectionProps> = ({
+  section,
+  onEdit,
+  onDelete,
+  onAddLesson,
+  children,
+  onToggleExpand
+}) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: section.id.toString()
   })
@@ -24,13 +30,14 @@ const SortableSection: React.FC<SortableSectionProps> = ({ section, onEdit, onDe
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    height: isDragging ? 'fit-content' : '100%',
     opacity: isDragging ? 0.5 : 1,
     marginBottom: '1rem'
   }
 
   return (
-    <Box ref={setNodeRef} style={style} sx={{ mb: 3 }}>
-      <Accordion>
+    <Box ref={setNodeRef} style={style} sx={{ mb: 3, bgcolor: 'white' }}>
+      <Accordion expanded={section.isOpen} onChange={onToggleExpand} variant='outlined'>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls={`panel-${section.id}-content`}
@@ -81,12 +88,12 @@ const SortableSection: React.FC<SortableSectionProps> = ({ section, onEdit, onDe
           </Box>
         </AccordionSummary>
         <AccordionDetails>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-            <Button size='small' variant='contained' startIcon={<AddIcon />} onClick={() => onAddLesson(section.id)}>
+          {children}
+          <Box sx={{ mb: 2 }}>
+            <Button fullWidth variant='outlined' startIcon={<AddIcon />} onClick={() => onAddLesson(section.id)}>
               Thêm bài học
             </Button>
           </Box>
-          {children}
         </AccordionDetails>
       </Accordion>
     </Box>

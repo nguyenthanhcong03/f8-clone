@@ -19,6 +19,7 @@ const CourseInfo = () => {
   const dispatch = useAppDispatch()
   const { currentCourse, loading } = useAppSelector((state) => state.courses)
   const { sections, sectionsLoading } = useAppSelector((state) => state.sections)
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -50,9 +51,9 @@ const CourseInfo = () => {
     const sectionIds = newSections.map((section) => section.id)
     try {
       await dispatch(updateSectionOrder({ courseId: parseInt(id), sectionIds })).unwrap()
-      showSnackbar('C?p nh?t th? t? chuong th�nh c�ng', 'success')
+      showSnackbar('Cập nhật thứ tự chương thành công', 'success')
     } catch {
-      showSnackbar('C� l?i khi c?p nh?t th? t? chuong', 'error')
+      showSnackbar('Có lỗi khi cập nhật thứ tự chương', 'error')
     }
   }
 
@@ -60,9 +61,9 @@ const CourseInfo = () => {
     const lessonIds = newLessons.map((lesson) => lesson.id)
     try {
       await dispatch(updateLessonOrder({ sectionId, lessonIds })).unwrap()
-      showSnackbar('C?p nh?t th? t? b�i h?c th�nh c�ng', 'success')
+      showSnackbar('Cập nhật thứ tự bài học th�nh c�ng', 'success')
     } catch {
-      showSnackbar('C� l?i khi c?p nh?t th? t? b�i h?c', 'error')
+      showSnackbar('Có lỗi khi Cập nhật thứ tự bài học', 'error')
     }
   }
 
@@ -165,8 +166,6 @@ const CourseInfo = () => {
 
         {/* Sections and Lessons */}
         <CourseSections
-          sections={sections}
-          isLoading={sectionsLoading}
           courseId={id}
           onAddSection={handleAddSection}
           onEditSection={handleEditSection}
@@ -175,7 +174,6 @@ const CourseInfo = () => {
           onDeleteLesson={handleDeleteLesson}
           onReorderSections={handleReorderSections}
           onReorderLessons={handleReorderLessons}
-          navigate={navigate}
         />
       </Box>
 

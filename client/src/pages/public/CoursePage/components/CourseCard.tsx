@@ -17,6 +17,7 @@ const CourseCard = ({ course }: CourseCardProps) => {
   const navigate = useNavigate()
   return (
     <Card
+      variant='outlined'
       sx={{ borderRadius: 3, bgcolor: '#F7F7F7', cursor: 'pointer', '&:hover': { boxShadow: 3 } }}
       elevation={0}
       onClick={() => navigate(course.id.toString())}

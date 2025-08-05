@@ -152,19 +152,19 @@ const sectionSlice = createSlice({
         state.sectionsError = action.payload as string
       })
 
-    // Update section order
-    builder
-      .addCase(updateSectionOrder.pending, (state) => {
-        state.sectionsLoading = true
-      })
-      .addCase(updateSectionOrder.fulfilled, (state, action) => {
-        state.sectionsLoading = false
-        state.sections = action.payload.data
-      })
-      .addCase(updateSectionOrder.rejected, (state, action) => {
-        state.sectionsLoading = false
-        state.sectionsError = action.payload as string
-      })
+    // // Update section order
+    // builder
+    //   .addCase(updateSectionOrder.pending, (state) => {
+    //     state.sectionsLoading = true
+    //   })
+    //   .addCase(updateSectionOrder.fulfilled, (state, action) => {
+    //     state.sectionsLoading = false
+    //     state.sections = action.payload
+    //   })
+    //   .addCase(updateSectionOrder.rejected, (state, action) => {
+    //     state.sectionsLoading = false
+    //     state.sectionsError = action.payload as string
+    //   })
   }
 })
 

@@ -1,7 +1,7 @@
 import Loader from '@/components/common/Loading/Loader'
 import { fetchCourses } from '@/store/courseSlice'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
-import { Box, Card, CardContent, CardMedia, Grid, Typography } from '@mui/material'
+import { Box, Grid } from '@mui/material'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AdSlider from './components/AdSlider'

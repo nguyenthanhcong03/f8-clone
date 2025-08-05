@@ -1,25 +1,24 @@
+import { useAppSelector } from '@/store/hook'
+import type { Lesson, Section } from '@/types/course'
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core'
 import {
-  DndContext,
   closestCenter,
+  DndContext,
+  DragOverlay,
   KeyboardSensor,
   PointerSensor,
+  rectIntersection,
   useSensor,
-  useSensors,
-  DragOverlay,
-  rectIntersection
+  useSensors
 } from '@dnd-kit/core'
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { Add as AddIcon } from '@mui/icons-material'
-import { Box, Button, Card, CardContent, CircularProgress, Typography } from '@mui/material'
-import type { Lesson, Section } from '@/types/course'
-import SortableSection from './SortableSection'
-import SortableLesson from './SortableLesson'
+import { Box, Button, Card, CardContent, Typography } from '@mui/material'
 import { useState } from 'react'
+import SortableLesson from './SortableLesson'
+import SortableSection from './SortableSection'
 
-interface CourseSectionsProps {
-  sections: Section[] | undefined
-  isLoading: boolean
+interface CourseStructureProps {
   courseId?: string
   onAddSection: () => void
   onEditSection: (section: Section) => void
@@ -28,12 +27,9 @@ interface CourseSectionsProps {
   onDeleteLesson: (lessonId: number) => void
   onReorderSections: (newSections: Section[]) => void
   onReorderLessons: (sectionId: number, newLessons: Lesson[]) => void
-  navigate: (path: string) => void
 }
 
-const CourseSections: React.FC<CourseSectionsProps> = ({
-  sections,
-  isLoading,
+const CourseStructure: React.FC<CourseStructureProps> = ({
   courseId,
   onAddSection,
   onEditSection,
@@ -41,16 +37,24 @@ const CourseSections: React.FC<CourseSectionsProps> = ({
   onAddLesson,
   onDeleteLesson,
   onReorderSections,
-  onReorderLessons,
-  navigate
+  onReorderLessons
 }) => {
-  // State to track the currently dragged item
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null)
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null)
   const [activeSection, setActiveSection] = useState<Section | null>(null)
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null)
 
-  // Configure sensors for drag and drop
+  const { sections } = useAppSelector((state) => state.sections)
+
+  const initialItems = sections?.map((section) => ({ ...section, isOpen: true })) || []
+  const [items, setItems] = useState(initialItems)
+
+  const toggleExpand = (sectionId: number) => {
+    setItems((prevItems) =>
+      prevItems.map((section) => (section.id === sectionId ? { ...section, isOpen: !section.isOpen } : section))
+    )
+  }
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -62,9 +66,8 @@ const CourseSections: React.FC<CourseSectionsProps> = ({
     const { active } = event
     setActiveSectionId(active.id.toString())
 
-    // Find the section being dragged
-    if (sections) {
-      const draggedSection = sections.find((section) => section.id.toString() === active.id)
+    if (items) {
+      const draggedSection = items.find((section) => section.id.toString() === active.id)
       if (draggedSection) {
         setActiveSection(draggedSection)
       }
@@ -74,20 +77,20 @@ const CourseSections: React.FC<CourseSectionsProps> = ({
   const handleDragEndSection = (event: DragEndEvent) => {
     const { active, over } = event
 
-    // Reset the active section data regardless of the result
     setActiveSection(null)
     setActiveSectionId(null)
 
-    if (!over || active.id === over.id || !sections) {
+    if (!over || active.id === over.id || !items) {
       return
     }
 
     // Find the indexes for reordering
-    const oldIndex = sections.findIndex((section) => section.id.toString() === active.id)
-    const newIndex = sections.findIndex((section) => section.id.toString() === over.id)
+    const oldIndex = items.findIndex((section) => section.id.toString() === active.id)
+    const newIndex = items.findIndex((section) => section.id.toString() === over.id)
 
     if (oldIndex !== -1 && newIndex !== -1) {
-      const newSections = arrayMove(sections, oldIndex, newIndex)
+      const newSections = arrayMove(items, oldIndex, newIndex)
+      setItems(newSections)
       onReorderSections(newSections)
     }
   }
@@ -96,7 +99,6 @@ const CourseSections: React.FC<CourseSectionsProps> = ({
     const { active } = event
     setActiveLessonId(active.id.toString())
 
-    // Find the lesson being dragged
     const draggedLesson = lessons.find((lesson) => lesson.id.toString() === active.id)
     if (draggedLesson) {
       setActiveLesson(draggedLesson)
@@ -106,7 +108,6 @@ const CourseSections: React.FC<CourseSectionsProps> = ({
   const handleDragEndLesson = (sectionId: number, lessons: Lesson[]) => (event: DragEndEvent) => {
     const { active, over } = event
 
-    // Reset the active lesson data regardless of the result
     setActiveLesson(null)
     setActiveLessonId(null)
 
@@ -114,7 +115,6 @@ const CourseSections: React.FC<CourseSectionsProps> = ({
       return
     }
 
-    // Find the indexes for reordering
     const oldIndex = lessons.findIndex((lesson) => lesson.id.toString() === active.id)
     const newIndex = lessons.findIndex((lesson) => lesson.id.toString() === over.id)
 
@@ -125,7 +125,7 @@ const CourseSections: React.FC<CourseSectionsProps> = ({
   }
 
   return (
-    <Card>
+    <Card variant='outlined'>
       <CardContent>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant='h5' component='h2'>
@@ -136,11 +136,7 @@ const CourseSections: React.FC<CourseSectionsProps> = ({
           </Button>
         </Box>
 
-        {isLoading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-            <CircularProgress />
-          </Box>
-        ) : sections && sections.length > 0 ? (
+        {items && items.length > 0 ? (
           <DndContext
             sensors={sensors}
             collisionDetection={rectIntersection}
@@ -148,16 +144,17 @@ const CourseSections: React.FC<CourseSectionsProps> = ({
             onDragEnd={handleDragEndSection}
           >
             <SortableContext
-              items={sections.map((section) => section.id.toString())}
+              items={items.map((section) => section.id.toString())}
               strategy={verticalListSortingStrategy}
             >
-              {sections.map((section) => (
+              {items.map((section) => (
                 <SortableSection
                   key={section.id}
                   section={section}
                   onEdit={onEditSection}
                   onDelete={onDeleteSection}
                   onAddLesson={onAddLesson}
+                  onToggleExpand={() => toggleExpand(section.id)}
                 >
                   {section.lessons && section.lessons.length > 0 ? (
                     <DndContext
@@ -176,7 +173,6 @@ const CourseSections: React.FC<CourseSectionsProps> = ({
                             lesson={lesson}
                             section={section}
                             id={courseId}
-                            navigate={navigate}
                             handleDeleteLesson={onDeleteLesson}
                           />
                         ))}
@@ -187,7 +183,6 @@ const CourseSections: React.FC<CourseSectionsProps> = ({
                             lesson={activeLesson}
                             section={section}
                             id={courseId}
-                            navigate={navigate}
                             handleDeleteLesson={onDeleteLesson}
                           />
                         )}
@@ -209,13 +204,16 @@ const CourseSections: React.FC<CourseSectionsProps> = ({
                   onDelete={onDeleteSection}
                   onAddLesson={onAddLesson}
                 >
-                  {activeSection.lessons && activeSection.lessons.length > 0 ? (
-                    <Typography variant='body2'>{activeSection.lessons.length} bài học</Typography>
-                  ) : (
-                    <Typography variant='body2' color='text.secondary'>
-                      Chưa có bài học nào trong chương này.
-                    </Typography>
-                  )}
+                  {activeSection?.lessons &&
+                    activeSection.lessons.map((lesson) => (
+                      <SortableLesson
+                        key={lesson.id}
+                        lesson={lesson}
+                        section={activeSection}
+                        id={courseId}
+                        handleDeleteLesson={onDeleteLesson}
+                      />
+                    ))}
                 </SortableSection>
               )}
             </DragOverlay>
@@ -230,4 +228,4 @@ const CourseSections: React.FC<CourseSectionsProps> = ({
   )
 }
 
-export default CourseSections
+export default CourseStructure

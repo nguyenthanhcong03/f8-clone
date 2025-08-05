@@ -1,21 +1,22 @@
-import { DragIndicator } from '@mui/icons-material'
-import { Box, Button, Typography } from '@mui/material'
+import type { Lesson, Section } from '@/types/course'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import type { Lesson, Section } from '@/types/course'
+import { Delete, DragIndicator, Edit } from '@mui/icons-material'
+import { Box, IconButton, Stack, Typography } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
 
 interface SortableLessonProps {
   lesson: Lesson
   section: Section
   id?: string
-  navigate: (path: string) => void
   handleDeleteLesson: (lessonId: number) => void
 }
 
-const SortableLesson: React.FC<SortableLessonProps> = ({ lesson, section, id, navigate, handleDeleteLesson }) => {
+const SortableLesson: React.FC<SortableLessonProps> = ({ lesson, section, id, handleDeleteLesson }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: lesson.id.toString()
   })
+  const navigate = useNavigate()
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -25,45 +26,42 @@ const SortableLesson: React.FC<SortableLessonProps> = ({ lesson, section, id, na
   }
 
   return (
-    <Box ref={setNodeRef} style={style} sx={{ mb: 2, p: 2, border: '1px solid #eee', borderRadius: 1 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <div {...attributes} {...listeners} style={{ cursor: 'grab' }}>
-            <DragIndicator color='action' fontSize='small' />
-          </div>
-          <Typography variant='body1' fontWeight='bold'>
-            {lesson.title}
-          </Typography>
+    <Box
+      ref={setNodeRef}
+      style={style}
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        mb: 2,
+        p: 1,
+        border: '1px solid #eee',
+        borderRadius: 1,
+        bgcolor: 'white',
+        cursor: 'pointer',
+        '&:hover': {
+          bgcolor: 'grey.100'
+        }
+      }}
+      onClick={() => navigate(`/admin/courses/${id}/sections/${section.id}/lessons/${lesson.id}`)}
+    >
+      <Stack direction='row' spacing={1} alignItems='center'>
+        <Box {...attributes} {...listeners} style={{ cursor: 'grab' }} sx={{ display: 'flex', alignItems: 'center' }}>
+          <DragIndicator color='action' fontSize='small' />
         </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            size='small'
-            variant='outlined'
-            onClick={() => navigate(`/admin/courses/${id}/sections/${section.id}/lessons/${lesson.id}`)}
-          >
-            Sửa
-          </Button>
-          <Button size='small' variant='outlined' color='error' onClick={() => handleDeleteLesson(lesson.id)}>
-            Xóa
-          </Button>
-        </Box>
-      </Box>
-      <Typography variant='body2' color='text.secondary'>
-        {lesson.content ? (
-          <span
-            dangerouslySetInnerHTML={{
-              __html: lesson.content.length > 100 ? lesson.content.substring(0, 100) + '...' : lesson.content
-            }}
-          />
-        ) : (
-          'No description available'
-        )}
-      </Typography>
-      {lesson.video_url && (
-        <Typography variant='body2' color='primary' sx={{ mt: 1 }}>
-          Video: Có
-        </Typography>
-      )}
+        <Typography variant='body1'>{lesson.title}</Typography>
+      </Stack>
+      <Stack direction='row' alignItems='center'>
+        <IconButton
+          color='error'
+          onClick={(e) => {
+            e.stopPropagation()
+            handleDeleteLesson(lesson.id)
+          }}
+        >
+          <Delete fontSize='small' />
+        </IconButton>
+      </Stack>
     </Box>
   )
 }

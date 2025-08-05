@@ -9,7 +9,7 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ course }) => {
   if (!course) return null
 
   return (
-    <Card sx={{ mb: 4 }}>
+    <Card variant='outlined' sx={{ mb: 4 }}>
       <CardContent>
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
           {/* Thumbnail */}
