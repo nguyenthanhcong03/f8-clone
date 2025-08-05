@@ -5,17 +5,19 @@ import CourseInfo from '@/pages/admin/CourseManagement/CourseInfo'
 import LessonForm from '@/pages/admin/CourseManagement/LessonForm'
 import CourseDetail from '@/pages/public/CourseDetail/CourseDetail'
 import CoursePage from '@/pages/public/CoursePage/CoursePage'
-import HomePage from '@/pages/public/HomePage/HomePage'
 import LearningPage from '@/pages/student/StudyPage/LearningPage'
 import { createBrowserRouter, type RouteObject } from 'react-router-dom'
 import ProtectedRoute from './guards/ProtectedRoute'
 import AdminLayout from './layouts/AdminLayout'
 import MainLayout from './layouts/MainLayout'
+import RoadMapPage from '@/pages/public/RoadMapPage/RoadMapPage'
+import BlogPage from '@/pages/public/BlogPage/BlogPage'
 
 const publicRoutes: RouteObject[] = [
-  { index: true, element: <HomePage /> },
-  { path: 'courses', element: <CoursePage /> },
-  { path: 'courses/:id', element: <CourseDetail /> }
+  { index: true, element: <CoursePage /> },
+  { path: ':id', element: <CourseDetail /> },
+  { path: 'learning-paths', element: <RoadMapPage /> },
+  { path: 'blog', element: <BlogPage /> }
 ]
 
 // Khách hàng đã đăng nhập

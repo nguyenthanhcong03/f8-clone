@@ -1,4 +1,6 @@
 import HomeIcon from '@mui/icons-material/Home'
+import MapIcon from '@mui/icons-material/Map'
+import NewspaperIcon from '@mui/icons-material/Newspaper'
 import { Box, useMediaQuery, useTheme } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { NavLink } from 'react-router-dom'
@@ -50,17 +52,8 @@ const Navigation = () => {
           backgroundColor: isActive ? '#E8EBED' : undefined
         })}
       >
-        <HomeIcon sx={{ mb: 0.5 }} />
+        <MapIcon sx={{ mb: 0.5 }} />
         Lộ trình
-      </StyledNavLink>
-      <StyledNavLink
-        to='/courses'
-        style={({ isActive }) => ({
-          backgroundColor: isActive ? '#E8EBED' : undefined
-        })}
-      >
-        <HomeIcon sx={{ mb: 0.5 }} />
-        Khóa học
       </StyledNavLink>
       <StyledNavLink
         to='/blog'
@@ -68,7 +61,7 @@ const Navigation = () => {
           backgroundColor: isActive ? '#E8EBED' : undefined
         })}
       >
-        <HomeIcon sx={{ mb: 0.5 }} />
+        <NewspaperIcon sx={{ mb: 0.5 }} />
         Bài viết
       </StyledNavLink>
     </Box>

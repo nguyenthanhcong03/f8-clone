@@ -1,9 +1,11 @@
+import Loader from '@/components/common/Loading/Loader'
 import { fetchCourses } from '@/store/courseSlice'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
-import { useEffect } from 'react'
-import AdSlider from './components/AdSlider'
 import { Box, Card, CardContent, CardMedia, Grid, Typography } from '@mui/material'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import AdSlider from './components/AdSlider'
+import CourseCard from './components/CourseCard'
 
 const CoursePage = () => {
   const { courses, loading, error } = useAppSelector((state) => state.courses)
@@ -15,12 +17,17 @@ const CoursePage = () => {
   }
 
   useEffect(() => {
-    dispatch(fetchCourses())
+    const getCourses = async () => {
+      await dispatch(fetchCourses())
+    }
+
+    getCourses()
   }, [dispatch])
 
   if (loading) {
-    return <div>Loading...</div>
+    return <Loader />
   }
+
   return (
     <div>
       <AdSlider />
@@ -28,18 +35,7 @@ const CoursePage = () => {
         <Grid container spacing={2} sx={{ padding: '20px' }}>
           {courses.map((course) => (
             <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={course.id}>
-              <Card
-                sx={{ borderRadius: 3, cursor: 'pointer' }}
-                onClick={() => handleNavigateToCourseDetail(course.id.toString())}
-              >
-                <CardMedia component='img' height='180' image={course.thumbnail} alt={course.title} />
-                <CardContent>
-                  <Typography variant='h6'>{course.title}</Typography>
-                  <Typography variant='body2' color='text.secondary'>
-                    {course.description}
-                  </Typography>
-                </CardContent>
-              </Card>
+              <CourseCard course={course} />
             </Grid>
           ))}
         </Grid>

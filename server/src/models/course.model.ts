@@ -11,12 +11,21 @@ interface CourseAttributes {
   level?: 'beginner' | 'intermediate' | 'advanced'
   is_paid?: boolean
   price?: number
+  enrollment_count?: number
   created_by?: number
 }
 
 type CourseCreationAttributes = Optional<
   CourseAttributes,
-  'id' | 'description' | 'thumbnail' | 'thumbnail_public_id' | 'level' | 'is_paid' | 'price' | 'created_by'
+  | 'id'
+  | 'description'
+  | 'thumbnail'
+  | 'thumbnail_public_id'
+  | 'level'
+  | 'is_paid'
+  | 'price'
+  | 'enrollment_count'
+  | 'created_by'
 >
 
 class Course extends Model<CourseAttributes, CourseCreationAttributes> implements CourseAttributes {
@@ -29,6 +38,7 @@ class Course extends Model<CourseAttributes, CourseCreationAttributes> implement
   declare level?: 'beginner' | 'intermediate' | 'advanced'
   declare is_paid?: boolean
   declare price?: number
+  declare enrollment_count?: number
   declare created_by?: number
 }
 
@@ -67,6 +77,10 @@ Course.init(
     },
     price: {
       type: DataTypes.DECIMAL(10, 2)
+    },
+    enrollment_count: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
     },
     created_by: {
       type: DataTypes.INTEGER,

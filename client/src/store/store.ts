@@ -5,10 +5,12 @@ import courseReducer from './courseSlice'
 import sectionReducer from './sectionSlice'
 import lessonReducer from './lessonSlice'
 import enrollmentReducer from './enrollmentSlice'
+import appReducer from './appSlice'
 
 export const store = configureStore({
   reducer: {
     theme: themeReducer,
+    app: appReducer,
     auth: authReducer,
     courses: courseReducer,
     sections: sectionReducer,

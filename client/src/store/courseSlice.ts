@@ -1,7 +1,8 @@
 import type { CreateCourseInput, UpdateCourseInput } from '@/schemas/course.schema'
 import courseAPI from '@/services/courseAPI'
+import { updateLessonOrder as updateLessonOrderAPI } from '@/services/lessonAPI'
 import { getCourseSections } from '@/services/sectionAPI'
-import type { Course, Section } from '@/types/course'
+import type { Course, Lesson, Section } from '@/types/course'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 interface CourseState {

@@ -34,6 +34,8 @@ const enrollInCourse = async (userId: number, courseId: number): Promise<Enrollm
     course_id: courseId
   })
 
+  course.increment('enrollment_count', { by: 1 })
+
   return enrollment
 }
 

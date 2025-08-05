@@ -58,23 +58,6 @@ const baseTheme = {
           // borderRadius: 8
         }
       }
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          '&:hover': {
-            boxShadow: '0 4px 16px rgba(0,0,0,0.15)'
-          }
-        }
-      }
-    },
-    MuiAppBar: {
-      styleOverrides: {
-        root: {
-          boxShadow: '0 1px 3px rgba(0,0,0,0.12)'
-        }
-      }
     }
   }
 }

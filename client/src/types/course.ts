@@ -34,6 +34,7 @@ export interface Course {
   level?: CourseLevel
   is_paid?: boolean
   price?: number
+  enrollment_count?: number
   status?: CourseStatus
   created_by?: number
   createdAt?: string

@@ -1,13 +1,12 @@
+import Logo from '@/assets/images/logo.png'
 import { fetchCourseById } from '@/store/courseSlice'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import MoreIcon from '@mui/icons-material/MoreVert'
-import { AppBar, Avatar, Box, CssBaseline, IconButton, Menu, MenuItem, Toolbar, Typography } from '@mui/material'
+import { AppBar, Avatar, Box, CssBaseline, IconButton, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import LessonArea from './components/LessonArea'
 import SidebarLesson from './components/SidebarLesson'
-import Logo from '@/assets/images/logo.png'
 
 const LearningPage = () => {
   const dispatch = useAppDispatch()
@@ -15,24 +14,24 @@ const LearningPage = () => {
   const [params, setParams] = useSearchParams()
   const { currentCourse } = useAppSelector((state) => state.courses)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   useEffect(() => {
     if (courseId) {
       dispatch(fetchCourseById(parseInt(courseId)))
+      if (
+        !params.get('lessonId') &&
+        currentCourse?.sections &&
+        currentCourse?.sections.length > 0 &&
+        currentCourse?.sections[0].lessons &&
+        currentCourse?.sections[0].lessons.length > 0
+      ) {
+        setParams({ lessonId: String(currentCourse?.sections[0].lessons[0].id) })
+      }
     }
   }, [dispatch, courseId])
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
-  }
-
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handleMenuClose = () => {
-    setAnchorEl(null)
   }
 
   return (
@@ -71,26 +70,12 @@ const LearningPage = () => {
             <img src={Logo} alt='Logo' width={30} height={30} />
           </Box>
 
-          <Typography
-            variant='h6'
-            component='div'
-            sx={{ flexGrow: 1, fontWeight: 'bold', fontSize: 14, display: { xs: 'none', sm: 'block' } }}
-          >
+          <Typography variant='h6' component='div' sx={{ flexGrow: 1, fontWeight: 'bold', fontSize: 14 }}>
             {currentCourse?.title || 'Khóa học'}
           </Typography>
 
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1, mr: 2, cursor: 'pointer' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mr: 2, cursor: 'pointer' }}>
             <Avatar alt='User avatar' src='/path-to-avatar.jpg' sx={{ width: 32, height: 32 }} />
-          </Box>
-
-          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-            <IconButton onClick={handleMenuOpen} color='inherit'>
-              <MoreIcon />
-            </IconButton>
-            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-              <MenuItem onClick={handleMenuClose}>Hồ sơ cá nhân</MenuItem>
-              <MenuItem onClick={handleMenuClose}>Đăng xuất</MenuItem>
-            </Menu>
           </Box>
         </Box>
       </AppBar>
