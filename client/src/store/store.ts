@@ -6,16 +6,20 @@ import sectionReducer from './sectionSlice'
 import lessonReducer from './lessonSlice'
 import enrollmentReducer from './enrollmentSlice'
 import appReducer from './appSlice'
+import snackbarReducer from './snackbarSlice'
+import progressReducer from './progressSlice'
 
 export const store = configureStore({
   reducer: {
     theme: themeReducer,
     app: appReducer,
+    snackbar: snackbarReducer,
     auth: authReducer,
     courses: courseReducer,
     sections: sectionReducer,
     lessons: lessonReducer,
-    enrollment: enrollmentReducer
+    enrollment: enrollmentReducer,
+    progress: progressReducer
   }
 })
 

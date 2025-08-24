@@ -1,17 +1,17 @@
 import NotFound from '@/components/ui/auth/NotFound/NotFound'
-import AddCourse from '@/pages/admin/CourseManagement/AddCourse'
 import CourseIndex from '@/pages/admin/CourseManagement/CourseIndex'
-import CourseInfo from '@/pages/admin/CourseManagement/CourseInfo'
-import LessonForm from '@/pages/admin/CourseManagement/LessonForm'
+import EditCoursePage from '@/pages/admin/CourseManagement/EditCoursePage'
+import EditLessonPage from '@/pages/admin/CourseManagement/EditLessonPage'
+import QuickAddCoursePage from '@/pages/admin/CourseManagement/QuickAddCoursePage'
+import BlogPage from '@/pages/public/BlogPage/BlogPage'
 import CourseDetail from '@/pages/public/CourseDetail/CourseDetail'
 import CoursePage from '@/pages/public/CoursePage/CoursePage'
+import RoadMapPage from '@/pages/public/RoadMapPage/RoadMapPage'
 import LearningPage from '@/pages/student/StudyPage/LearningPage'
 import { createBrowserRouter, type RouteObject } from 'react-router-dom'
 import ProtectedRoute from './guards/ProtectedRoute'
 import AdminLayout from './layouts/AdminLayout'
 import MainLayout from './layouts/MainLayout'
-import RoadMapPage from '@/pages/public/RoadMapPage/RoadMapPage'
-import BlogPage from '@/pages/public/BlogPage/BlogPage'
 
 const publicRoutes: RouteObject[] = [
   { index: true, element: <CoursePage /> },
@@ -26,10 +26,9 @@ const publicRoutes: RouteObject[] = [
 // Admin
 const adminRoutes: RouteObject[] = [
   { path: 'courses', element: <CourseIndex /> },
-  { path: 'courses/add', element: <AddCourse /> },
-  { path: 'courses/:id', element: <CourseInfo /> },
-  { path: 'courses/:courseId/sections/:sectionId/lessons/add', element: <LessonForm /> },
-  { path: 'courses/:courseId/sections/:sectionId/lessons/:lessonId', element: <LessonForm /> }
+  { path: 'courses/add', element: <QuickAddCoursePage /> },
+  { path: 'courses/:id', element: <EditCoursePage /> },
+  { path: 'courses/:courseId/sections/:sectionId/lessons/:lessonId', element: <EditLessonPage /> }
 ]
 
 // Main router configuration

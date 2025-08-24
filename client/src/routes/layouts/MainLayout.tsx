@@ -1,6 +1,7 @@
 import Header, { HEADER_HEIGHT } from '@/components/common/Header/Header'
 import GlobalLoading from '@/components/common/Loading/GlobalLoading'
-import Navigation from '@/components/common/Navigation/Navigation'
+import NavigationDesktop from '@/components/common/Navigation/NavigationDesktop'
+import NavigationMobile from '@/components/common/Navigation/NavigationMobile'
 import { Box, useMediaQuery, useTheme } from '@mui/material'
 import { Outlet } from 'react-router-dom'
 
@@ -32,17 +33,31 @@ const MainLayout = () => {
 
         {/* Navigation - fixed position */}
         <Box
+          display={isMobile ? 'none' : 'block'}
           sx={{
             position: 'fixed',
             left: 0,
-            ...(isMobile
-              ? { bottom: 0, width: '100%' }
-              : { top: HEADER_HEIGHT, width: NAVIGATION_WIDTH, height: `calc(100vh - ${HEADER_HEIGHT})` }),
+            top: HEADER_HEIGHT,
+            width: NAVIGATION_WIDTH,
+            height: `calc(100vh - ${HEADER_HEIGHT})`,
             zIndex: 1000,
             bgcolor: '#fff'
           }}
         >
-          <Navigation />
+          <NavigationDesktop />
+        </Box>
+        <Box
+          display={isMobile ? 'block' : 'none'}
+          sx={{
+            position: 'fixed',
+            left: 0,
+            bottom: 0,
+            width: '100%',
+            zIndex: 1000,
+            bgcolor: '#fff'
+          }}
+        >
+          <NavigationMobile />
         </Box>
       </Box>
     </>

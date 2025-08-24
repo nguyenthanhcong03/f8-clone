@@ -157,8 +157,8 @@ const lessonSlice = createSlice({
       })
       .addCase(createLesson.fulfilled, (state, action) => {
         state.lessonLoading = false
-        state.lessons.push(action.payload.data)
-        state.currentLesson = action.payload.data
+        // state.lessons.push(action.payload)
+        state.currentLesson = action.payload
       })
       .addCase(createLesson.rejected, (state, action) => {
         state.lessonLoading = false

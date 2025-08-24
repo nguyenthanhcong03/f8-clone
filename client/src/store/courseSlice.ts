@@ -99,9 +99,6 @@ const courseSlice = createSlice({
   reducers: {
     clearError: (state) => {
       state.error = null
-    },
-    clearCurrentCourse: (state) => {
-      state.currentCourse = null
     }
   },
   extraReducers: (builder) => {
@@ -188,26 +185,8 @@ const courseSlice = createSlice({
         state.loading = false
         state.error = action.payload as string
       })
-
-    // // Update lesson order
-    // builder
-    //   .addCase(updateLessonOrder.pending, (state) => {
-    //     state.lessonsLoading = true
-    //   })
-    //   .addCase(updateLessonOrder.fulfilled, (state, action) => {
-    //     state.lessonsLoading = false
-    //     const { sectionId, lessons } = action.payload
-    //     const sectionIndex = state.sections.findIndex((section) => section.id === sectionId)
-    //     if (sectionIndex !== -1) {
-    //       state.sections[sectionIndex].lessons = lessons.data
-    //     }
-    //   })
-    //   .addCase(updateLessonOrder.rejected, (state, action) => {
-    //     state.lessonsLoading = false
-    //     state.lessonsError = action.payload as string
-    //   })
   }
 })
 
-export const { clearError, clearCurrentCourse } = courseSlice.actions
+export const { clearError } = courseSlice.actions
 export default courseSlice.reducer

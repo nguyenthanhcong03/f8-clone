@@ -26,6 +26,7 @@ import {
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Visibility } from '@mui/icons-material'
 import { fetchCourses, deleteCourse, clearError } from '@/store/courseSlice'
 import type { Course, CourseLevel } from '@/types/course'
+import CourseGrid from '../../../components/common/CourseGridAdmin/CourseGridAdmin'
 
 const levelColors: Record<CourseLevel, 'success' | 'warning' | 'error'> = {
   beginner: 'success',
@@ -65,19 +66,6 @@ const CourseIndex = () => {
     navigate('/admin/courses/add')
   }
 
-  const handleViewCourse = (course: Course) => {
-    navigate(`/admin/courses/${course.id}`)
-  }
-
-  const handleEditCourse = (course: Course) => {
-    navigate(`/admin/courses/${course.id}`)
-  }
-
-  const handleDeleteClick = (course: Course) => {
-    setCourseToDelete(course)
-    setDeleteDialogOpen(true)
-  }
-
   const handleDeleteConfirm = async () => {
     if (!courseToDelete) return
 
@@ -104,97 +92,15 @@ const CourseIndex = () => {
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant='h4' component='h1'>
-          Quản lý khóa học
+          Danh sách khóa học
         </Typography>
         <Button variant='contained' startIcon={<AddIcon />} onClick={handleAddCourse} sx={{ minWidth: 150 }}>
           Thêm khóa học
         </Button>
       </Box>
 
-      {/* Courses Table */}
-      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer>
-          <Table stickyHeader>
-            <TableHead>
-              <TableRow>
-                <TableCell>Tên</TableCell>
-                <TableCell>Level</TableCell>
-                <TableCell>Loại</TableCell>
-                <TableCell>Giá tiền</TableCell>
-                <TableCell align='right'>Thao tác</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {courses && courses.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} align='center' sx={{ py: 4 }}>
-                    <Typography variant='body1' color='text.secondary'>
-                      Không có khóa học nào. Nhấn "Thêm khóa học" để tạo khóa học đầu tiên.
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                courses &&
-                courses.length > 0 &&
-                courses.map((course) => (
-                  <TableRow key={course.id} hover>
-                    <TableCell>
-                      <Box>
-                        <Typography variant='body1' fontWeight='medium'>
-                          {course.title}
-                        </Typography>
-                        {course.description && (
-                          <Typography variant='body2' color='text.secondary' noWrap>
-                            {course.description}
-                          </Typography>
-                        )}
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={course.level || 'beginner'}
-                        color={levelColors[course.level || 'beginner']}
-                        size='small'
-                        sx={{ textTransform: 'capitalize' }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={course.is_paid ? 'Paid' : 'Free'}
-                        color={course.is_paid ? 'primary' : 'default'}
-                        variant={course.is_paid ? 'filled' : 'outlined'}
-                        size='small'
-                      />
-                    </TableCell>
-                    <TableCell>
-                      {course.is_paid && course.price ? (
-                        <Typography variant='body2' fontWeight='medium'>
-                          ${course.price.toFixed(2)}
-                        </Typography>
-                      ) : (
-                        <Typography variant='body2' color='text.secondary'>
-                          Free
-                        </Typography>
-                      )}
-                    </TableCell>
-                    <TableCell align='right'>
-                      {/* <IconButton onClick={() => handleEditCourse(course)} color='primary' size='small'>
-                        <EditIcon />
-                      </IconButton> */}
-                      <IconButton onClick={() => handleDeleteClick(course)} color='error' size='small'>
-                        <DeleteIcon />
-                      </IconButton>
-                      <IconButton onClick={() => handleViewCourse(course)} color='error' size='small'>
-                        <Visibility />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
+      {/* Danh sách khóa học */}
+      <CourseGrid />
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>

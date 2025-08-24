@@ -27,7 +27,7 @@ import { fetchCourseSections } from '@/store/sectionSlice'
 import { fetchCourseById } from '@/store/courseSlice'
 import { lessonSchema, type LessonFormValues } from '@/schemas/lesson.schema'
 
-const LessonForm = () => {
+const EditLessonPage = () => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const { courseId, sectionId, lessonId } = useParams<{
@@ -106,16 +106,6 @@ const LessonForm = () => {
           })
         ).unwrap()
         navigate(`/admin/courses/${courseId}`)
-      } else {
-        // Create new lesson
-        await dispatch(
-          createLesson({
-            section_id: Number(sectionId),
-            ...data,
-            videoFile: data.videoFile
-          })
-        ).unwrap()
-        navigate(`/admin/courses/${courseId}`)
       }
     } catch {
       setError('Có lỗi xảy ra khi lưu bài học. Vui lòng thử lại.')
@@ -147,13 +137,13 @@ const LessonForm = () => {
     navigate(`/admin/courses/${courseId}`)
   }
 
-  if (lessonLoading) {
-    return (
-      <Box display='flex' justifyContent='center' alignItems='center' minHeight='80vh'>
-        <CircularProgress />
-      </Box>
-    )
-  }
+  // if (lessonLoading) {
+  //   return (
+  //     <Box display='flex' justifyContent='center' alignItems='center' minHeight='80vh'>
+  //       <CircularProgress />
+  //     </Box>
+  //   )
+  // }
 
   return (
     <Container maxWidth='lg'>
@@ -306,4 +296,4 @@ const LessonForm = () => {
   )
 }
 
-export default LessonForm
+export default EditLessonPage

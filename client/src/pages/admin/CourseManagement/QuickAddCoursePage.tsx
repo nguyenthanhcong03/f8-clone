@@ -26,7 +26,7 @@ import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 
-const AddCourse = () => {
+const QuickAddCoursePage = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const [snackbar, setSnackbar] = useState({
@@ -293,4 +293,4 @@ const AddCourse = () => {
   )
 }
 
-export default AddCourse
+export default QuickAddCoursePage

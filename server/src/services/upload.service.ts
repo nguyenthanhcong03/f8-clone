@@ -1,9 +1,11 @@
+import { duration } from './../../node_modules/dayjs/esm/plugin/duration/index.d'
 import cloudinary from '../config/cloudinary'
 import { UploadApiResponse } from 'cloudinary'
 
 interface UploadResult {
   url: string
   public_id: string
+  duration?: number
 }
 
 class UploadService {
@@ -56,7 +58,8 @@ class UploadService {
               } else if (result) {
                 resolve({
                   url: result.secure_url,
-                  public_id: result.public_id
+                  public_id: result.public_id,
+                  duration: result.duration
                 })
               } else {
                 reject(new Error('Upload failed'))

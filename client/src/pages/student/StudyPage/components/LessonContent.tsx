@@ -1,12 +1,15 @@
 import { useAppDispatch, useAppSelector } from '@/store/hook'
 import { fetchLessonById } from '@/store/lessonSlice'
+import { saveProgress } from '@/store/progressSlice'
 import { Menu } from '@mui/icons-material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import FactCheckIcon from '@mui/icons-material/FactCheck'
 import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled'
-import { Box, Button, CircularProgress, IconButton, Paper, Typography } from '@mui/material'
+import { Box, Button, IconButton, Paper, Stack, Typography } from '@mui/material'
 import { useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
+import ReactPlayer from 'react-player'
 import { useSearchParams } from 'react-router-dom'
 
 const LessonArea = ({ handleDrawerToggle }: { handleDrawerToggle?: () => void }) => {
@@ -14,6 +17,7 @@ const LessonArea = ({ handleDrawerToggle }: { handleDrawerToggle?: () => void })
   const [searchParams, setSearchParams] = useSearchParams()
   const lessonId = searchParams.get('lessonId')
   const { currentLesson, lessonLoading } = useAppSelector((state) => state.lessons)
+  const { loading: progressLoading, isCompleted } = useAppSelector((state) => state.progress)
   const { currentCourse } = useAppSelector((state) => state.courses)
 
   const previousLessonId = currentLesson?.previousLessonId
@@ -37,14 +41,6 @@ const LessonArea = ({ handleDrawerToggle }: { handleDrawerToggle?: () => void })
     if (lessonId) {
       setSearchParams({ lessonId: String(lessonId) })
     }
-  }
-
-  if (lessonLoading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', width: '100%' }}>
-        <CircularProgress />
-      </Box>
-    )
   }
 
   if (!currentLesson && !lessonLoading) {
@@ -81,20 +77,36 @@ const LessonArea = ({ handleDrawerToggle }: { handleDrawerToggle?: () => void })
       }}
     >
       {/* Lesson header */}
-      <Box
+      <Stack
+        direction={'row'}
+        justifyContent='space-between'
+        alignItems='center'
         sx={{
           p: 2,
           borderBottom: '1px solid',
           borderColor: 'divider'
         }}
       >
-        <Typography variant='body2' color='text.secondary'>
-          {getSectionTitle()}
-        </Typography>
-        <Typography variant='h6' sx={{ fontWeight: 'bold' }}>
-          {currentLesson?.title}
-        </Typography>
-      </Box>
+        <div>
+          <Typography variant='body2' color='text.secondary'>
+            {getSectionTitle()}
+          </Typography>
+          <Typography variant='h6' sx={{ fontWeight: 'bold' }}>
+            {currentLesson?.title}
+          </Typography>
+        </div>
+        {isCompleted ? (
+          <Button size='small' loading={progressLoading}>
+            <FactCheckIcon fontSize='small' sx={{ mr: 1 }} />
+            Đánh dấu đã học
+          </Button>
+        ) : (
+          <Button size='small' loading={progressLoading}>
+            <FactCheckIcon fontSize='small' sx={{ mr: 1 }} />
+            Đánh dấu đã học
+          </Button>
+        )}
+      </Stack>
 
       {/* Lesson content */}
       <Box
@@ -117,39 +129,56 @@ const LessonArea = ({ handleDrawerToggle }: { handleDrawerToggle?: () => void })
               borderRadius: 1
             }}
           >
-            <iframe
+            <ReactPlayer
               src={currentLesson.video_url}
+              width='100%'
+              height='100%'
               style={{
                 position: 'absolute',
                 top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                border: 'none'
+                left: 0
               }}
-              allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-              allowFullScreen
+              controls={true}
+              onEnded={() => {
+                if (currentLesson?.id) {
+                  dispatch(saveProgress({ lessonId: currentLesson.id, isCompleted: true }))
+                }
+              }}
             />
           </Box>
         ) : (
           <Box
             sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
+              position: 'relative',
+              paddingTop: '56.25%', // 16:9 Aspect Ratio
               width: '100%',
-              height: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              color: 'white',
-              flexDirection: 'column'
+              maxWidth: '100%',
+              mb: 3
             }}
           >
-            <PlayCircleFilledIcon sx={{ fontSize: 60, opacity: 0.7 }} />
-            <Typography variant='body1' sx={{ mt: 2 }}>
-              Video không khả dụng
-            </Typography>
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                border: 'none',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                bgcolor: 'grey.200',
+                borderRadius: 1,
+                textAlign: 'center',
+                color: 'text.secondary'
+              }}
+            >
+              <PlayCircleFilledIcon sx={{ fontSize: 60, opacity: 0.7 }} />
+              <Typography variant='body1' sx={{ mt: 2 }}>
+                Video không khả dụng
+              </Typography>
+            </Box>
           </Box>
         )}
 

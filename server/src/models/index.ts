@@ -8,6 +8,7 @@ import RoadmapCourse from './roadmapCourse.model'
 import Enrollment from './enrollment.model'
 import Blog from './blog.model'
 import BlogComment from './blogComment.model'
+import Progress from './progress.model'
 
 // Define associations
 // User - Course (One-to-Many: User can create many courses)
@@ -65,5 +66,11 @@ BlogComment.belongsTo(Blog, { foreignKey: 'blog_id', as: 'blog' })
 // User - BlogComment (One-to-Many: User can write many comments)
 User.hasMany(BlogComment, { foreignKey: 'user_id', as: 'comments' })
 BlogComment.belongsTo(User, { foreignKey: 'user_id', as: 'user' })
+
+User.hasMany(Progress, { foreignKey: 'user_id' })
+Lesson.hasMany(Progress, { foreignKey: 'lesson_id' })
+
+Progress.belongsTo(User, { foreignKey: 'user_id' })
+Progress.belongsTo(Lesson, { foreignKey: 'lesson_id' })
 
 export { User, Course, Section, Lesson, Quiz, Roadmap, RoadmapCourse, Enrollment, Blog, BlogComment }

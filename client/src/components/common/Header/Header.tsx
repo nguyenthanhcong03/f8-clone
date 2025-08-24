@@ -203,7 +203,6 @@ const Header = () => {
               </Box>
               {!isMobile && (
                 <Typography
-                  // variant='subtitle1'
                   noWrap
                   component='span'
                   sx={{ ml: 2, fontSize: 14, fontWeight: 700, display: { xs: 'none', sm: 'block' } }}
@@ -213,24 +212,6 @@ const Header = () => {
               )}
             </Box>
           </StyledLink>
-
-          {/* Desktop navigation */}
-          {/* {!isMobile && (
-            <Box sx={{ display: 'flex', flexGrow: 1 }}>
-              <Button color='inherit' component={Link} to='/'>
-                Trang chủ
-              </Button>
-              <Button color='inherit' component={Link} to='/learning-paths'>
-                Lộ trình
-              </Button>
-              <Button color='inherit' component={Link} to='/courses'>
-                Khóa học
-              </Button>
-              <Button color='inherit' component={Link} to='/blog'>
-                Blog
-              </Button>
-            </Box>
-          )} */}
 
           {/* Search bar */}
           <Search>
@@ -245,9 +226,9 @@ const Header = () => {
             <ThemeToggle />
 
             {/* Notification icon */}
-            <IconButton size='medium' aria-label='show notifications' color='inherit'>
+            <IconButton disableRipple size='medium' color='inherit'>
               <Badge badgeContent={5} color='error'>
-                <NotificationsIcon />
+                <NotificationsIcon color='action' sx={{ '&:hover': { color: '#333' } }} />
               </Badge>
             </IconButton>
 
@@ -260,11 +241,12 @@ const Header = () => {
                 aria-haspopup='true'
                 onClick={handleProfileMenuOpen}
                 color='inherit'
+                disableRipple
               >
                 {user?.avatar ? (
                   <Avatar alt={user.name} src={user.avatar} sx={{ width: 32, height: 32 }} />
                 ) : (
-                  <AccountCircle fontSize='large' />
+                  <AccountCircle fontSize='large' color='action' />
                 )}
               </IconButton>
             ) : (

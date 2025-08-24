@@ -1,5 +1,6 @@
 import { useAppSelector } from '@/store/hook'
 import { Category, Menu as MenuIcon, ShoppingBag } from '@mui/icons-material'
+import AddCircleIcon from '@mui/icons-material/AddCircle'
 import {
   Box,
   Divider,
@@ -18,12 +19,12 @@ import { useState } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 
 // Định nghĩa chiều rộng của sidebar
-const drawerWidth = 240
+const drawerWidth = 340
 const collapsedWidth = 65
 
 // Menu items
 const SIDEBAR_ITEMS = [
-  { name: 'Dashboard', icon: <ShoppingBag />, href: '/admin/dashboard' },
+  { name: 'Tạo khóa học', icon: <AddCircleIcon />, href: '/admin/courses/add' },
   { name: 'Khóa học', icon: <Category />, href: '/admin/courses' }
 ]
 

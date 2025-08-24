@@ -7,13 +7,14 @@ interface LessonAttributes {
   title?: string
   video_url?: string
   video_public_id?: string
+  duration?: number
   content?: string
   order?: number
 }
 
 type LessonCreationAttributes = Optional<
   LessonAttributes,
-  'id' | 'title' | 'video_url' | 'video_public_id' | 'content' | 'order'
+  'id' | 'title' | 'video_url' | 'video_public_id' | 'duration' | 'content' | 'order'
 >
 
 class Lesson extends Model<LessonAttributes, LessonCreationAttributes> implements LessonAttributes {
@@ -22,6 +23,7 @@ class Lesson extends Model<LessonAttributes, LessonCreationAttributes> implement
   declare title?: string
   declare video_url?: string
   declare video_public_id?: string
+  declare duration?: number
   declare content?: string
   declare order?: number
 }
@@ -49,6 +51,9 @@ Lesson.init(
     },
     video_public_id: {
       type: DataTypes.STRING(255)
+    },
+    duration: {
+      type: DataTypes.INTEGER
     },
     content: {
       type: DataTypes.TEXT

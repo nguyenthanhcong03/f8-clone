@@ -6,12 +6,12 @@ import type { CreateCourseInput, UpdateCourseInput } from '@/schemas/course.sche
 const API_ENDPOINT = '/courses'
 
 export const getAllCourses = async () => {
-  const response = await axiosInstance.get<ApiResponse<Course[]>>(API_ENDPOINT)
+  const response = await axiosInstance.get(API_ENDPOINT)
   return response
 }
 
 export const getCourseById = async (id: number) => {
-  const response = await axiosInstance.get<ApiResponse<Course>>(`${API_ENDPOINT}/${id}`)
+  const response = await axiosInstance.get(`${API_ENDPOINT}/${id}`)
   return response
 }
 
@@ -39,7 +39,6 @@ export const createCourse = async (courseData: CreateCourseInput) => {
     formData.append('price', courseData.price.toString())
   }
 
-  // Append thumbnail file if exists
   if (courseData.thumbnail instanceof File) {
     formData.append('thumbnail', courseData.thumbnail)
   }

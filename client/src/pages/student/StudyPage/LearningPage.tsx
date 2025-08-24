@@ -5,8 +5,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { AppBar, Avatar, Box, CssBaseline, IconButton, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import LessonArea from './components/LessonArea'
-import SidebarLesson from './components/SidebarLesson'
+import LessonContent from './components/LessonContent'
+import LessonSidebar from './components/LessonSidebar'
 
 const LearningPage = () => {
   const dispatch = useAppDispatch()
@@ -36,8 +36,6 @@ const LearningPage = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <CssBaseline />
-
       {/* Header */}
       <AppBar
         position='static'
@@ -56,10 +54,11 @@ const LearningPage = () => {
           }}
         >
           <IconButton
+            onClick={() => console.log('Back to course list')}
             component={Link}
             disableRipple
             color='inherit'
-            to={`/courses/${courseId}`}
+            to={`/${courseId}`}
             edge='end'
             sx={{ width: 65, height: 50, borderRadius: 0, '&:hover': { bgcolor: '#252B35' } }}
           >
@@ -99,7 +98,7 @@ const LearningPage = () => {
             zIndex: 1200
           }}
         >
-          <SidebarLesson params={params} setParams={setParams} handleDrawerToggle={handleDrawerToggle} />
+          <LessonSidebar params={params} setParams={setParams} handleDrawerToggle={handleDrawerToggle} />
         </Box>
         {/* Overlay */}
         {mobileOpen && (
@@ -127,7 +126,7 @@ const LearningPage = () => {
             overflow: 'auto'
           }}
         >
-          <LessonArea handleDrawerToggle={handleDrawerToggle} />
+          <LessonContent handleDrawerToggle={handleDrawerToggle} />
         </Box>
       </Box>
     </Box>

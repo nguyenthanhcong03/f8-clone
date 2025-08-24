@@ -1,5 +1,5 @@
 import { Box, Card, CardContent, CardMedia, Typography } from '@mui/material'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import GroupsIcon from '@mui/icons-material/Groups'
 
 interface CourseCardProps {
@@ -15,12 +15,26 @@ interface CourseCardProps {
 
 const CourseCard = ({ course }: CourseCardProps) => {
   const navigate = useNavigate()
+  const location = useLocation()
+
+  const isDetailPage = location.pathname.includes(`/${course.id}`)
+  const isAdminPage = location.pathname.includes('/admin')
+
+  const handleNavigate = () => {
+    if (!isDetailPage) {
+      navigate(`/${course.id}`)
+    }
+    if (isAdminPage) {
+      navigate(`/admin/courses/${course.id}`)
+    }
+  }
+
   return (
     <Card
       variant='outlined'
       sx={{ borderRadius: 3, bgcolor: '#F7F7F7', cursor: 'pointer', '&:hover': { boxShadow: 3 } }}
       elevation={0}
-      onClick={() => navigate(course.id.toString())}
+      onClick={handleNavigate}
     >
       <CardMedia component='img' height='180' image={course.thumbnail} alt={course.title} />
       <CardContent sx={{ pb: '16px !important' }}>

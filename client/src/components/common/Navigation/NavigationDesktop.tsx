@@ -1,7 +1,7 @@
 import HomeIcon from '@mui/icons-material/Home'
 import MapIcon from '@mui/icons-material/Map'
 import NewspaperIcon from '@mui/icons-material/Newspaper'
-import { Box, useMediaQuery, useTheme } from '@mui/material'
+import { Box } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { NavLink } from 'react-router-dom'
 
@@ -21,20 +21,18 @@ const StyledNavLink = styled(NavLink)(({ theme }) => ({
   }
 }))
 
-const Navigation = () => {
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+const NavigationDesktop = () => {
   return (
     <Box
       sx={{
-        height: isMobile ? 'auto' : '100%',
+        height: '100%',
         display: 'flex',
         gap: 1,
-        flexDirection: isMobile ? 'row' : 'column',
-        width: isMobile ? '100%' : '96px',
-        justifyContent: isMobile ? 'space-around' : 'flex-start',
+        flexDirection: 'column',
+        width: '96px',
+        justifyContent: 'flex-start',
         alignItems: 'center',
-        padding: isMobile ? '8px 0' : '16px 0'
+        padding: '16px 0'
       }}
     >
       <StyledNavLink
@@ -68,4 +66,4 @@ const Navigation = () => {
   )
 }
 
-export default Navigation
+export default NavigationDesktop

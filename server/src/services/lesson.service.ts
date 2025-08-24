@@ -2,6 +2,7 @@ import { Op } from 'sequelize'
 import Lesson from '../models/lesson.model'
 import uploadService from './upload.service'
 import { Section } from '@/models'
+import ApiError from '@/utils/ApiError'
 
 export class LessonService {
   async createLesson(lessonData: any) {
@@ -22,6 +23,10 @@ export class LessonService {
         attributes: ['id', 'course_id']
       }
     })
+
+    if (!lesson) {
+      throw new Error('Lesson not found')
+    }
 
     const courseId = lesson?.section.course_id
 

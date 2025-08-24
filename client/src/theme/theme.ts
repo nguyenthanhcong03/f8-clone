@@ -59,13 +59,6 @@ const baseTheme = {
         }
       }
     },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          boxShadow: 'none'
-        }
-      }
-    },
     MuiCard: {
       styleOverrides: {
         root: {
