@@ -7,13 +7,6 @@ import ThemeProvider from './theme/ThemeProvider'
 import GlobalSnackbar from './components/common/GlobaSnackbar/GlobalSnackbar'
 
 function App() {
-  const user
-  // console.log('🚀 ~ App.tsx:11 ~ App ~ user:', user)
-  // console.log('🚀 ~ App.tsx:12 ~ App ~ tsx:', tsx)
-
-  // console.log('🚀 ~ App.tsx:14 ~ App ~ user:', user)
-  console.log('hahhah')
-
   return (
     <Provider store={store}>
       <ThemeProvider>

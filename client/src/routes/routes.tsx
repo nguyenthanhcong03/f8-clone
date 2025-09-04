@@ -27,8 +27,8 @@ const publicRoutes: RouteObject[] = [
 const adminRoutes: RouteObject[] = [
   { path: 'courses', element: <CourseIndex /> },
   { path: 'courses/add', element: <QuickAddCoursePage /> },
-  { path: 'courses/:id', element: <EditCoursePage /> },
-  { path: 'courses/:courseId/sections/:sectionId/lessons/:lessonId', element: <EditLessonPage /> }
+  { path: 'courses/:courseId', element: <EditCoursePage /> },
+  { path: 'courses/:courseId/lessons/:lessonId/edit', element: <EditLessonPage /> }
 ]
 
 // Main router configuration
