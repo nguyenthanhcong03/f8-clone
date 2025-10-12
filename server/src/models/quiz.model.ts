@@ -1,19 +1,20 @@
 import { DataTypes, Model, Optional } from 'sequelize'
 import sequelize from '../config/database'
+import { v4 as uuidv4 } from 'uuid'
 
 interface QuizAttributes {
-  id: number
-  lesson_id: number
+  quiz_id: string
+  lesson_id: string
   question?: string
   options?: string[]
   correct_option?: string
 }
 
-type QuizCreationAttributes = Optional<QuizAttributes, 'id' | 'question' | 'options' | 'correct_option'>
+type QuizCreationAttributes = Optional<QuizAttributes, 'quiz_id' | 'question' | 'options' | 'correct_option'>
 
 class Quiz extends Model<QuizAttributes, QuizCreationAttributes> implements QuizAttributes {
-  public id!: number
-  public lesson_id!: number
+  public quiz_id!: string
+  public lesson_id!: string
   public question?: string
   public options?: string[]
   public correct_option?: string
@@ -21,17 +22,13 @@ class Quiz extends Model<QuizAttributes, QuizCreationAttributes> implements Quiz
 
 Quiz.init(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true
-    },
+    quiz_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), unique: true, primaryKey: true },
     lesson_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
       references: {
         model: 'lessons',
-        key: 'id'
+        key: 'lesson_id'
       }
     },
     question: {

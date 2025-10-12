@@ -1,19 +1,7 @@
 import { useAppSelector } from '@/store/hook'
-import { Close } from '@mui/icons-material'
-import ExpandMore from '@mui/icons-material/ExpandMore'
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Box,
-  IconButton,
-  List,
-  ListItemButton,
-  ListItemText,
-  Typography
-} from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import { X, ChevronDown, PlayCircle } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { useEffect, useState } from 'react'
 
 interface Iprops {
   params: URLSearchParams
@@ -22,7 +10,7 @@ interface Iprops {
 }
 
 const SidebarLesson = ({ params, setParams, handleDrawerToggle }: Iprops) => {
-  const [openSections, setOpenSections] = useState<number[]>([])
+  const [openSections, setOpenSections] = useState<string[]>([])
   const [activeLessonId, setActiveLessonId] = useState<number | null>(null)
   const { currentCourse } = useAppSelector((state) => state.courses)
   const { currentLesson } = useAppSelector((state) => state.lessons)
@@ -40,8 +28,9 @@ const SidebarLesson = ({ params, setParams, handleDrawerToggle }: Iprops) => {
     if (currentLesson) {
       setOpenSections((prev) => {
         // Kiểm tra xem section của bài học hiện tại đã có trong danh sách mở chưa
-        if (!prev.includes(currentLesson.section_id)) {
-          return [...prev, currentLesson.section_id]
+        const sectionIdStr = currentLesson.section_id.toString()
+        if (!prev.includes(sectionIdStr)) {
+          return [...prev, sectionIdStr]
         }
         return prev
       })
@@ -49,7 +38,7 @@ const SidebarLesson = ({ params, setParams, handleDrawerToggle }: Iprops) => {
   }, [currentLesson])
 
   // Xử lý mở accordion section khi click vào section
-  const handleSectionClick = (sectionId: number) => {
+  const handleSectionClick = (sectionId: string) => {
     if (openSections.includes(sectionId)) {
       setOpenSections(openSections.filter((id) => id !== sectionId))
     } else {
@@ -63,108 +52,82 @@ const SidebarLesson = ({ params, setParams, handleDrawerToggle }: Iprops) => {
   }
 
   return (
-    <Box
-      sx={{
-        height: '100%',
-        borderRight: '1px solid',
-        borderColor: 'divider',
-        overflowY: 'auto'
-      }}
-    >
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          p: 2,
-          borderBottom: '1px solid',
-          borderColor: 'divider'
-        }}
-      >
-        <Box>
-          <Typography variant='h6' fontWeight='bold'>
-            Nội dung bài học
-          </Typography>
-          <Typography variant='body2' color='text.secondary'>
+    <div className='h-full border-r border-border overflow-y-auto'>
+      <div className='flex justify-between items-center p-4 border-b border-border'>
+        <div>
+          <h2 className='text-lg font-bold'>Nội dung bài học</h2>
+          <p className='text-sm text-muted-foreground'>
             {currentCourse?.sections && currentCourse?.sections.length} chương •{' '}
             {currentCourse?.sections &&
               currentCourse?.sections.reduce((sum, section) => {
                 return sum + (section.lessons?.length || 0)
               }, 0)}{' '}
             bài học
-          </Typography>
-        </Box>
-        <Box sx={{ display: { xs: 'block', lg: 'none' }, cursor: 'pointer' }}>
-          <Close onClick={handleDrawerToggle} />
-        </Box>
-      </Box>
+          </p>
+        </div>
+        <div className='block lg:hidden cursor-pointer'>
+          <X onClick={handleDrawerToggle} className='h-5 w-5' />
+        </div>
+      </div>
 
-      <List component='nav' sx={{ p: 0 }}>
+      <nav className='p-0'>
         {currentCourse?.sections &&
-          currentCourse?.sections.map((section) => (
-            <React.Fragment key={section.id}>
-              <Accordion
-                expanded={openSections.includes(section.id)}
-                onChange={() => handleSectionClick(section.id)}
-                disableGutters
-                elevation={0}
-                sx={{
-                  '&:before': { display: 'none' },
-                  borderBottom: '1px solid',
-                  borderColor: 'divider'
-                }}
-              >
-                <AccordionSummary
-                  expandIcon={<ExpandMore />}
-                  sx={{
-                    bgcolor: openSections.includes(section.id) ? 'action.selected' : 'background.paper',
-                    '&:hover': { bgcolor: 'action.hover' },
-                    span: {
-                      my: 1
-                    }
-                  }}
-                >
-                  <Box>
-                    <Typography sx={{ fontWeight: 500 }}>{section.title}</Typography>
-                    <Typography variant='body2' sx={{ color: '#29303b', fontSize: 13, mt: 0.5 }}>
-                      {section.lessons?.length} bài học
-                    </Typography>
-                  </Box>
-                </AccordionSummary>
-                <AccordionDetails sx={{ padding: 0 }}>
-                  <List component='div' disablePadding>
-                    {section?.lessons &&
-                      section.lessons.map((lesson) => (
-                        <ListItemButton
-                          key={lesson.id}
-                          selected={activeLessonId === lesson.id}
-                          onClick={() => handleLessonClick(lesson.id)}
-                          sx={{ pl: 4, py: 1, display: 'flex', alignItems: 'center', justifyItems: 'center' }}
-                        >
-                          <PlayCircleOutlineIcon
-                            color={activeLessonId === lesson.id ? 'primary' : 'inherit'}
-                            fontSize='small'
-                            sx={{ mr: 1 }}
-                          />
-                          <ListItemText
-                            primary={lesson.title}
-                            primaryTypographyProps={{
-                              fontSize: '0.9rem',
-                              color: activeLessonId === lesson.id ? 'primary' : 'inherit',
-                              fontWeight: activeLessonId === lesson.id ? 'bold' : 'normal'
-                            }}
-                          />
+          currentCourse?.sections.map((section) => {
+            const isExpanded = openSections.includes(section.id)
 
-                          {/* <CheckCircle fontSize='small' color='success' /> */}
-                        </ListItemButton>
-                      ))}
-                  </List>
-                </AccordionDetails>
-              </Accordion>
-            </React.Fragment>
-          ))}
-      </List>
-    </Box>
+            return (
+              <div key={section.id} className='border-b border-border'>
+                {/* Section Header */}
+                <button
+                  onClick={() => handleSectionClick(section.id)}
+                  className={cn(
+                    'w-full p-3 text-left transition-colors hover:bg-accent',
+                    isExpanded ? 'bg-accent' : 'bg-background'
+                  )}
+                >
+                  <div className='flex items-center justify-between'>
+                    <div>
+                      <h3 className='font-medium'>{section.title}</h3>
+                      <p className='text-xs text-muted-foreground mt-1'>{section.lessons?.length} bài học</p>
+                    </div>
+                    <ChevronDown
+                      className={cn('h-4 w-4 transition-transform', isExpanded ? 'transform rotate-180' : '')}
+                    />
+                  </div>
+                </button>
+
+                {/* Section Content */}
+                <div
+                  className={cn(
+                    'transition-all duration-200 ease-in-out overflow-hidden',
+                    isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                  )}
+                >
+                  {section?.lessons &&
+                    section.lessons.map((lesson) => (
+                      <button
+                        key={lesson.id}
+                        onClick={() => handleLessonClick(lesson.id)}
+                        className={cn(
+                          'w-full pl-8 pr-4 py-2 text-left flex items-center transition-colors hover:bg-accent',
+                          activeLessonId === lesson.id ? 'bg-accent text-primary font-semibold' : 'text-foreground'
+                        )}
+                      >
+                        <PlayCircle
+                          className={cn(
+                            'h-4 w-4 mr-2 flex-shrink-0',
+                            activeLessonId === lesson.id ? 'text-primary' : 'text-muted-foreground'
+                          )}
+                        />
+                        <span className='text-sm line-clamp-2'>{lesson.title}</span>
+                      </button>
+                    ))}
+                </div>
+              </div>
+            )
+          })}
+      </nav>
+    </div>
   )
 }
 

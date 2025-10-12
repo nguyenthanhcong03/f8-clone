@@ -16,7 +16,7 @@ const initialState: SectionState = {
 
 export const fetchCourseSections = createAsyncThunk(
   'courses/fetchCourseSections',
-  async (courseId: number, { rejectWithValue }) => {
+  async (courseId: string, { rejectWithValue }) => {
     try {
       const response = await getCourseSections(courseId)
       return response.data
@@ -29,7 +29,7 @@ export const fetchCourseSections = createAsyncThunk(
 
 export const addSection = createAsyncThunk(
   'sections/addSection',
-  async ({ title, course_id }: { title: string; course_id: number }, { rejectWithValue }) => {
+  async ({ title, course_id }: { title: string; course_id: string }, { rejectWithValue }) => {
     try {
       const response = await createSection({ title, course_id })
       return response.data
@@ -42,7 +42,7 @@ export const addSection = createAsyncThunk(
 
 export const editSection = createAsyncThunk(
   'sections/editSection',
-  async ({ sectionId, title }: { sectionId: number; title: string }, { rejectWithValue }) => {
+  async ({ sectionId, title }: { sectionId: string; title: string }, { rejectWithValue }) => {
     try {
       const response = await updateSection(sectionId, { title })
       return response.data
@@ -55,7 +55,7 @@ export const editSection = createAsyncThunk(
 
 export const removeSection = createAsyncThunk(
   'sections/removeSection',
-  async (sectionId: number, { rejectWithValue }) => {
+  async (sectionId: string, { rejectWithValue }) => {
     try {
       const response = await deleteSection(sectionId)
       return { sectionId, data: response.data }
@@ -68,7 +68,7 @@ export const removeSection = createAsyncThunk(
 
 export const updateSectionOrder = createAsyncThunk(
   'courses/updateSectionOrder',
-  async ({ courseId, sectionIds }: { courseId: number; sectionIds: number[] }, { rejectWithValue }) => {
+  async ({ courseId, sectionIds }: { courseId: string; sectionIds: string[] }, { rejectWithValue }) => {
     try {
       const response = await sectionAPI.updateSectionOrder(courseId, sectionIds)
       return response.data

@@ -1,39 +1,22 @@
 import { courseFormSchema, type CourseFormInput } from '@/schemas/course.schema'
-import { createCourse } from '@/store/courseSlice'
+import { createCourse } from '@/store/features/courses/courseSlice'
 import { useAppDispatch } from '@/store/hook'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowBack as ArrowBackIcon, Image as ImageIcon, Save as SaveIcon } from '@mui/icons-material'
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Divider,
-  FormControl,
-  FormControlLabel,
-  FormHelperText,
-  InputLabel,
-  MenuItem,
-  Select,
-  Snackbar,
-  Switch,
-  TextField,
-  Typography
-} from '@mui/material'
+import { ArrowLeft, Image, Save } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
 import { Editor } from '@tinymce/tinymce-react'
-import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
+import { showSnackbar } from '@/store/snackbarSlice'
 
 const QuickAddCoursePage = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: '',
-    severity: 'success' as 'success' | 'error'
-  })
 
   const {
     control,
@@ -55,13 +38,8 @@ const QuickAddCoursePage = () => {
 
   const isPaidValue = watch('is_paid')
 
-  const showSnackbar = (message: string, severity: 'success' | 'error') => {
-    setSnackbar({ open: true, message, severity })
-  }
-
   const onSubmit = async (data: CourseFormInput) => {
     try {
-      // Convert form data to create course format
       const courseData = {
         ...data,
         price: data.is_paid ? (typeof data.price === 'string' ? parseFloat(data.price) : data.price) : undefined
@@ -69,72 +47,94 @@ const QuickAddCoursePage = () => {
       console.log('course Data:', courseData)
 
       await dispatch(createCourse(courseData)).unwrap()
-      showSnackbar('Course created successfully!', 'success')
-      setTimeout(() => {
-        navigate('/admin/courses')
-      }, 1500)
+      dispatch(showSnackbar({ message: 'Course created successfully!', severity: 'success' }))
+      // setTimeout(() => {
+      //   navigate('/admin/courses')
+      // }, 1500)
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to create course'
-      showSnackbar(errorMessage, 'error')
+      dispatch(showSnackbar({ message: errorMessage, severity: 'error' }))
     }
   }
 
   return (
-    <Box sx={{ p: 3, maxWidth: 800, mx: 'auto' }}>
+    <div className='p-6 max-w-4xl mx-auto'>
       {/* Header */}
-      <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/admin/courses')} variant='outlined'>
-          Back to Courses
-        </Button>
-        <Typography variant='h4' component='h1'>
-          Add New Course
-        </Typography>
-      </Box>
+      <div className='mb-6 flex items-center gap-4'>
+        <h1 className='text-3xl font-bold'>Thêm khóa học mới</h1>
+      </div>
 
       <Card>
-        <CardContent sx={{ p: 3 }}>
+        <CardContent className='p-6'>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <div className='flex flex-col gap-6'>
               {/* Basic Information */}
-              <Box>
-                <Typography variant='h6' sx={{ mb: 2, color: 'primary.main' }}>
-                  Thông tin khóa học
-                </Typography>
+              <div>
+                <h2 className='text-xl font-semibold text-primary mb-4'>Thông tin khóa học</h2>
 
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <div className='flex flex-col gap-4'>
                   <Controller
                     name='title'
                     control={control}
                     render={({ field }) => (
-                      <TextField
-                        {...field}
-                        fullWidth
-                        label='Tên khóa học'
-                        error={!!errors.title}
-                        helperText={errors.title?.message}
-                        placeholder='Nhập tên khóa học'
-                      />
+                      <div className='space-y-2'>
+                        <Label htmlFor='title'>Tên khóa học</Label>
+                        <Input
+                          {...field}
+                          id='title'
+                          placeholder='Nhập tên khóa học'
+                          className={errors.title ? 'border-red-500' : ''}
+                        />
+                        {errors.title && <p className='text-sm text-red-500'>{errors.title.message}</p>}
+                      </div>
+                    )}
+                  />
+
+                  <Controller
+                    name='slug'
+                    control={control}
+                    render={({ field }) => (
+                      <div className='space-y-2'>
+                        <Label htmlFor='title'>Đường dẫn khóa học</Label>
+                        <Input
+                          {...field}
+                          id='slug'
+                          placeholder='Nhập đường dẫn khóa học'
+                          className={errors.slug ? 'border-red-500' : ''}
+                        />
+                        {errors.slug && <p className='text-sm text-red-500'>{errors.slug.message}</p>}
+                      </div>
                     )}
                   />
 
                   <Controller
                     name='description'
                     control={control}
-                    render={({ field: { onChange, value } }) => (
-                      <Editor
-                        apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
-                        init={{
-                          height: 300,
-                          menubar: false,
-                          plugins: ['link', 'image', 'code', 'lists', 'table'],
-                          toolbar:
-                            'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | link image | code'
-                        }}
-                        value={value}
-                        onEditorChange={(content) => {
-                          onChange(content)
-                        }}
-                      />
+                    render={({ field }) => (
+                      <div className='space-y-2'>
+                        <Label>Mô tả khóa học</Label>
+                        {/* <Editor
+                          apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
+                          init={{
+                            height: 300,
+                            menubar: false,
+                            plugins: ['link', 'image', 'code', 'lists', 'table'],
+                            toolbar:
+                              'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | link image | code'
+                          }}
+                          value={value}
+                          onEditorChange={(content) => {
+                            onChange(content)
+                          }}
+                        /> */}
+                        <Input
+                          {...field}
+                          id='description'
+                          placeholder='Nhập mô tả khóa học'
+                          className={errors.title ? 'border-red-500' : ''}
+                        />
+                        {errors.title && <p className='text-sm text-red-500'>{errors.title.message}</p>}
+                      </div>
                     )}
                   />
 
@@ -142,38 +142,40 @@ const QuickAddCoursePage = () => {
                     name='level'
                     control={control}
                     render={({ field }) => (
-                      <FormControl fullWidth error={!!errors.level}>
-                        <InputLabel>Level</InputLabel>
-                        <Select {...field} label='Level'>
-                          <MenuItem value='beginner'>Cơ bản</MenuItem>
-                          <MenuItem value='intermediate'>Trung cấp</MenuItem>
-                          <MenuItem value='advanced'>Nâng cao</MenuItem>
+                      <div className='space-y-2'>
+                        <Label>Trình độ</Label>
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger className={errors.level ? 'border-red-500' : ''}>
+                            <SelectValue placeholder='Chọn trình độ' />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value='beginner'>Cơ bản</SelectItem>
+                            <SelectItem value='intermediate'>Trung cấp</SelectItem>
+                            <SelectItem value='advanced'>Nâng cao</SelectItem>
+                          </SelectContent>
                         </Select>
-                        {errors.level && <FormHelperText>{errors.level.message}</FormHelperText>}
-                      </FormControl>
+                        {errors.level && <p className='text-sm text-red-500'>{errors.level.message}</p>}
+                      </div>
                     )}
                   />
-                </Box>
-              </Box>
+                </div>
+              </div>
 
-              <Divider />
+              <hr className='my-6' />
 
               {/* Pricing */}
-              <Box>
-                <Typography variant='h6' sx={{ mb: 2, color: 'primary.main' }}>
-                  Pricing
-                </Typography>
+              <div>
+                <h2 className='text-xl font-semibold text-primary mb-4'>Giá khóa học</h2>
 
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <div className='flex flex-col gap-4'>
                   <Controller
                     name='is_paid'
                     control={control}
                     render={({ field }) => (
-                      <FormControlLabel
-                        control={<Switch {...field} checked={field.value} />}
-                        label='This is a paid course'
-                        sx={{ width: 'fit-content' }}
-                      />
+                      <div className='flex items-center space-x-2 w-fit'>
+                        <Switch id='is_paid' checked={field.value} onCheckedChange={field.onChange} />
+                        <Label htmlFor='is_paid'>Khóa học trả phí</Label>
+                      </div>
                     )}
                   />
 
@@ -182,114 +184,86 @@ const QuickAddCoursePage = () => {
                       name='price'
                       control={control}
                       render={({ field }) => (
-                        <TextField
-                          {...field}
-                          fullWidth
-                          label='Price *'
-                          type='number'
-                          inputProps={{ min: 0, step: 0.01 }}
-                          error={!!errors.price}
-                          helperText={errors.price?.message}
-                          placeholder='0.00'
-                          sx={{ maxWidth: 300 }}
-                        />
+                        <div className='space-y-2 max-w-xs'>
+                          <Label htmlFor='price'>Giá tiền (VNĐ)</Label>
+                          <Input
+                            {...field}
+                            id='price'
+                            type='number'
+                            min={0}
+                            step={1}
+                            placeholder='0.00'
+                            className={errors.price ? 'border-red-500' : ''}
+                          />
+                          {errors.price && <p className='text-sm text-red-500'>{errors.price.message}</p>}
+                        </div>
                       )}
                     />
                   )}
-                </Box>
-              </Box>
+                </div>
+              </div>
 
-              <Divider />
+              <hr className='my-6' />
 
               {/* Thumbnail */}
-              <Box>
-                <Typography variant='h6' sx={{ mb: 2, color: 'primary.main' }}>
-                  Course Thumbnail
-                </Typography>
+              <div>
+                <h2 className='text-xl font-semibold text-primary mb-4'>Ảnh thumbnail</h2>
 
                 <Controller
                   name='thumbnail'
                   control={control}
                   render={({ field: { onChange, value, ...field } }) => (
-                    <Box>
-                      <input
-                        {...field}
-                        type='file'
-                        accept='image/*'
-                        onChange={(e) => {
-                          const file = e.target.files?.[0]
-                          onChange(file)
-                        }}
-                        style={{ display: 'none' }}
-                        id='thumbnail-upload'
-                      />
-                      <label htmlFor='thumbnail-upload'>
-                        <Button
-                          variant='outlined'
-                          component='span'
-                          startIcon={<ImageIcon />}
-                          sx={{
-                            minHeight: 56,
-                            width: '100%',
-                            maxWidth: 400,
-                            border: errors.thumbnail ? '2px solid' : '1px solid',
-                            borderColor: errors.thumbnail ? 'error.main' : 'divider',
-                            borderStyle: 'dashed'
+                    <div className='space-y-2'>
+                      <div className='grid w-full max-w-sm items-center gap-3'>
+                        <Label>Ảnh nền</Label>
+
+                        {/* Ẩn input thật */}
+                        <input
+                          id='picture'
+                          type='file'
+                          className='hidden'
+                          onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            onChange(file)
                           }}
-                        >
-                          {value
-                            ? `Selected: ${value instanceof File ? value.name : 'Current thumbnail'}`
-                            : 'Click to upload thumbnail'}
+                        />
+
+                        {/* Button custom thay thế */}
+                        <Button asChild variant='outline'>
+                          <label htmlFor='picture' className='cursor-pointer'>
+                            {value ? `Đã chọn: ${value.name}` : 'Chọn ảnh...'}
+                          </label>
                         </Button>
-                      </label>
-                      {errors.thumbnail && (
-                        <Typography variant='body2' color='error' sx={{ mt: 1 }}>
-                          {errors.thumbnail.message}
-                        </Typography>
-                      )}
+                      </div>
+
+                      {errors.thumbnail && <p className='text-sm text-red-500 mt-2'>{errors.thumbnail.message}</p>}
                       {!errors.thumbnail && (
-                        <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
-                          Supported formats: JPEG, PNG, WebP (Max 5MB)
-                        </Typography>
+                        <p className='text-sm text-muted-foreground mt-2'>
+                          Định dạng: JPEG, PNG, WebP (Dung lượng tối đa 5MB)
+                        </p>
                       )}
-                    </Box>
+                    </div>
                   )}
                 />
-              </Box>
+              </div>
 
-              <Divider />
+              <hr className='my-6' />
 
               {/* Form Actions */}
-              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', pt: 2 }}>
-                <Button variant='outlined' onClick={() => navigate('/admin/courses')} disabled={isSubmitting}>
-                  Cancel
+              <div className='flex gap-4 justify-end pt-4'>
+                <Button variant='outline' onClick={() => navigate('/admin/courses')} disabled={isSubmitting}>
+                  Hủy
                 </Button>
-                <Button
-                  type='submit'
-                  variant='contained'
-                  startIcon={<SaveIcon />}
-                  disabled={isSubmitting}
-                  sx={{ minWidth: 120 }}
-                >
-                  {isSubmitting ? 'Creating...' : 'Create Course'}
+                <Button type='submit' disabled={isSubmitting} className='min-w-[120px] flex items-center gap-2'>
+                  <Save className='h-4 w-4' />
+                  {isSubmitting ? 'Đang thêm...' : 'Thêm khóa học'}
                 </Button>
-              </Box>
-            </Box>
+              </div>
+            </div>
           </form>
         </CardContent>
       </Card>
-
-      {/* Snackbar */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-      >
-        <Alert severity={snackbar.severity} onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </Box>
+    </div>
   )
 }
 

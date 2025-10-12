@@ -1,37 +1,25 @@
 import { courseFormSchema, type CourseFormInput } from '@/schemas/course.schema'
-import { createCourse } from '@/store/courseSlice'
+import { createCourse } from '@/store/features/courses/courseSlice'
 import { useAppDispatch } from '@/store/hook'
 import { showSnackbar } from '@/store/snackbarSlice'
 import type { Course } from '@/types/course'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Image } from '@mui/icons-material'
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Divider,
-  FormControl,
-  FormControlLabel,
-  FormHelperText,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
-  Switch,
-  TextField,
-  Typography
-} from '@mui/material'
-import { Editor } from '@tinymce/tinymce-react'
+import { ImageIcon } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
+import { Separator } from '@/components/ui/separator'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 
 interface CourseDetailsProps {
-  course: Course | null
+  course?: Course | null
 }
 
-const CourseInfo: React.FC<CourseDetailsProps> = ({ course }) => {
+const CourseInfo: React.FC<CourseDetailsProps> = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
@@ -76,23 +64,28 @@ const CourseInfo: React.FC<CourseDetailsProps> = ({ course }) => {
   }
 
   return (
-    <Card variant='outlined' sx={{ mb: 4 }}>
-      <CardHeader title='Thông tin khóa học' subheader='Cung cấp thông tin cơ bản của khóa học' />
-      <CardContent>
-        <Box>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <Card className='mb-6'>
+      <CardHeader>
+        <CardTitle>Thông tin khóa học</CardTitle>
+        <p className='text-sm text-muted-foreground'>Cung cấp thông tin cơ bản của khóa học</p>
+      </CardHeader>
+      <CardContent className='space-y-6'>
+        <div>
+          <div className='space-y-4'>
             <Controller
               name='title'
               control={control}
               render={({ field }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  label='Tên khóa học'
-                  error={!!errors.title}
-                  helperText={errors.title?.message}
-                  placeholder='Nhập tên khóa học'
-                />
+                <div className='space-y-2'>
+                  <Label htmlFor='title'>Tên khóa học</Label>
+                  <Input
+                    id='title'
+                    {...field}
+                    placeholder='Nhập tên khóa học'
+                    className={errors.title ? 'border-red-500' : ''}
+                  />
+                  {errors.title && <p className='text-sm text-red-500'>{errors.title.message}</p>}
+                </div>
               )}
             />
 
@@ -121,38 +114,40 @@ const CourseInfo: React.FC<CourseDetailsProps> = ({ course }) => {
               name='level'
               control={control}
               render={({ field }) => (
-                <FormControl fullWidth error={!!errors.level}>
-                  <InputLabel>Level</InputLabel>
-                  <Select {...field} label='Level'>
-                    <MenuItem value='beginner'>Cơ bản</MenuItem>
-                    <MenuItem value='intermediate'>Trung cấp</MenuItem>
-                    <MenuItem value='advanced'>Nâng cao</MenuItem>
+                <div className='space-y-2'>
+                  <Label htmlFor='level'>Mức độ</Label>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className={errors.level ? 'border-red-500' : ''}>
+                      <SelectValue placeholder='Chọn mức độ' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value='beginner'>Cơ bản</SelectItem>
+                      <SelectItem value='intermediate'>Trung cấp</SelectItem>
+                      <SelectItem value='advanced'>Nâng cao</SelectItem>
+                    </SelectContent>
                   </Select>
-                  {errors.level && <FormHelperText>{errors.level.message}</FormHelperText>}
-                </FormControl>
+                  {errors.level && <p className='text-sm text-red-500'>{errors.level.message}</p>}
+                </div>
               )}
             />
-          </Box>
-        </Box>
+          </div>
+        </div>
 
-        <Divider sx={{ mt: 3, mb: 1 }} />
+        <Separator className='my-6' />
 
         {/* Pricing */}
-        <Box>
-          <Typography variant='h6' sx={{ mb: 2 }}>
-            Trả phí
-          </Typography>
+        <div>
+          <h3 className='text-lg font-semibold mb-2'>Trả phí</h3>
 
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div className='space-y-4'>
             <Controller
               name='is_paid'
               control={control}
               render={({ field }) => (
-                <FormControlLabel
-                  control={<Switch {...field} checked={field.value} />}
-                  label='Đây là khóa học trả phí'
-                  sx={{ width: 'fit-content' }}
-                />
+                <label className='flex items-center gap-2 w-fit cursor-pointer'>
+                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  <span>Đây là khóa học trả phí</span>
+                </label>
               )}
             />
 
@@ -161,34 +156,35 @@ const CourseInfo: React.FC<CourseDetailsProps> = ({ course }) => {
                 name='price'
                 control={control}
                 render={({ field }) => (
-                  <TextField
-                    {...field}
-                    fullWidth
-                    label='Price'
-                    type='number'
-                    inputProps={{ min: 0, step: 1000 }}
-                    error={!!errors.price}
-                    helperText={errors.price?.message}
-                    placeholder='0.00'
-                  />
+                  <div className='space-y-2'>
+                    <Label htmlFor='price'>Giá khóa học (VNĐ)</Label>
+                    <Input
+                      id='price'
+                      {...field}
+                      type='number'
+                      min={0}
+                      step={1000}
+                      placeholder='0'
+                      className={errors.price ? 'border-red-500' : ''}
+                    />
+                    {errors.price && <p className='text-sm text-red-500'>{errors.price.message}</p>}
+                  </div>
                 )}
               />
             )}
-          </Box>
-        </Box>
+          </div>
+        </div>
 
-        <Divider sx={{ mt: 3, mb: 1 }} />
+        <Separator className='my-6' />
 
-        <Box>
-          <Typography variant='h6' sx={{ mb: 2 }}>
-            Hình ảnh minh họa
-          </Typography>
+        <div>
+          <h3 className='text-lg font-semibold mb-2'>Hình ảnh minh họa</h3>
 
           <Controller
             name='thumbnail'
             control={control}
             render={({ field: { onChange, value, ...field } }) => (
-              <Box>
+              <div>
                 <input
                   {...field}
                   type='file'
@@ -197,54 +193,45 @@ const CourseInfo: React.FC<CourseDetailsProps> = ({ course }) => {
                     const file = e.target.files?.[0]
                     onChange(file)
                   }}
-                  style={{ display: 'none' }}
+                  className='hidden'
                   id='thumbnail-upload'
                 />
                 <label htmlFor='thumbnail-upload'>
                   <Button
-                    variant='outlined'
-                    component='span'
-                    startIcon={<Image />}
-                    sx={{
-                      minHeight: 56,
-                      width: '100%',
-                      maxWidth: 400,
-                      border: errors.thumbnail ? '2px solid' : '1px solid',
-                      borderColor: errors.thumbnail ? 'error.main' : 'divider',
-                      borderStyle: 'dashed'
-                    }}
+                    variant='outline'
+                    asChild
+                    className={`h-14 w-full max-w-md border-2 border-dashed cursor-pointer ${
+                      errors.thumbnail ? 'border-red-500' : 'border-muted-foreground/30'
+                    }`}
                   >
-                    {value
-                      ? `Đã chọn: ${value instanceof File ? value.name : 'Current thumbnail'}`
-                      : 'Chọn hình ảnh minh họa'}
+                    <span className='flex items-center gap-2'>
+                      <ImageIcon className='h-4 w-4' />
+                      {value
+                        ? `Đã chọn: ${value instanceof File ? value.name : 'Current thumbnail'}`
+                        : 'Chọn hình ảnh minh họa'}
+                    </span>
                   </Button>
                 </label>
-                {errors.thumbnail && (
-                  <Typography variant='body2' color='error' sx={{ mt: 1 }}>
-                    {errors.thumbnail.message}
-                  </Typography>
-                )}
+                {errors.thumbnail && <p className='text-sm text-red-500 mt-2'>{errors.thumbnail.message}</p>}
                 {!errors.thumbnail && (
-                  <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
-                    Định dạng: JPEG, PNG, WebP (Tối đa 5MB)
-                  </Typography>
+                  <p className='text-sm text-muted-foreground mt-2'>Định dạng: JPEG, PNG, WebP (Tối đa 5MB)</p>
                 )}
-              </Box>
+              </div>
             )}
           />
-        </Box>
-        <Stack direction='row' spacing={2} justifyContent='flex-end' sx={{ mt: 3 }}>
-          {isDirty && <Button variant='outlined'>Khôi phục</Button>}
+        </div>
+        <div className='flex justify-end gap-2 mt-6'>
+          {isDirty && <Button variant='outline'>Khôi phục</Button>}
           <Button
-            variant='contained'
+            variant='default'
             color='primary'
             onClick={handleSubmit(onSubmit)}
             disabled={isSubmitting}
-            sx={{ minWidth: 150 }}
+            className='min-w-[150px]'
           >
             {isSubmitting ? 'Đang lưu...' : 'Lưu thông tin'}
           </Button>
-        </Stack>
+        </div>
       </CardContent>
     </Card>
   )

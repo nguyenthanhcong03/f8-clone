@@ -2,42 +2,20 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import type { AppDispatch, RootState } from '@/store/store'
-import {
-  Box,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Button,
-  Typography,
-  Chip,
-  IconButton,
-  Alert,
-  Snackbar,
-  CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions
-} from '@mui/material'
-import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Visibility } from '@mui/icons-material'
-import { fetchCourses, deleteCourse, clearError } from '@/store/courseSlice'
-import type { Course, CourseLevel } from '@/types/course'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Plus } from 'lucide-react'
+import { fetchCourses, deleteCourse, clearError } from '@/store/features/courses/courseSlice'
+import type { Course } from '@/types/course'
 import CourseGrid from '../../../components/common/CourseGridAdmin/CourseGridAdmin'
 
-const levelColors: Record<CourseLevel, 'success' | 'warning' | 'error'> = {
-  beginner: 'success',
-  intermediate: 'warning',
-  advanced: 'error'
-}
+// Level colors moved to CourseGrid component if needed
 
 const CourseIndex = () => {
   const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
-  const { courses, loading, error } = useSelector((state: RootState) => state.courses)
+  const { loading, error } = useSelector((state: RootState) => state.courses)
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -70,7 +48,7 @@ const CourseIndex = () => {
     if (!courseToDelete) return
 
     try {
-      await dispatch(deleteCourse(courseToDelete.id)).unwrap()
+      await dispatch(deleteCourse(parseInt(courseToDelete.id))).unwrap()
       showSnackbar('Course deleted successfully', 'success')
       setDeleteDialogOpen(false)
       setCourseToDelete(null)
@@ -81,54 +59,55 @@ const CourseIndex = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-        <CircularProgress />
-      </Box>
+      <div className='flex justify-center p-6'>
+        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary'></div>
+      </div>
     )
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <div className='p-6'>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant='h4' component='h1'>
-          Danh sách khóa học
-        </Typography>
-        <Button variant='contained' startIcon={<AddIcon />} onClick={handleAddCourse} sx={{ minWidth: 150 }}>
+      <div className='flex justify-between items-center mb-6'>
+        <h1 className='text-3xl font-bold'>Danh sách khóa học</h1>
+        <Button onClick={handleAddCourse} className='flex items-center gap-2 min-w-[150px]'>
+          <Plus className='h-4 w-4' />
           Thêm khóa học
         </Button>
-      </Box>
+      </div>
 
       {/* Danh sách khóa học */}
       <CourseGrid />
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>Delete Course</DialogTitle>
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
-          <Typography>
-            Are you sure you want to delete "{courseToDelete?.title}"? This action cannot be undone.
-          </Typography>
+          <DialogHeader>
+            <DialogTitle>Xóa khóa học</DialogTitle>
+          </DialogHeader>
+          <p className='text-sm text-muted-foreground'>
+            Bạn có chắc chắn muốn xóa "{courseToDelete?.title}"? Hành động này không thể hoàn tác.
+          </p>
+          <DialogFooter>
+            <Button variant='outline' onClick={() => setDeleteDialogOpen(false)}>
+              Hủy
+            </Button>
+            <Button variant='destructive' onClick={handleDeleteConfirm}>
+              Xóa
+            </Button>
+          </DialogFooter>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleDeleteConfirm} color='error' variant='contained'>
-            Delete
-          </Button>
-        </DialogActions>
       </Dialog>
 
-      {/* Snackbar */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-      >
-        <Alert severity={snackbar.severity} onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </Box>
+      {/* Snackbar replacement with Alert */}
+      {snackbar.open && (
+        <div className='fixed bottom-4 right-4 z-50'>
+          <Alert className={`${snackbar.severity === 'error' ? 'border-destructive' : 'border-green-500'}`}>
+            <AlertDescription>{snackbar.message}</AlertDescription>
+          </Alert>
+        </div>
+      )}
+    </div>
   )
 }
 

@@ -1,8 +1,5 @@
-import { useAppSelector } from '@/store/hook'
-import { darkTheme, lightTheme } from '@/theme/theme'
-import { CssBaseline } from '@mui/material'
-import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
 import React from 'react'
+import { useAppSelector } from '@/store/hook'
 
 interface ThemeProviderProps {
   children: React.ReactNode
@@ -11,14 +8,19 @@ interface ThemeProviderProps {
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const themeMode = useAppSelector((state) => state.theme.mode)
 
-  const theme = themeMode === 'dark' ? darkTheme : lightTheme
+  React.useEffect(() => {
+    const root = window.document.documentElement
 
-  return (
-    <MuiThemeProvider theme={theme}>
-      <CssBaseline />
-      {children}
-    </MuiThemeProvider>
-  )
+    root.classList.remove('light', 'dark')
+
+    if (themeMode === 'dark') {
+      root.classList.add('dark')
+    } else {
+      root.classList.add('light')
+    }
+  }, [themeMode])
+
+  return <>{children}</>
 }
 
 export default ThemeProvider

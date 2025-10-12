@@ -51,7 +51,7 @@ export const createLesson = createAsyncThunk(
       video_public_id,
       videoFile
     }: {
-      section_id: number
+      section_id: string
       title: string
       content?: string
       video_url?: string
@@ -113,7 +113,7 @@ export const updateLesson = createAsyncThunk(
   }
 )
 
-export const deleteLesson = createAsyncThunk('lessons/deleteLesson', async (lessonId: number, { rejectWithValue }) => {
+export const deleteLesson = createAsyncThunk('lessons/deleteLesson', async (lessonId: string, { rejectWithValue }) => {
   try {
     const response = await lessonAPI.deleteLesson(lessonId)
     return { lessonId, data: response.data }

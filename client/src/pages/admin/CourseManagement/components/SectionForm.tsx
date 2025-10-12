@@ -1,4 +1,7 @@
-import { Box, Button, CircularProgress, Modal, TextField, Typography } from '@mui/material'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { useState, useEffect } from 'react'
 import type { Section } from '@/types/course'
 
@@ -32,50 +35,46 @@ const SectionForm: React.FC<SectionFormProps> = ({ open, onClose, onSave, select
   }
 
   return (
-    <Modal open={open} onClose={onClose}>
-      <Box
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: 'background.paper',
-          p: 4,
-          borderRadius: 2,
-          minWidth: 400,
-          maxWidth: '90%',
-          boxShadow: 24
-        }}
-      >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Typography variant='h6'>{selectedSection ? 'Chỉnh sửa chương' : 'Thêm chương mới'}</Typography>
-        </Box>
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className='sm:max-w-md'>
+        <DialogHeader>
+          <DialogTitle>{selectedSection ? 'Chỉnh sửa chương' : 'Thêm chương mới'}</DialogTitle>
+        </DialogHeader>
 
-        <TextField
-          autoFocus
-          margin='dense'
-          id='section-title'
-          label='Tên chương'
-          type='text'
-          fullWidth
-          variant='outlined'
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          error={!!error}
-          helperText={error}
-          sx={{ mb: 3 }}
-        />
+        <div className='space-y-4'>
+          <div className='space-y-2'>
+            <Label htmlFor='section-title'>Tên chương</Label>
+            <Input
+              id='section-title'
+              autoFocus
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder='Nhập tên chương...'
+              className={error ? 'border-destructive' : ''}
+            />
+            {error && <p className='text-sm text-destructive'>{error}</p>}
+          </div>
+        </div>
 
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
-          <Button variant='outlined' onClick={onClose}>
+        <DialogFooter>
+          <Button variant='outline' onClick={onClose}>
             Hủy
           </Button>
-          <Button variant='contained' color='primary' onClick={handleSave} disabled={isLoading}>
-            {isLoading ? <CircularProgress size={24} color='inherit' /> : selectedSection ? 'Cập nhật' : 'Tạo chương'}
+          <Button onClick={handleSave} disabled={isLoading}>
+            {isLoading ? (
+              <div className='flex items-center gap-2'>
+                <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-current'></div>
+                Đang xử lý...
+              </div>
+            ) : selectedSection ? (
+              'Cập nhật'
+            ) : (
+              'Tạo chương'
+            )}
           </Button>
-        </Box>
-      </Box>
-    </Modal>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 

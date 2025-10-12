@@ -1,12 +1,9 @@
 import axiosInstance from '../config/axios'
-import type { ApiResponse } from '@/types/api'
-import type { Course, Section, Lesson } from '@/types/course'
-import type { CreateCourseInput, UpdateCourseInput } from '@/schemas/course.schema'
 
 const API_ENDPOINT = '/enrollments'
 
-export const enrollCourse = async (id: number) => {
-  const response = await axiosInstance.post(API_ENDPOINT, { id })
+export const enrollCourse = async (slug: string) => {
+  const response = await axiosInstance.post(API_ENDPOINT, { slug })
   return response
 }
 
@@ -15,8 +12,8 @@ export const getUserEnrollments = async () => {
   return response
 }
 
-export const checkEnrollment = async (id: number) => {
-  const response = await axiosInstance.get(`${API_ENDPOINT}/check/${id}`)
+export const checkEnrollment = async (slug: string) => {
+  const response = await axiosInstance.get(`${API_ENDPOINT}/check/${slug}`)
   return response
 }
 

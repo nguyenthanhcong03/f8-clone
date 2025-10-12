@@ -1,39 +1,36 @@
 import { DataTypes, Model, Optional } from 'sequelize'
 import sequelize from '../config/database'
+import { v4 as uuidv4 } from 'uuid'
 
 interface SectionAttributes {
-  id: number
+  section_id: string
   title: string
-  course_id: number
+  course_id: string
   order?: number
 }
 
-type SectionCreationAttributes = Optional<SectionAttributes, 'id' | 'order'>
+type SectionCreationAttributes = Optional<SectionAttributes, 'section_id' | 'order'>
 
 class Section extends Model<SectionAttributes, SectionCreationAttributes> implements SectionAttributes {
-  declare id: number
+  declare section_id: string
   declare title: string
-  declare course_id: number
+  declare course_id: string
   declare order?: number
 }
 
 Section.init(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true
-    },
+    section_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), unique: true, primaryKey: true },
     title: {
       type: DataTypes.STRING(255),
       allowNull: false
     },
     course_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
       references: {
         model: 'courses',
-        key: 'id'
+        key: 'course_id'
       }
     },
     order: {

@@ -1,55 +1,45 @@
-import { Box, Card, CardContent, CardMedia, Typography } from '@mui/material'
+import type { Course } from '@/types/course'
+import { Users } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
 import { useLocation, useNavigate } from 'react-router-dom'
-import GroupsIcon from '@mui/icons-material/Groups'
 
 interface CourseCardProps {
-  course: {
-    id: number
-    title: string
-    thumbnail: string
-    enrollment_count?: number
-    is_paid?: boolean
-    price?: number
-  }
+  course: Course
 }
 
-const CourseCard = ({ course }: CourseCardProps) => {
-  const navigate = useNavigate()
+const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
   const location = useLocation()
-
-  const isDetailPage = location.pathname.includes(`/${course.id}`)
-  const isAdminPage = location.pathname.includes('/admin')
-
-  const handleNavigate = () => {
-    if (!isDetailPage) {
-      navigate(`/${course.id}`)
-    }
-    if (isAdminPage) {
-      navigate(`/admin/courses/${course.id}`)
+  const isAdmin = location.pathname.startsWith('/admin')
+  const navigate = useNavigate()
+  const handleNavigateToCourseDetail = (course: Course) => {
+    if (isAdmin) {
+      navigate(`/admin/courses/${course.course_id}`)
+      return
+    } else {
+      navigate(`${course.slug}`)
     }
   }
 
   return (
     <Card
-      variant='outlined'
-      sx={{ borderRadius: 3, bgcolor: '#F7F7F7', cursor: 'pointer', '&:hover': { boxShadow: 3 } }}
-      elevation={0}
-      onClick={handleNavigate}
+      className='rounded-3xl bg-gray-50 cursor-pointer hover:shadow-lg transition-shadow border'
+      onClick={(e) => {
+        e.stopPropagation() // tránh trigger onClick card
+        handleNavigateToCourseDetail(course)
+      }}
     >
-      <CardMedia component='img' height='180' image={course.thumbnail} alt={course.title} />
-      <CardContent sx={{ pb: '16px !important' }}>
-        <Typography variant='h6' fontSize={16}>
-          {course.title}
-        </Typography>
-        <Typography variant='body2' color='primary' fontWeight={600} sx={{ mt: 1 }}>
+      <img src={course.thumbnail} alt={course.title} className='w-full h-[180px] object-cover rounded-t-3xl' />
+      <CardContent className='pb-4'>
+        <h3 className='text-base font-semibold mb-2'>{course.title}</h3>
+        <p className='text-primary font-semibold text-sm mb-2'>
           {course.is_paid ? `${(course.price || 0).toLocaleString('vi-VN')} ₫` : 'Miễn phí'}
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
-          <Typography variant='body2' sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1, color: '#666' }}>
-            <GroupsIcon />
+        </p>
+        <div className='flex items-center gap-2 mt-2'>
+          <div className='flex items-center gap-1 text-sm text-gray-600'>
+            <Users className='h-4 w-4' />
             {course.enrollment_count?.toLocaleString() || 0}
-          </Typography>
-        </Box>
+          </div>
+        </div>
       </CardContent>
     </Card>
   )

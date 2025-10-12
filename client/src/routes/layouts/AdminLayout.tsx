@@ -1,19 +1,18 @@
-import AdminHeader from '@/components/common/Header/AdminHeader'
+import AdminHeader from '@/components/admin/AdminHeader'
 import AdminSidebar from '@/components/admin/AdminSidebar'
-import { Box } from '@mui/material'
 import { Outlet } from 'react-router-dom'
 
 const AdminLayout = () => {
   return (
-    <Box sx={{ display: 'flex', width: '100%' }}>
+    <div className='flex w-full h-screen'>
       <AdminSidebar />
-      <Box component='main' sx={{ flexGrow: 1 }}>
+      <main className='flex-1 flex flex-col'>
         <AdminHeader />
-        <Box sx={{ p: 3 }}>
+        <div className='flex-1 overflow-y-auto p-6'>
           <Outlet />
-        </Box>
-      </Box>
-    </Box>
+        </div>
+      </main>
+    </div>
   )
 }
 

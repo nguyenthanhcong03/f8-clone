@@ -1,21 +1,22 @@
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import CourseInfo from '@/pages/admin/CourseManagement/components/CourseInfo'
 import LessonForm from '@/pages/admin/CourseManagement/components/LessonForm'
 import { setActiveTab } from '@/store/appSlice'
-import { createCourse, fetchCourseById, updateLessonOrder } from '@/store/courseSlice'
+import { fetchCourseById, updateLessonOrder } from '@/store/features/courses/courseSlice'
+import { createLesson, deleteLesson } from '@/store/features/courses/lessonSlice'
+import { removeSection, updateSectionOrder } from '@/store/features/courses/sectionSlice'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
-import { createLesson, deleteLesson } from '@/store/lessonSlice'
-import { fetchCourseSections, removeSection, updateSectionOrder } from '@/store/sectionSlice'
 import { showSnackbar } from '@/store/snackbarSlice'
 import type { Lesson, Section } from '@/types/course'
-import { ArrowBack } from '@mui/icons-material'
-import { Box, Button, CircularProgress, Tab, Tabs, Typography } from '@mui/material'
+import { ArrowLeft } from 'lucide-react'
 import type { SyntheticEvent } from 'react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import CourseStructure from './components/CourseStructure'
 
 const EditCoursePage = () => {
-  const { id } = useParams<{ id: string }>()
+  const { courseId } = useParams<{ courseId: string }>()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const { currentCourse, loading } = useAppSelector((state) => state.courses)
@@ -25,7 +26,7 @@ const EditCoursePage = () => {
   const [isOpenFormSection, setIsOpenFormSection] = useState(false)
   const [isOpenFormLesson, setIsOpenFormLesson] = useState(false)
   const [selectedSection, setSelectedSection] = useState<Section | null>(null)
-  const [currentSectionId, setCurrentSectionId] = useState<number | null>(null)
+  const [currentSectionId, setCurrentSectionId] = useState<string | null>(null)
   const [lessonSubmitLoading, setLessonSubmitLoading] = useState(false)
 
   const handleChangeTab = (_event: SyntheticEvent, newValue: string) => {
@@ -42,31 +43,25 @@ const EditCoursePage = () => {
   }, [dispatch, searchParams, activeTab, setSearchParams])
 
   useEffect(() => {
-    if (id) {
-      dispatch(fetchCourseById(parseInt(id)))
+    if (courseId) {
+      dispatch(fetchCourseById(courseId))
     }
-  }, [dispatch, id])
-
-  useEffect(() => {
-    if (id) {
-      dispatch(fetchCourseSections(parseInt(id)))
-    }
-  }, [dispatch, id])
+  }, [dispatch, courseId])
 
   const handleReorderSections = async (newSections: Section[]) => {
-    if (!id) return
+    if (!courseId) return
 
-    const sectionIds = newSections.map((section) => section.id)
+    const sectionIds = newSections.map((section) => section.section_id)
     try {
-      await dispatch(updateSectionOrder({ courseId: parseInt(id), sectionIds })).unwrap()
+      await dispatch(updateSectionOrder({ courseId, sectionIds })).unwrap()
       dispatch(showSnackbar({ message: 'Cập nhật thứ tự chương thành công', severity: 'success' }))
     } catch {
       dispatch(showSnackbar({ message: 'Có lỗi khi cập nhật thứ tự chương', severity: 'error' }))
     }
   }
 
-  const handleReorderLessons = async (sectionId: number, newLessons: Lesson[]) => {
-    const lessonIds = newLessons.map((lesson) => lesson.id)
+  const handleReorderLessons = async (sectionId: string, newLessons: Lesson[]) => {
+    const lessonIds = newLessons.map((lesson) => lesson.lesson_id)
     try {
       await dispatch(updateLessonOrder({ sectionId, lessonIds })).unwrap()
       dispatch(showSnackbar({ message: 'Cập nhật thứ tự bài học th�nh c�ng', severity: 'success' }))
@@ -85,23 +80,23 @@ const EditCoursePage = () => {
     setIsOpenFormSection(true)
   }
 
-  const handleDeleteSection = async (sectionId: number) => {
-    if (window.confirm('B?n c� ch?c ch?n mu?n x�a chuong n�y kh�ng?')) {
+  const handleDeleteSection = async (sectionId: string) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa chương này không?')) {
       try {
         await dispatch(removeSection(sectionId)).unwrap()
-        dispatch(showSnackbar({ message: 'X�a chuong th�nh c�ng', severity: 'success' }))
+        dispatch(showSnackbar({ message: 'Xóa chương thành công', severity: 'success' }))
       } catch {
-        dispatch(showSnackbar({ message: 'C� l?i x?y ra khi x�a chuong', severity: 'error' }))
+        dispatch(showSnackbar({ message: 'Có lỗi xảy ra khi xóa chương', severity: 'error' }))
       }
     }
   }
 
-  const handleAddLesson = (sectionId: number) => {
+  const handleAddLesson = (sectionId: string) => {
     setIsOpenFormLesson(true)
     setCurrentSectionId(sectionId)
   }
 
-  const handleSaveLesson = async (title: string, sectionId: number) => {
+  const handleSaveLesson = async (title: string, sectionId: string) => {
     setLessonSubmitLoading(true)
 
     try {
@@ -113,14 +108,14 @@ const EditCoursePage = () => {
       ).unwrap()
       setIsOpenFormLesson(false)
       dispatch(showSnackbar({ message: 'Tạo bài học thành công', severity: 'success' }))
-    } catch (error) {
+    } catch {
       dispatch(showSnackbar({ message: 'Có lỗi xảy ra khi tạo bài học', severity: 'error' }))
     } finally {
       setLessonSubmitLoading(false)
     }
   }
 
-  const handleDeleteLesson = async (lessonId: number) => {
+  const handleDeleteLesson = async (lessonId: string) => {
     if (window.confirm('Bạn có chắc muốn xóa bài học này không?')) {
       try {
         await dispatch(deleteLesson(lessonId)).unwrap()
@@ -133,42 +128,61 @@ const EditCoursePage = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-        <CircularProgress />
-      </Box>
+      <div className='flex justify-center p-6'>
+        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary'></div>
+      </div>
     )
   }
 
   return (
-    <Box sx={{ p: 3, mx: 'auto' }}>
+    <div className='p-6 mx-auto'>
       {/* Header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-        <Button startIcon={<ArrowBack />} onClick={() => navigate('/admin/courses')} variant='outlined'>
+      <div className='flex items-center gap-4 mb-6'>
+        <Button variant='outline' onClick={() => navigate('/admin/courses')} className='flex items-center gap-2'>
+          <ArrowLeft className='h-4 w-4' />
           Trở về
         </Button>
-        <Typography variant='h4' component='h1'>
-          Chỉnh sửa khóa học
-        </Typography>
-      </Box>
+        <h1 className='text-3xl font-bold'>Chỉnh sửa khóa học</h1>
+      </div>
 
-      <Box sx={{ width: '100%', mb: 4 }}>
+      <div className='w-full mb-8'>
         {/* Tabs */}
-        <Box sx={{ border: 1, borderColor: 'divider', mb: 3 }}>
-          <Tabs value={activeTab} onChange={handleChangeTab} centered aria-label='course edit tabs'>
-            <Tab label='Thông tin' value='info' />
-            <Tab label='Bài học' value='lessons' />
-          </Tabs>
-        </Box>
+        <div className='border border-border rounded-lg mb-6'>
+          <nav className='flex justify-center' aria-label='course edit tabs'>
+            <button
+              onClick={(e) => handleChangeTab(e, 'info')}
+              className={cn(
+                'px-6 py-3 text-sm font-medium border-b-2 transition-colors',
+                activeTab === 'info'
+                  ? 'border-primary text-primary bg-accent'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+              )}
+            >
+              Thông tin
+            </button>
+            <button
+              onClick={(e) => handleChangeTab(e, 'lessons')}
+              className={cn(
+                'px-6 py-3 text-sm font-medium border-b-2 transition-colors',
+                activeTab === 'lessons'
+                  ? 'border-primary text-primary bg-accent'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+              )}
+            >
+              Bài học
+            </button>
+          </nav>
+        </div>
 
         {/* Tab panels */}
-        <Box role='tabpanel' hidden={activeTab !== 'info'}>
+        <div role='tabpanel' className={cn('transition-opacity', activeTab !== 'info' && 'hidden')}>
           {activeTab === 'info' && <CourseInfo course={currentCourse} />}
-        </Box>
+        </div>
 
-        <Box role='tabpanel' hidden={activeTab !== 'lessons'}>
+        <div role='tabpanel' className={cn('transition-opacity', activeTab !== 'lessons' && 'hidden')}>
           {activeTab === 'lessons' && (
             <CourseStructure
-              courseId={id}
+              courseId={courseId!}
               isOpenFormSection={isOpenFormSection}
               setIsOpenFormSection={setIsOpenFormSection}
               selectedSection={selectedSection}
@@ -181,18 +195,18 @@ const EditCoursePage = () => {
               onReorderLessons={handleReorderLessons}
             />
           )}
-        </Box>
-      </Box>
+        </div>
+      </div>
 
       {/* Lesson Form Modal */}
       <LessonForm
         open={isOpenFormLesson}
         onClose={() => setIsOpenFormLesson(false)}
         onSave={handleSaveLesson}
-        sectionId={currentSectionId || 0}
+        sectionId={currentSectionId!}
         isLoading={lessonSubmitLoading}
       />
-    </Box>
+    </div>
   )
 }
 

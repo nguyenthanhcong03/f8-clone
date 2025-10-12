@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 
 interface UserPayload {
-  id: number
+  user_id: string
   name: string
   email: string
   phone?: string
@@ -12,7 +12,7 @@ interface UserPayload {
 export const generateAccessToken = (user: UserPayload): string => {
   return jwt.sign(
     {
-      id: user.id,
+      user_id: user.user_id,
       name: user.name,
       email: user.email,
       phone: user.phone,
@@ -26,9 +26,9 @@ export const generateAccessToken = (user: UserPayload): string => {
   )
 }
 
-export const generateRefreshToken = (user: Pick<UserPayload, 'id'>): string => {
+export const generateRefreshToken = (user: Pick<UserPayload, 'user_id'>): string => {
   return jwt.sign(
-    { id: user.id },
+    { id: user.user_id },
     process.env.JWT_SECRET as jwt.Secret,
     {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN

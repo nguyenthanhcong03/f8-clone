@@ -1,20 +1,20 @@
 import type { Lesson, Section } from '@/types/course'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { Delete, DragIndicator, Edit } from '@mui/icons-material'
-import { Box, IconButton, Stack, Typography } from '@mui/material'
+import { Trash2, GripVertical } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { useNavigate } from 'react-router-dom'
 
 interface SortableLessonProps {
   lesson: Lesson
   section: Section
   id?: string
-  handleDeleteLesson: (lessonId: number) => void
+  handleDeleteLesson: (lessonId: string) => void
 }
 
 const SortableLesson: React.FC<SortableLessonProps> = ({ lesson, section, id, handleDeleteLesson }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: lesson.id.toString()
+    id: lesson.lesson_id
   })
   const navigate = useNavigate()
 
@@ -26,43 +26,32 @@ const SortableLesson: React.FC<SortableLessonProps> = ({ lesson, section, id, ha
   }
 
   return (
-    <Box
+    <div
       ref={setNodeRef}
       style={style}
-      sx={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        mb: 2,
-        p: 1,
-        border: '1px solid #eee',
-        borderRadius: 1,
-        bgcolor: 'white',
-        cursor: 'pointer',
-        '&:hover': {
-          bgcolor: 'grey.100'
-        }
-      }}
-      onClick={() => navigate(`/admin/courses/${id}/sections/${section.id}/lessons/${lesson.id}`)}
+      className='flex justify-between items-center mb-4 p-3 border border-border rounded-lg bg-white cursor-pointer hover:bg-accent transition-colors'
+      onClick={() => navigate(`/admin/courses/${id}/sections/${section.section_id}/lessons/${lesson.lesson_id}`)}
     >
-      <Stack direction='row' spacing={1} alignItems='center'>
-        <Box {...attributes} {...listeners} style={{ cursor: 'grab' }} sx={{ display: 'flex', alignItems: 'center' }}>
-          <DragIndicator color='action' fontSize='small' />
-        </Box>
-        <Typography variant='body1'>{lesson.title}</Typography>
-      </Stack>
-      <Stack direction='row' alignItems='center'>
-        <IconButton
-          color='error'
+      <div className='flex items-center gap-3'>
+        <div {...attributes} {...listeners} className='cursor-grab hover:cursor-grabbing flex items-center'>
+          <GripVertical className='h-4 w-4 text-muted-foreground' />
+        </div>
+        <span className='text-sm font-medium'>{lesson.title}</span>
+      </div>
+      <div className='flex items-center'>
+        <Button
+          variant='ghost'
+          size='sm'
           onClick={(e) => {
             e.stopPropagation()
-            handleDeleteLesson(lesson.id)
+            handleDeleteLesson(lesson.lesson_id)
           }}
+          className='text-destructive hover:text-destructive'
         >
-          <Delete fontSize='small' />
-        </IconButton>
-      </Stack>
-    </Box>
+          <Trash2 className='h-4 w-4' />
+        </Button>
+      </div>
+    </div>
   )
 }
 

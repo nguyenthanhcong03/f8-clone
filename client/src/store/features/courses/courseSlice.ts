@@ -1,8 +1,6 @@
 import type { CreateCourseInput, UpdateCourseInput } from '@/schemas/course.schema'
 import courseAPI from '@/services/courseAPI'
-import { updateLessonOrder as updateLessonOrderAPI } from '@/services/lessonAPI'
-import { getCourseSections } from '@/services/sectionAPI'
-import type { Course, Lesson, Section } from '@/types/course'
+import type { Course } from '@/types/course'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 interface CourseState {
@@ -10,17 +8,13 @@ interface CourseState {
   loading: boolean
   error: string | null
   currentCourse: Course | null
-  totalSections: number
-  totalLessons: number
 }
 
 const initialState: CourseState = {
   courses: [],
   loading: false,
   error: null,
-  currentCourse: null,
-  totalSections: 0,
-  totalLessons: 0
+  currentCourse: null
 }
 
 // Async thunks
@@ -34,15 +28,34 @@ export const fetchCourses = createAsyncThunk('courses/fetchCourses', async (_, {
   }
 })
 
-export const fetchCourseById = createAsyncThunk('courses/fetchCourseById', async (id: number, { rejectWithValue }) => {
-  try {
-    const response = await courseAPI.getCourseById(id)
-    return response.data
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : `Failed to fetch course with ID ${id}`
-    return rejectWithValue(message)
+export const fetchCourseById = createAsyncThunk(
+  'courses/fetchCourseById',
+  async (course_id: string, { rejectWithValue }) => {
+    try {
+      const response = await courseAPI.getCourseById(course_id)
+      console.log('response.data', response.data)
+      return response.data
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : `Failed to fetch course with ID ${course_id}`
+      return rejectWithValue(message)
+    }
   }
-})
+)
+
+export const fetchCourseBySlug = createAsyncThunk(
+  'courses/fetchCourseBySlug',
+  async (slug: string, { rejectWithValue }) => {
+    try {
+      const response = await courseAPI.getCourseBySlug(slug)
+      console.log(response.data)
+
+      return response.data
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : `Failed to fetch course with ID ${slug}`
+      return rejectWithValue(message)
+    }
+  }
+)
 
 export const createCourse = createAsyncThunk(
   'courses/createCourse',
@@ -70,7 +83,7 @@ export const updateCourse = createAsyncThunk(
   }
 )
 
-export const deleteCourse = createAsyncThunk('courses/deleteCourse', async (id: number, { rejectWithValue }) => {
+export const deleteCourse = createAsyncThunk('courses/deleteCourse', async (id: string, { rejectWithValue }) => {
   try {
     await courseAPI.deleteCourse(id)
     return id
@@ -82,7 +95,7 @@ export const deleteCourse = createAsyncThunk('courses/deleteCourse', async (id: 
 
 export const updateLessonOrder = createAsyncThunk(
   'courses/updateLessonOrder',
-  async ({ sectionId, lessonIds }: { sectionId: number; lessonIds: number[] }, { rejectWithValue }) => {
+  async ({ sectionId, lessonIds }: { sectionId: string; lessonIds: string[] }, { rejectWithValue }) => {
     try {
       const response = await courseAPI.updateLessonOrder(sectionId, lessonIds)
       return { sectionId, lessons: response.data }
@@ -117,7 +130,7 @@ const courseSlice = createSlice({
         state.error = action.payload as string
       })
 
-    // Fetch course by ID
+    // Fetch course by id
     builder
       .addCase(fetchCourseById.pending, (state) => {
         state.loading = true
@@ -126,10 +139,23 @@ const courseSlice = createSlice({
       .addCase(fetchCourseById.fulfilled, (state, action) => {
         state.loading = false
         state.currentCourse = action.payload.course
-        state.totalSections = action.payload.totalSections
-        state.totalLessons = action.payload.totalLessons
       })
       .addCase(fetchCourseById.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+      })
+
+    // Fetch course by slug
+    builder
+      .addCase(fetchCourseBySlug.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchCourseBySlug.fulfilled, (state, action) => {
+        state.loading = false
+        state.currentCourse = action.payload.course
+      })
+      .addCase(fetchCourseBySlug.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
       })

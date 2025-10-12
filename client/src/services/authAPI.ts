@@ -19,7 +19,12 @@ export const changePassword = async (userId: number, currentPassword: string, ne
     currentPassword,
     newPassword
   })
-  return response.data
+  return response
+}
+
+export const getCurrentUser = async () => {
+  const response = await axiosInstance.get(`${API_ENDPOINT}/me`)
+  return response
 }
 
 export const logout = async (): Promise<void> => {
@@ -33,14 +38,15 @@ export const logout = async (): Promise<void> => {
 
 export const refreshToken = async () => {
   const response = await axiosInstance.get(`${API_ENDPOINT}/refresh-token`)
-  return response.data
+  return response
 }
 
 const authAPI = {
   register,
   login,
   changePassword,
-  logout
+  logout,
+  getCurrentUser
 }
 
 export default authAPI

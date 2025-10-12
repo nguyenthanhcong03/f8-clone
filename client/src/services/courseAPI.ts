@@ -10,8 +10,14 @@ export const getAllCourses = async () => {
   return response
 }
 
-export const getCourseById = async (id: number) => {
-  const response = await axiosInstance.get(`${API_ENDPOINT}/${id}`)
+export const getCourseById = async (course_id: string) => {
+  console.log('courseID', course_id)
+  const response = await axiosInstance.get(`${API_ENDPOINT}/${course_id}`)
+  return response
+}
+
+export const getCourseBySlug = async (slug: string) => {
+  const response = await axiosInstance.get(`${API_ENDPOINT}/slug/${slug}`)
   return response
 }
 
@@ -67,12 +73,12 @@ export const updateCourse = async (id: number, courseData: UpdateCourseInput | F
   return response
 }
 
-export const deleteCourse = async (id: number) => {
+export const deleteCourse = async (id: string) => {
   const response = await axiosInstance.delete<ApiResponse<null>>(`${API_ENDPOINT}/${id}`)
   return response
 }
 
-export const updateLessonOrder = async (sectionId: number, lessonIds: number[]) => {
+export const updateLessonOrder = async (sectionId: string, lessonIds: string[]) => {
   const response = await axiosInstance.put<ApiResponse<Lesson[]>>(`/sections/${sectionId}/lessons/reorder`, {
     lessonIds
   })
@@ -82,6 +88,7 @@ export const updateLessonOrder = async (sectionId: number, lessonIds: number[]) 
 const courseAPI = {
   getAllCourses,
   getCourseById,
+  getCourseBySlug,
   createCourse,
   updateCourse,
   deleteCourse,

@@ -1,38 +1,38 @@
-import { fetchCourseById } from '@/store/courseSlice'
-import { checkEnrollment, enrollCourse } from '@/store/enrollmentSlice'
+import Loader from '@/components/common/Loading/Loader'
+import { Button } from '@/components/ui/button'
+import { fetchCourseBySlug } from '@/store/features/courses/courseSlice'
+import { checkEnrollment, enrollCourse } from '@/store/features/courses/enrollmentSlice'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
+import { showSnackbar } from '@/store/snackbarSlice'
 import { translateLevel } from '@/utils/courseUtils'
-import DevicesIcon from '@mui/icons-material/Devices'
-import SchoolIcon from '@mui/icons-material/School'
-import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt'
-import { Box, Button, Stack, Typography } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { BarChart3, GraduationCap, Monitor } from 'lucide-react'
+import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import CourseContent from './components/CourseContent'
-import Loader from '@/components/common/Loading/Loader'
-import { showSnackbar } from '@/store/snackbarSlice'
-import { HEADER_HEIGHT } from '@/components/common/Header/Header'
 
 const CourseDetail = () => {
-  const courseId = useParams().id
+  const { slug } = useParams()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
-  const { currentCourse, totalSections, totalLessons } = useAppSelector((state) => state.courses)
-  const { loading: getCourseLoading } = useAppSelector((state) => state.courses)
-  const { loading, enrolled, checkingEnrollment } = useAppSelector((state) => state.enrollment)
+  const { currentCourse, loading } = useAppSelector((state) => state.courses)
+  const { loading: enrollCourseLoading, enrolled } = useAppSelector((state) => state.enrollment)
   const { isAuthenticated, user } = useAppSelector((state) => state.auth)
 
-  const handleEnrollCourse = (courseId: number) => {
-    dispatch(enrollCourse(courseId))
+  const totalSections = currentCourse?.sections ? currentCourse.sections.length : 0
+  const totalLessons =
+    currentCourse?.sections && currentCourse?.sections.reduce((acc, section) => acc + section.lessons!.length, 0)
+
+  const handleEnrollCourse = (slug: string) => {
+    dispatch(enrollCourse(slug))
   }
 
-  const handleNavigateToStudy = async (courseId: number) => {
+  const handleNavigateToStudy = async (slug: string) => {
     try {
-      const result = await dispatch(checkEnrollment(courseId)).unwrap()
+      const result = await dispatch(checkEnrollment(slug)).unwrap()
       const isEnrolled = result.enrolled
 
       if (isEnrolled) {
-        navigate(`/learning/${courseId}`)
+        navigate(`/learning/${slug}`)
       }
     } catch (error: any) {
       dispatch(
@@ -45,139 +45,98 @@ const CourseDetail = () => {
   }
 
   useEffect(() => {
-    if (courseId) {
-      dispatch(fetchCourseById(parseInt(courseId)))
+    if (slug) {
+      dispatch(fetchCourseBySlug(slug))
     }
 
-    if (courseId && isAuthenticated && user) {
-      dispatch(checkEnrollment(parseInt(courseId)))
+    if (slug && isAuthenticated && user) {
+      dispatch(checkEnrollment(slug))
     }
-  }, [dispatch, courseId, isAuthenticated, user])
+  }, [dispatch, slug, isAuthenticated, user])
 
-  if (getCourseLoading) {
+  if (loading) {
     return <Loader />
   }
 
   return (
-    <Stack direction='row' spacing={2} alignItems={'flex-start'}>
-      <Box sx={{ overflowY: 'auto', scrollbarWidth: 'none' }} flex={4}>
-        <Box sx={{ height: `100vh` }}>
-          <Typography variant='h4' sx={{ fontWeight: 'bold' }}>
-            {currentCourse?.title || 'Thông tin khóa học'}
-          </Typography>
-          <Typography variant='body1' sx={{ mt: 1 }}>
-            {currentCourse?.description || 'Không có mô tả.'}
-          </Typography>
-          <Box sx={{ mt: 2 }}>
-            <Box sx={{ mb: 2 }}>
-              <Typography variant='h6' sx={{ fontWeight: 'bold' }}>
-                Nội dung khóa học
-              </Typography>
-              <Box sx={{ mt: 1, fontSize: '14px', display: 'flex', gap: 1 }}>
-                <Box>
-                  <Box component='span' sx={{ fontWeight: 500 }}>
-                    {totalSections}{' '}
-                  </Box>
+    <div className='flex flex-row gap-4 items-start'>
+      <div className='flex-[4] overflow-y-auto scrollbar-none'>
+        <div className='min-h-screen'>
+          <h1 className='text-3xl font-bold'>{currentCourse?.title || 'Thông tin khóa học'}</h1>
+          <p className='mt-2 text-muted-foreground'>{currentCourse?.description || 'Không có mô tả.'}</p>
+          <div className='mt-6'>
+            <div className='mb-4'>
+              <h2 className='text-xl font-bold'>Nội dung khóa học</h2>
+              <div className='mt-2 text-sm flex gap-2'>
+                <div>
+                  <span className='font-medium'>{totalSections} </span>
                   chương
-                </Box>
+                </div>
                 •
-                <Box>
-                  <Box component='span' sx={{ fontWeight: 500 }}>
-                    {totalLessons}{' '}
-                  </Box>
+                <div>
+                  <span className='font-medium'>{totalLessons || 0} </span>
                   bài học
-                </Box>
-              </Box>
-            </Box>
+                </div>
+              </div>
+            </div>
             <CourseContent />
-          </Box>
-        </Box>
-      </Box>
-      <Box
-        flex={2}
-        sx={{
-          padding: 3,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyItems: 'center',
-          alignItems: 'center',
-          gap: 2,
-          // height: '100vh',
-          position: 'sticky'
-        }}
-      >
-        {/* Thumbnail with video overlay */}
-        <Box
-          sx={{
-            overflow: 'hidden'
-          }}
-        >
-          <Box
-            component='img'
+          </div>
+        </div>
+      </div>
+      <div className='flex-[2] p-6 flex flex-col justify-center items-center gap-4 sticky top-0'>
+        {/* Thumbnail */}
+        <div className='overflow-hidden rounded-lg w-full'>
+          <img
             src={currentCourse?.thumbnail || '/path/to/default-thumbnail.jpg'}
             alt={currentCourse?.title}
-            sx={{
-              borderRadius: 2,
-
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover'
-            }}
+            className='w-full h-full object-cover rounded-lg'
           />
-        </Box>
+        </div>
 
         {/* Price */}
-        <Typography
-          variant='h5'
-          sx={{
-            textAlign: 'center',
-            color: 'primary.main'
-          }}
-        >
+        <h3 className='text-2xl text-center text-primary font-semibold'>
           {currentCourse?.is_paid === true ? `${(currentCourse?.price || 0).toLocaleString('vi-VN')} ₫` : 'Miễn phí'}
-        </Typography>
+        </h3>
 
         {enrolled ? (
           <Button
-            variant='contained'
-            color='secondary'
-            sx={{ width: 200 }}
-            loading={checkingEnrollment}
-            onClick={() => courseId && handleNavigateToStudy(parseInt(courseId))}
+            variant='secondary'
+            className='w-48'
+            disabled={enrollCourseLoading}
+            onClick={() => slug && handleNavigateToStudy(slug)}
           >
             VÀO HỌC
           </Button>
         ) : (
           <Button
-            variant='contained'
-            color='secondary'
-            sx={{ width: 200 }}
-            loading={loading}
-            onClick={() => courseId && handleEnrollCourse(parseInt(courseId))}
+            variant='secondary'
+            className='w-48'
+            disabled={enrollCourseLoading}
+            onClick={() => slug && handleEnrollCourse(slug)}
           >
             ĐĂNG KÝ HỌC
           </Button>
         )}
 
         {/* Course stats */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 2 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <SignalCellularAltIcon sx={{ color: '#666', fontSize: 20 }} />
-            <Typography variant='body2'>Trình độ {translateLevel(currentCourse?.level)}</Typography>
-          </Box>
+        <div className='flex flex-col gap-2 mt-4'>
+          <div className='flex items-center gap-3'>
+            <BarChart3 className='text-gray-600 h-5 w-5' />
+            <span className='text-sm'>Trình độ {translateLevel(currentCourse?.level)}</span>
+          </div>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <SchoolIcon sx={{ color: '#666', fontSize: 20 }} />
-            <Typography variant='body2'>Tổng số {totalLessons || 0} bài học</Typography>
-          </Box>
+          <div className='flex items-center gap-3'>
+            <GraduationCap className='text-gray-600 h-5 w-5' />
+            <span className='text-sm'>Tổng số {totalLessons || 0} bài học</span>
+          </div>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <DevicesIcon sx={{ color: '#666', fontSize: 20 }} />
-            <Typography variant='body2'>Học mọi lúc, mọi nơi</Typography>
-          </Box>
-        </Box>
-      </Box>
-    </Stack>
+          <div className='flex items-center gap-3'>
+            <Monitor className='text-gray-600 h-5 w-5' />
+            <span className='text-sm'>Học mọi lúc, mọi nơi</span>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 

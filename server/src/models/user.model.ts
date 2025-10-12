@@ -1,8 +1,9 @@
 import { DataTypes, Model, Optional } from 'sequelize'
 import sequelize from '../config/database'
+import { v4 as uuidv4 } from 'uuid'
 
 interface UserAttributes {
-  id: number
+  user_id: string
   name: string
   phone?: string
   email: string
@@ -12,10 +13,10 @@ interface UserAttributes {
   role?: 'admin' | 'student'
 }
 
-type UserCreationAttributes = Optional<UserAttributes, 'id' | 'phone' | 'avatar' | 'avatar_public_id' | 'role'>
+type UserCreationAttributes = Optional<UserAttributes, 'user_id' | 'phone' | 'avatar' | 'avatar_public_id' | 'role'>
 
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
-  declare id: number
+  declare user_id: string
   declare name: string
   declare phone?: string
   declare email: string
@@ -27,11 +28,8 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
 
 User.init(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true
-    },
+    user_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), unique: true, primaryKey: true },
+
     name: {
       type: DataTypes.STRING(100),
       allowNull: false

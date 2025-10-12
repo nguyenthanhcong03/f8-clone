@@ -1,31 +1,19 @@
-import { useEffect, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Editor } from '@tinymce/tinymce-react'
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CircularProgress,
-  Stack,
-  TextField,
-  Typography,
-  Alert,
-  Container,
-  Paper,
-  FormHelperText,
-  IconButton
-} from '@mui/material'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import CloudUploadIcon from '@mui/icons-material/CloudUpload'
-import DeleteIcon from '@mui/icons-material/Delete'
-import { useAppDispatch, useAppSelector } from '@/store/hook'
-import { fetchLessonById, createLesson, updateLesson, clearCurrentLesson } from '@/store/lessonSlice'
-import { fetchCourseSections } from '@/store/sectionSlice'
-import { fetchCourseById } from '@/store/courseSlice'
 import { lessonSchema, type LessonFormValues } from '@/schemas/lesson.schema'
+import { fetchCourseById } from '@/store/features/courses/courseSlice'
+import { useAppDispatch, useAppSelector } from '@/store/hook'
+import { clearCurrentLesson, fetchLessonById, updateLesson } from '@/store/features/courses/lessonSlice'
+import { fetchCourseSections } from '@/store/features/courses/sectionSlice'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { ArrowLeft, Upload, Trash2, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Editor } from '@tinymce/tinymce-react'
+import { useEffect, useRef, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { useNavigate, useParams } from 'react-router-dom'
 
 const EditLessonPage = () => {
   const navigate = useNavigate()
@@ -42,7 +30,7 @@ const EditLessonPage = () => {
   const [videoPreview, setVideoPreview] = useState<string | null>(null)
 
   const { currentCourse } = useAppSelector((state) => state.courses)
-  const { currentLesson, lessonLoading } = useAppSelector((state) => state.lessons)
+  const { currentLesson } = useAppSelector((state) => state.lessons)
 
   const {
     control,
@@ -146,61 +134,50 @@ const EditLessonPage = () => {
   // }
 
   return (
-    <Container maxWidth='lg'>
-      <Paper elevation={0} sx={{ p: 3, mb: 4 }}>
-        <Box display='flex' alignItems='center' mb={3}>
-          <Button startIcon={<ArrowBackIcon />} variant='outlined' onClick={handleCancel} sx={{ mr: 2 }}>
+    <div className='max-w-6xl mx-auto'>
+      <div className='bg-white p-6 mb-6 rounded-lg shadow-sm'>
+        <div className='flex items-center mb-6'>
+          <Button variant='outline' onClick={handleCancel} className='mr-4 flex items-center gap-2'>
+            <ArrowLeft className='h-4 w-4' />
             Trở về
           </Button>
-          <Typography variant='h4' component='h1'>
-            {lessonId ? 'Chỉnh sửa bài học' : 'Thêm bài học mới'}
-          </Typography>
-        </Box>
+          <h1 className='text-3xl font-bold'>{lessonId ? 'Chỉnh sửa bài học' : 'Thêm bài học mới'}</h1>
+        </div>
 
         {error && (
-          <Alert severity='error' sx={{ mb: 3 }}>
-            {error}
+          <Alert className='mb-6'>
+            <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
-        <Box>
+        <div>
           <Card>
-            <CardContent>
+            <CardContent className='p-6'>
               {/* Course and Section Info */}
               {currentCourse && (
-                <Box mb={4}>
-                  <Typography variant='subtitle1' color='text.secondary' gutterBottom>
+                <div className='mb-6'>
+                  <p className='text-muted-foreground'>
                     Khóa học: <strong>{currentCourse.title}</strong>
-                  </Typography>
-                  {/* {currentSection && (
-                    <Typography variant='subtitle1' color='text.secondary'>
-                      Chương: <strong>{currentSection.title}</strong>
-                    </Typography>
-                  )} */}
-                </Box>
+                  </p>
+                </div>
               )}
 
               <form onSubmit={handleSubmit(onSubmit)}>
-                <Stack spacing={3}>
+                <div className='space-y-6'>
                   <Controller
                     name='title'
                     control={control}
                     render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label='Tiêu đề bài học'
-                        fullWidth
-                        error={!!errors.title}
-                        helperText={errors.title?.message}
-                        required
-                      />
+                      <div className='space-y-2'>
+                        <Label htmlFor='title'>Tiêu đề bài học *</Label>
+                        <Input {...field} id='title' className={errors.title ? 'border-red-500' : ''} />
+                        {errors.title && <p className='text-sm text-red-500'>{errors.title.message}</p>}
+                      </div>
                     )}
                   />
 
-                  <Box>
-                    <Typography variant='subtitle1' gutterBottom>
-                      Nội dung bài học
-                    </Typography>
+                  <div>
+                    <Label className='text-base font-medium mb-2 block'>Nội dung bài học</Label>
                     <Controller
                       name='content'
                       control={control}
@@ -228,71 +205,70 @@ const EditLessonPage = () => {
                         />
                       )}
                     />
-                  </Box>
+                  </div>
 
                   {/* Video File Upload */}
-                  <Box sx={{ mt: 2 }}>
-                    <Typography variant='subtitle1' gutterBottom>
-                      Tải lên video bài học
-                    </Typography>
+                  <div className='mt-4'>
+                    <Label className='text-base font-medium mb-2 block'>Tải lên video bài học</Label>
 
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Button variant='contained' component='label' startIcon={<CloudUploadIcon />}>
+                    <div className='flex items-center gap-4'>
+                      <Button variant='default' className='flex items-center gap-2'>
+                        <Upload className='h-4 w-4' />
                         Chọn tập tin video
-                        <input ref={fileInputRef} type='file' hidden accept='video/*' onChange={handleFileChange} />
+                        <input
+                          ref={fileInputRef}
+                          type='file'
+                          className='absolute inset-0 opacity-0'
+                          accept='video/*'
+                          onChange={handleFileChange}
+                        />
                       </Button>
 
                       {watch('videoFile') && (
-                        <Button variant='outlined' color='error' startIcon={<DeleteIcon />} onClick={handleRemoveVideo}>
+                        <Button
+                          variant='outline'
+                          onClick={handleRemoveVideo}
+                          className='flex items-center gap-2 text-red-600 hover:text-red-700'
+                        >
+                          <Trash2 className='h-4 w-4' />
                           Xóa
                         </Button>
                       )}
-                    </Box>
+                    </div>
 
-                    {errors.videoFile && <FormHelperText error>{errors.videoFile.message?.toString()}</FormHelperText>}
+                    {errors.videoFile && (
+                      <p className='text-sm text-red-500 mt-2'>{errors.videoFile.message?.toString()}</p>
+                    )}
 
                     {/* Video Preview */}
                     {videoPreview && (
-                      <Box sx={{ mt: 2 }}>
-                        <Typography variant='subtitle2' gutterBottom>
-                          Xem trước video:
-                        </Typography>
-                        <Box
-                          component='video'
+                      <div className='mt-4'>
+                        <Label className='text-sm font-medium mb-2 block'>Xem trước video:</Label>
+                        <video
                           controls
-                          sx={{
-                            width: '100%',
-                            maxHeight: '300px',
-                            border: '1px solid #ccc',
-                            borderRadius: '4px'
-                          }}
+                          className='w-full max-h-[300px] border border-gray-300 rounded'
                           src={videoPreview}
                         />
-                      </Box>
+                      </div>
                     )}
-                  </Box>
+                  </div>
 
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
-                    <Button variant='outlined' onClick={handleCancel}>
+                  <div className='flex justify-end gap-4 mt-6'>
+                    <Button variant='outline' onClick={handleCancel}>
                       Hủy
                     </Button>
-                    <Button
-                      type='submit'
-                      variant='contained'
-                      color='primary'
-                      disabled={isSubmitting}
-                      startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
-                    >
+                    <Button type='submit' disabled={isSubmitting} className='flex items-center gap-2'>
+                      {isSubmitting && <Loader2 className='h-4 w-4 animate-spin' />}
                       {lessonId ? 'Cập nhật' : 'Tạo bài học'}
                     </Button>
-                  </Box>
-                </Stack>
+                  </div>
+                </div>
               </form>
             </CardContent>
           </Card>
-        </Box>
-      </Paper>
-    </Container>
+        </div>
+      </div>
+    </div>
   )
 }
 

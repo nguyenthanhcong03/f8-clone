@@ -1,13 +1,12 @@
-import Loader from '@/components/common/Loading/Loader'
-import { fetchCourses } from '@/store/courseSlice'
+import CourseCard from '@/components/common/CourseCard/CourseCard'
+import { fetchCourses } from '@/store/features/courses/courseSlice'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
-import { Box, Grid } from '@mui/material'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AdSlider from './components/AdSlider'
-import CourseCard from '@/components/common/CourseCard/CourseCard'
+import Loader from '@/components/common/Loading/Loader'
 
-const CoursePage = () => {
+const HomePage = () => {
   const { courses, loading, error } = useAppSelector((state) => state.courses)
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
@@ -16,7 +15,6 @@ const CoursePage = () => {
     const getCourses = async () => {
       await dispatch(fetchCourses())
     }
-
     getCourses()
   }, [dispatch])
 
@@ -25,19 +23,18 @@ const CoursePage = () => {
   }
 
   return (
-    <div>
+    <div className='w-full'>
       <AdSlider />
-      <Box>
-        <Grid container spacing={3} mt={3}>
+
+      <div className='mt-6 px-4 md:px-8'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
           {courses.map((course) => (
-            <Grid size={{ xs: 12, sm: 6, lg: 4, xl: 3 }} key={course.id}>
-              <CourseCard course={course} />
-            </Grid>
+            <CourseCard key={course.course_id} course={course} />
           ))}
-        </Grid>
-      </Box>
+        </div>
+      </div>
     </div>
   )
 }
 
-export default CoursePage
+export default HomePage

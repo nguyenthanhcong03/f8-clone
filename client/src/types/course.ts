@@ -2,8 +2,8 @@ export type CourseLevel = 'beginner' | 'intermediate' | 'advanced'
 export type CourseStatus = 'draft' | 'published'
 
 export interface Lesson {
-  id: number
-  section_id: number
+  lesson_id: string
+  section_id: string
   title?: string
   video_url?: string
   video_public_id?: string
@@ -15,9 +15,9 @@ export interface Lesson {
 }
 
 export interface Section {
-  id: number
+  section_id: string
   title: string
-  course_id: number
+  course_id: string
   order?: number
   createdAt?: string
   updatedAt?: string
@@ -25,7 +25,7 @@ export interface Section {
 }
 
 export interface Course {
-  id: number
+  course_id: string
   title: string
   slug: string
   description?: string

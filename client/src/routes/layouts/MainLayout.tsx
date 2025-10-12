@@ -1,65 +1,46 @@
-import Header, { HEADER_HEIGHT } from '@/components/common/Header/Header'
+import Header from '@/components/common/Header/Header'
 import GlobalLoading from '@/components/common/Loading/GlobalLoading'
 import NavigationDesktop from '@/components/common/Navigation/NavigationDesktop'
 import NavigationMobile from '@/components/common/Navigation/NavigationMobile'
-import { Box, useMediaQuery, useTheme } from '@mui/material'
 import { Outlet } from 'react-router-dom'
 
 const NAVIGATION_WIDTH = '96px'
 
 const MainLayout = () => {
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-
   return (
     <>
       <GlobalLoading />
 
-      <Box sx={{ minHeight: '100vh' }}>
+      <div className='min-h-screen'>
         <Header />
 
         {/* Main content area */}
-        <Box
-          sx={{
-            padding: '40px',
-            marginLeft: isMobile ? 0 : NAVIGATION_WIDTH,
-            marginBottom: isMobile ? '56px' : 0,
-            minHeight: `calc(100vh - ${HEADER_HEIGHT})`,
-            overflow: 'auto'
+        <div
+          className='p-10 overflow-auto md:ml-24 mb-14 md:mb-0'
+          style={{
+            minHeight: `calc(100vh - 66px)`
           }}
         >
           <Outlet />
-        </Box>
+        </div>
 
-        {/* Navigation - fixed position */}
-        <Box
-          display={isMobile ? 'none' : 'block'}
-          sx={{
-            position: 'fixed',
-            left: 0,
-            top: HEADER_HEIGHT,
+        {/* Desktop Navigation - hidden on mobile, visible on md+ */}
+        <div
+          className='hidden md:block fixed left-0 bg-background border-r z-[1000]'
+          style={{
+            top: '66px',
             width: NAVIGATION_WIDTH,
-            height: `calc(100vh - ${HEADER_HEIGHT})`,
-            zIndex: 1000,
-            bgcolor: '#fff'
+            height: `calc(100vh - 66px)`
           }}
         >
           <NavigationDesktop />
-        </Box>
-        <Box
-          display={isMobile ? 'block' : 'none'}
-          sx={{
-            position: 'fixed',
-            left: 0,
-            bottom: 0,
-            width: '100%',
-            zIndex: 1000,
-            bgcolor: '#fff'
-          }}
-        >
+        </div>
+
+        {/* Mobile Navigation - visible on mobile, hidden on md+ */}
+        <div className='block md:hidden fixed left-0 bottom-0 w-full bg-background border-t z-[1000]'>
           <NavigationMobile />
-        </Box>
-      </Box>
+        </div>
+      </div>
     </>
   )
 }

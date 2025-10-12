@@ -1,5 +1,5 @@
-import { useAppSelector } from '@/store/hook'
-import { Navigate, useLocation } from 'react-router-dom'
+import { useAppDispatch, useAppSelector } from '@/store/hook'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 
 interface IProps {
   children: React.ReactNode
@@ -17,6 +17,8 @@ const ProtectedRoute = ({
   fallbackComponent = null
 }: IProps) => {
   const location = useLocation()
+  const navigate = useNavigate()
+  const dispatch = useAppDispatch()
   const { user, isAuthenticated, isLoading } = useAppSelector((state) => state.auth)
 
   if (isLoading) {
@@ -32,7 +34,7 @@ const ProtectedRoute = ({
   // Chuyển hướng người dùng không được xác thực đến trang đăng nhập với đường dẫn trở về
   // Chỉ khi đã hoàn thành việc kiểm tra xác thực (isLoading = false) và user thực sự chưa đăng nhập
   if (requireAuth && !isAuthenticated && !isLoading) {
-    return <Navigate to={redirectPath} state={{ from: location.pathname }} replace />
+    return <Navigate to={'/'} state={{ from: location.pathname }} replace />
   }
   // Kiểm tra quyền truy cập dựa trên vai trò người dùng
   if (roles.length > 0 && user && !roles.includes(user.role)) {

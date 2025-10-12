@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 5000
 // Middleware
 app.use(helmet()) // Security headers
 app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:5173', credentials: true }))
-app.use(morgan('combined')) // Logging
+// app.use(morgan('combined')) // Logging
 app.use(cookieParser()) // Parse cookies
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
@@ -48,6 +48,7 @@ const startServer = async () => {
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`)
       console.log(`Environment: ${process.env.NODE_ENV || 'development'}`)
+      console.log('00000000000000000000000000000000000000000000000000000000000000000000')
     })
   } catch (error) {
     console.error('Unable to start server:', error)

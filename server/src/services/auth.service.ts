@@ -7,7 +7,6 @@ import jwt from 'jsonwebtoken'
 
 const register = async (userData: RegisterAccountInput['body']) => {
   const { name, email, password } = userData
-  console.log('userData:', userData)
 
   // Kiểm tra xem người dùng đã tồn tại chưa
   const existingUser = await User.findOne({ where: { email } })
@@ -43,8 +42,6 @@ const login = async (loginData: LoginAccountInput['body']) => {
   }
 
   const currentPassword = user.password
-  // const currentPassword = user.getDataValue('password')
-  console.log('đến đây:', currentPassword)
 
   // Kiểm tra mật khẩu
   const isMatch = await bcrypt.compare(password, currentPassword)
@@ -54,7 +51,7 @@ const login = async (loginData: LoginAccountInput['body']) => {
 
   // Tạo user payload cho JWT
   const userPayload = {
-    id: user.id,
+    user_id: user.user_id,
     name: user.name,
     email: user.email,
     phone: user.phone,
@@ -69,7 +66,7 @@ const login = async (loginData: LoginAccountInput['body']) => {
 
   return {
     user: {
-      id: user.id,
+      id: user.user_id,
       name: user.name,
       phone: user.phone,
       email: user.email,
@@ -84,13 +81,13 @@ const login = async (loginData: LoginAccountInput['body']) => {
 const changePassword = async (id: number, currentPassword: string, newPassword: string) => {
   const user = await User.findByPk(id)
   if (!user) {
-    throw new Error('User not found')
+    throw new ApiError(404, 'Người dùng không tồn tại')
   }
 
   // Verify current password
   const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.getDataValue('password'))
   if (!isCurrentPasswordValid) {
-    throw new Error('Current password is incorrect')
+    throw new ApiError(400, 'Mật khẩu hiện tại không đúng')
   }
 
   // Hash new password
@@ -98,24 +95,24 @@ const changePassword = async (id: number, currentPassword: string, newPassword: 
   const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds)
 
   await user.update({ password: hashedNewPassword })
-  return { message: 'Password changed successfully' }
+  return { message: 'Thay đổi mật khẩu thành công' }
 }
 
 const refreshToken = async (refreshToken: string) => {
   if (!refreshToken) {
-    throw new ApiError(401, 'Refresh token is required')
+    throw new ApiError(401, 'Không có refresh token')
   }
   try {
     const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET as string)
-    const user = await User.findByPk(decoded.id, {
+    const user = await User.findByPk(decoded.user_id, {
       attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
     })
     if (!user) {
-      throw new ApiError(401, 'User not found')
+      throw new ApiError(401, 'Người dùng không tồn tại')
     }
     // Create new tokens
     const newAccessToken = generateAccessToken({
-      id: user.id,
+      user_id: user.user_id,
       name: user.name,
       email: user.email,
       phone: user.phone,
@@ -125,7 +122,7 @@ const refreshToken = async (refreshToken: string) => {
     return {
       accessToken: newAccessToken,
       user: {
-        id: user.id,
+        user_id: user.user_id,
         name: user.name,
         phone: user.phone,
         email: user.email,
@@ -135,7 +132,7 @@ const refreshToken = async (refreshToken: string) => {
     }
   } catch (error) {
     console.log('Error refreshing token:', error)
-    throw new ApiError(401, 'Invalid refresh token')
+    throw new ApiError(401, 'Refresh token không hợp lệ hoặc đã hết hạn')
   }
 }
 

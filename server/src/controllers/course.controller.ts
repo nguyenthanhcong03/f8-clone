@@ -65,14 +65,23 @@ const getAllCourses = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getCourseById = catchAsync(async (req: Request, res: Response) => {
-  const courseId = parseInt(req.params.id)
-  const response = await courseService.getCourseById(courseId)
+  const course_id = req.params.course_id
+  const response = await courseService.getCourseById(course_id)
   res.status(200).json({
     success: true,
     data: {
-      course: response.course,
-      totalSections: response.totalSections,
-      totalLessons: response.totalLessons
+      course: response.course
+    }
+  })
+})
+
+const getCourseBySlug = catchAsync(async (req: Request, res: Response) => {
+  const slug = req.params.slug
+  const response = await courseService.getCourseBySlug(slug)
+  res.status(200).json({
+    success: true,
+    data: {
+      course: response.course
     }
   })
 })
@@ -140,6 +149,7 @@ export default {
   createCourse,
   getAllCourses,
   getCourseById,
+  getCourseBySlug,
   updateCourse,
   deleteCourse,
   uploadThumbnail,

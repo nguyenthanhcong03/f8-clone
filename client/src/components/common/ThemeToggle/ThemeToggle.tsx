@@ -1,27 +1,21 @@
 import React from 'react'
-import { IconButton, Tooltip } from '@mui/material'
-import { Brightness4, Brightness7 } from '@mui/icons-material'
+import { Moon, Sun } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { useTheme } from '../../../hooks/useTheme'
 
 interface ThemeToggleProps {
-  size?: 'small' | 'medium' | 'large'
-  showTooltip?: boolean
+  size?: 'sm' | 'default' | 'lg'
+  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'
 }
 
-export const ThemeToggle: React.FC<ThemeToggleProps> = ({ size = 'medium', showTooltip = true }) => {
+export const ThemeToggle: React.FC<ThemeToggleProps> = ({ size = 'default', variant = 'ghost' }) => {
   const { mode, toggleTheme } = useTheme()
 
-  const toggleButton = (
-    <IconButton onClick={toggleTheme} color='inherit' size={size} aria-label='toggle theme'>
-      {mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
-    </IconButton>
+  return (
+    <Button variant={variant} size={size} onClick={toggleTheme} aria-label='toggle theme' className='h-10 w-10 p-0'>
+      {mode === 'dark' ? <Sun className='h-[1.2rem] w-[1.2rem]' /> : <Moon className='h-[1.2rem] w-[1.2rem]' />}
+    </Button>
   )
-
-  if (showTooltip) {
-    return <Tooltip title={`Switch to ${mode === 'dark' ? 'light' : 'dark'} mode`}>{toggleButton}</Tooltip>
-  }
-
-  return toggleButton
 }
 
 export default ThemeToggle

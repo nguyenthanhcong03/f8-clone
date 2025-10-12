@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import authService from '../services/auth.service'
 import catchAsync from '@/utils/catchAsync'
+import ApiError from '@/utils/ApiError'
 
 const registerAccount = catchAsync(async (req: Request, res: Response) => {
   const user = await authService.register(req.body)
@@ -25,7 +26,7 @@ const loginAccount = catchAsync(async (req: Request, res: Response) => {
   res.cookie('refreshToken', response.refreshToken, {
     httpOnly: true,
     // secure: true,
-    // sameSite: "Strict",
+    // sameSite: 'Strict',
     maxAge: process.env.REFRESH_TOKEN_COOKIE_EXPIRES
   })
 
@@ -94,10 +95,23 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const getCurrentUser = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user
+  console.log('req.user', user)
+  if (!user) {
+    throw new ApiError(401, 'Unauthorized')
+  }
+  res.status(200).json({
+    success: true,
+    data: user
+  })
+})
+
 export default {
   registerAccount,
   loginAccount,
   logout,
   changePassword,
-  refreshToken
+  refreshToken,
+  getCurrentUser
 }

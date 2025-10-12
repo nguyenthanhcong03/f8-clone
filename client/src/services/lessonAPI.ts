@@ -15,7 +15,7 @@ export const getSectionLessons = async (sectionId: number) => {
 }
 
 export const createLesson = async (lessonData: {
-  section_id: number
+  section_id: string
   title: string
   content?: string
   videoFile?: File
@@ -44,7 +44,7 @@ export const createLesson = async (lessonData: {
 }
 
 export const updateLesson = async (
-  lessonId: number,
+  lessonId: string,
   lessonData: {
     title?: string
     content?: string
@@ -75,12 +75,12 @@ export const updateLesson = async (
   return response
 }
 
-export const deleteLesson = async (lessonId: number) => {
+export const deleteLesson = async (lessonId: string) => {
   const response = await axiosInstance.delete<ApiResponse<Lesson>>(`${API_ENDPOINT}/${lessonId}`)
   return response
 }
 
-export const updateLessonOrder = async (sectionId: number, lessonIds: number[]) => {
+export const updateLessonOrder = async (sectionId: string, lessonIds: string[]) => {
   const response = await axiosInstance.put<ApiResponse<Lesson[]>>(`/sections/${sectionId}/lessons/reorder`, {
     lessonIds
   })

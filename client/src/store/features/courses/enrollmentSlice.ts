@@ -3,22 +3,20 @@ import enrollmentAPI from '@/services/enrollmetAPI'
 
 interface EnrollmentState {
   loading: boolean
-  checkingEnrollment: boolean
   enrolled: boolean
   error: string | null
 }
 
 const initialState: EnrollmentState = {
   loading: false,
-  checkingEnrollment: false,
   enrolled: false,
   error: null
 }
 
 // Async thunks
-export const enrollCourse = createAsyncThunk('enrollment/enrollCourse', async (id: number, { rejectWithValue }) => {
+export const enrollCourse = createAsyncThunk('enrollment/enrollCourse', async (slug: string, { rejectWithValue }) => {
   try {
-    const response = await enrollmentAPI.enrollCourse(id)
+    const response = await enrollmentAPI.enrollCourse(slug)
     return response.data
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Có lỗi xảy ra khi đăng ký khóa học'
@@ -28,9 +26,9 @@ export const enrollCourse = createAsyncThunk('enrollment/enrollCourse', async (i
 
 export const checkEnrollment = createAsyncThunk(
   'enrollment/checkEnrollment',
-  async (id: number, { rejectWithValue }) => {
+  async (slug: string, { rejectWithValue }) => {
     try {
-      const response = await enrollmentAPI.checkEnrollment(id)
+      const response = await enrollmentAPI.checkEnrollment(slug)
       return response.data
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Có lỗi xảy ra khi kiểm tra đăng ký khóa học'
@@ -70,15 +68,15 @@ const enrollmentSlice = createSlice({
       })
       // Check enrollment
       .addCase(checkEnrollment.pending, (state) => {
-        state.checkingEnrollment = true
+        state.loading = true
         state.error = null
       })
       .addCase(checkEnrollment.fulfilled, (state, action) => {
-        state.checkingEnrollment = false
+        state.loading = false
         state.enrolled = action.payload.enrolled
       })
       .addCase(checkEnrollment.rejected, (state, action) => {
-        state.checkingEnrollment = false
+        state.loading = false
         state.error = action.payload as string
       })
   }

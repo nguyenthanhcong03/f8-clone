@@ -1,21 +1,21 @@
 import { configureStore } from '@reduxjs/toolkit'
-import themeReducer from './themeSlice'
-import authReducer from './authSlice'
-import courseReducer from './courseSlice'
-import sectionReducer from './sectionSlice'
-import lessonReducer from './lessonSlice'
-import enrollmentReducer from './enrollmentSlice'
+import courseReducer from './features/courses/courseSlice'
+import themeReducer from './features/theme/themeSlice'
+import authReducer from './features/auth/authSlice'
+import sectionReducer from './features/courses/sectionSlice'
+import lessonReducer from './features/courses/lessonSlice'
+import enrollmentReducer from './features/courses/enrollmentSlice'
 import appReducer from './appSlice'
 import snackbarReducer from './snackbarSlice'
-import progressReducer from './progressSlice'
+import progressReducer from './features/courses/progressSlice'
 
 export const store = configureStore({
   reducer: {
     theme: themeReducer,
     app: appReducer,
     snackbar: snackbarReducer,
-    auth: authReducer,
     courses: courseReducer,
+    auth: authReducer,
     sections: sectionReducer,
     lessons: lessonReducer,
     enrollment: enrollmentReducer,

@@ -1,8 +1,9 @@
 import { DataTypes, Model, Optional } from 'sequelize'
 import sequelize from '../config/database'
+import { v4 as uuidv4 } from 'uuid'
 
 interface CourseAttributes {
-  id: number
+  course_id: string
   title: string
   slug: string
   description?: string
@@ -12,12 +13,12 @@ interface CourseAttributes {
   is_paid?: boolean
   price?: number
   enrollment_count?: number
-  created_by?: number
+  created_by?: string
 }
 
 type CourseCreationAttributes = Optional<
   CourseAttributes,
-  | 'id'
+  | 'course_id'
   | 'description'
   | 'thumbnail'
   | 'thumbnail_public_id'
@@ -29,7 +30,7 @@ type CourseCreationAttributes = Optional<
 >
 
 class Course extends Model<CourseAttributes, CourseCreationAttributes> implements CourseAttributes {
-  declare id: number
+  declare course_id: string
   declare title: string
   declare slug: string
   declare description?: string
@@ -39,23 +40,18 @@ class Course extends Model<CourseAttributes, CourseCreationAttributes> implement
   declare is_paid?: boolean
   declare price?: number
   declare enrollment_count?: number
-  declare created_by?: number
+  declare created_by?: string
 }
 
 Course.init(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true
-    },
+    course_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), unique: true, primaryKey: true },
     title: {
       type: DataTypes.STRING(255),
       allowNull: false
     },
     slug: {
       type: DataTypes.STRING(255),
-      allowNull: false,
       unique: true
     },
     description: {
@@ -79,14 +75,14 @@ Course.init(
       type: DataTypes.DECIMAL(10, 2)
     },
     enrollment_count: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       defaultValue: 0
     },
     created_by: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       references: {
         model: 'users',
-        key: 'id'
+        key: 'user_id'
       }
     }
   },

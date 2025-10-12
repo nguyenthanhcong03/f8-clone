@@ -1,16 +1,16 @@
 import type { Section } from '@/types/course'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { Add as AddIcon, Delete, DragIndicator, Edit } from '@mui/icons-material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import FolderIcon from '@mui/icons-material/Folder'
-import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Chip, IconButton, Typography } from '@mui/material'
+import { Plus, Trash2, GripVertical, Edit, ChevronDown, Folder } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+// cn utility not needed in this simplified version
 
 interface SortableSectionProps {
   section: Section
   onEdit: (section: Section) => void
-  onDelete: (sectionId: number) => void
-  onAddLesson: (sectionId: number) => void
+  onDelete: (sectionId: string) => void
+  onAddLesson: (sectionId: string) => void
   children: React.ReactNode
   onToggleExpand?: () => void
 }
@@ -24,7 +24,7 @@ const SortableSection: React.FC<SortableSectionProps> = ({
   onToggleExpand
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: section.id.toString()
+    id: section.section_id
   })
 
   const style = {
@@ -36,67 +36,71 @@ const SortableSection: React.FC<SortableSectionProps> = ({
   }
 
   return (
-    <Box ref={setNodeRef} style={style} sx={{ mb: 3, bgcolor: 'white' }}>
-      <Accordion expanded={section.isOpen} onChange={onToggleExpand} variant='outlined'>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls={`panel-${section.id}-content`}
-          id={`panel-${section.id}-header`}
+    <div ref={setNodeRef} style={style} className='mb-6 bg-white rounded-lg border'>
+      <div className='border border-border rounded-lg'>
+        {/* Section Header */}
+        <button
+          onClick={onToggleExpand}
+          className='w-full p-4 text-left flex items-center justify-between hover:bg-accent transition-colors'
+          aria-controls={`panel-${section.section_id}-content`}
+          id={`panel-${section.section_id}-header`}
         >
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              width: '100%',
-              justifyContent: 'space-between'
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <div {...attributes} {...listeners} style={{ cursor: 'grab' }}>
-                <DragIndicator color='action' />
-              </div>
-              <FolderIcon />
-              <Typography variant='h6'>{section?.title}</Typography>
-              <Chip
-                label={`${section?.lessons && section?.lessons.length} bài học`}
-                size='small'
-                color='info'
-                sx={{ ml: 2 }}
-              />
-            </Box>
+          <div className='flex items-center gap-3'>
+            <div {...attributes} {...listeners} className='cursor-grab hover:cursor-grabbing'>
+              <GripVertical className='h-4 w-4 text-muted-foreground' />
+            </div>
+            <Folder className='h-5 w-5 text-blue-600' />
+            <h3 className='text-lg font-semibold'>{section?.title}</h3>
+            <Badge variant='secondary' className='ml-2'>
+              {section?.lessons && section?.lessons.length} bài học
+            </Badge>
+          </div>
 
-            <Box>
-              <IconButton
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onEdit(section)
-                }}
-              >
-                <Edit color='info' fontSize='small' />
-              </IconButton>
-              <IconButton
-                color='error'
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onDelete(section.id)
-                }}
-              >
-                <Delete fontSize='small' />
-              </IconButton>
-            </Box>
-          </Box>
-        </AccordionSummary>
-        <AccordionDetails>
-          {children}
-          <Box sx={{ mb: 2 }}>
-            <Button fullWidth variant='outlined' startIcon={<AddIcon />} onClick={() => onAddLesson(section.id)}>
-              Thêm bài học
+          <div className='flex items-center gap-2'>
+            <Button
+              variant='ghost'
+              size='sm'
+              onClick={(e) => {
+                e.stopPropagation()
+                onEdit(section)
+              }}
+            >
+              <Edit className='h-4 w-4' />
             </Button>
-          </Box>
-        </AccordionDetails>
-      </Accordion>
-    </Box>
+            <Button
+              variant='ghost'
+              size='sm'
+              onClick={(e) => {
+                e.stopPropagation()
+                onDelete(section.section_id)
+              }}
+              className='text-destructive hover:text-destructive'
+            >
+              <Trash2 className='h-4 w-4' />
+            </Button>
+            <ChevronDown className='h-4 w-4 transition-transform' />
+          </div>
+        </button>
+
+        {section.isOpen && (
+          <div className='p-4 pt-2'>
+            <div className='p-4 pt-0'>
+              {children}
+              <div className='mt-4'>
+                <Button
+                  variant='outline'
+                  className='w-full flex items-center gap-2'
+                  onClick={() => onAddLesson(section.section_id)}
+                >
+                  <Plus className='h-4 w-4' />
+                  Thêm bài học
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
 

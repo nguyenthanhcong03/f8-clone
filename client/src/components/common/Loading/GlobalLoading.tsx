@@ -1,11 +1,9 @@
 import { useAppSelector } from '@/store/hook'
-import { Box, CircularProgress, Paper, Typography, alpha } from '@mui/material'
 import { useEffect, useState } from 'react'
 import Logo from '@/assets/images/logo.png'
 
 const GlobalLoading = () => {
   const { globalLoading } = useAppSelector((state) => state.app)
-  console.log('GlobalLoading component rendered with globalLoading:', globalLoading)
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
@@ -20,82 +18,31 @@ const GlobalLoading = () => {
   }, [globalLoading])
 
   return (
-    <>
-      <Paper
-        sx={{
-          opacity: isLoading ? 1 : 0,
-          pointerEvents: isLoading ? 'auto' : 'none',
-          transition: 'all .5s ease',
-          position: 'fixed',
-          width: '100vw',
-          height: '100vh',
-          zIndex: 99999,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          background: `linear-gradient(135deg, 
-          ${alpha('#000000', 0.95)} 0%, 
-          ${alpha('#141414', 0.95)} 50%, 
-          ${alpha('#000000', 0.95)} 100%
-        )`,
-          backdropFilter: 'blur(10px)'
-        }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 4
-          }}
-        >
-          {/* Logo with pulse animation */}
-          <Box
-            sx={{
-              animation: 'pulse 2s infinite',
-              '@keyframes pulse': {
-                '0%': { transform: 'scale(1)' },
-                '50%': { transform: 'scale(1.05)' },
-                '100%': { transform: 'scale(1)' }
-              }
-            }}
-          >
-            <img src={Logo} alt='Logo' />
-          </Box>
+    <div
+      className={`
+        fixed inset-0 z-[99999] 
+        flex flex-col justify-center items-center
+        transition-all duration-500 ease-in-out
+        backdrop-blur-lg
+        ${isLoading ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
+      `}
+      style={{
+        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,20,0.95) 50%, rgba(0,0,0,0.95) 100%)'
+      }}
+    >
+      <div className='flex flex-col items-center gap-8'>
+        {/* Logo with pulse animation */}
+        <div className='animate-pulse'>
+          <img src={Logo} alt='Logo' className='w-auto h-auto' />
+        </div>
 
-          {/* Loading spinner */}
-          <CircularProgress
-            size={60}
-            thickness={4}
-            sx={{
-              color: 'primary.main',
-              '& .MuiCircularProgress-circle': {
-                strokeLinecap: 'round'
-              }
-            }}
-          />
+        {/* Loading spinner */}
+        <div className='animate-spin rounded-full h-16 w-16 border-4 border-primary border-t-transparent'></div>
 
-          {/* Loading text */}
-          <Typography
-            variant='h6'
-            sx={{
-              color: 'primary.contrastText',
-              fontWeight: 500,
-              opacity: 0.8,
-              animation: 'fadeInOut 2s infinite',
-              '@keyframes fadeInOut': {
-                '0%': { opacity: 0.5 },
-                '50%': { opacity: 1 },
-                '100%': { opacity: 0.5 }
-              }
-            }}
-          >
-            Đang tải...
-          </Typography>
-        </Box>
-      </Paper>
-    </>
+        {/* Loading text */}
+        <h2 className='text-xl font-medium text-primary-foreground opacity-80 animate-pulse'>Đang tải...</h2>
+      </div>
+    </div>
   )
 }
 

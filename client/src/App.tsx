@@ -1,27 +1,45 @@
-import { store } from '@/store/store'
-import { CssBaseline } from '@mui/material'
-import { Provider } from 'react-redux'
+import { useEffect, useState } from 'react'
 import { RouterProvider } from 'react-router-dom'
+import GlobalSnackbar from './components/common/GlobaSnackbar/GlobalSnackbar'
 import router from './routes/routes'
 import ThemeProvider from './theme/ThemeProvider'
-import GlobalSnackbar from './components/common/GlobaSnackbar/GlobalSnackbar'
+import Loader from './components/common/Loading/Loader'
+import { getCurrentUser, logout } from './store/features/auth/authSlice'
+import { useAppDispatch, useAppSelector } from './store/hook'
 
 function App() {
-  const user
-  // console.log('🚀 ~ App.tsx:11 ~ App ~ user:', user)
-  // console.log('🚀 ~ App.tsx:12 ~ App ~ tsx:', tsx)
+  const dispatch = useAppDispatch()
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
+  const { user, isAuthenticated, isLoading } = useAppSelector((state) => state.auth)
 
-  // console.log('🚀 ~ App.tsx:14 ~ App ~ user:', user)
-  console.log('hahhah')
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        await dispatch(getCurrentUser()).unwrap()
+      } catch (error) {
+        console.error('Error verifying auth:', error)
+        dispatch(logout())
+      } finally {
+        setIsCheckingAuth(false)
+      }
+    }
+
+    if (!user && !isAuthenticated && localStorage.getItem('accessToken')) {
+      checkAuth()
+    } else {
+      setIsCheckingAuth(false)
+    }
+  }, [user, isAuthenticated, dispatch])
+
+  if (isLoading || isCheckingAuth) {
+    return <Loader />
+  }
 
   return (
-    <Provider store={store}>
-      <ThemeProvider>
-        <CssBaseline />
-        <GlobalSnackbar />
-        <RouterProvider router={router} />
-      </ThemeProvider>
-    </Provider>
+    <ThemeProvider>
+      <GlobalSnackbar />
+      <RouterProvider router={router} />
+    </ThemeProvider>
   )
 }
 

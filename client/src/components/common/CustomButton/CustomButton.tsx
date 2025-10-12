@@ -1,53 +1,40 @@
-// CustomButton.tsx
-import { styled } from '@mui/material/styles'
-import Button from '@mui/material/Button'
+import React from 'react'
+import { Button } from '@/components/ui/button'
+import type { ButtonProps } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
-// Define props riêng để truyền biến thể
-interface CustomButtonProps {
+interface CustomButtonProps extends ButtonProps {
   variantType?: 'default' | 'danger' | 'ghost'
 }
 
-const CustomButton = styled(Button, {
-  shouldForwardProp: (prop) => prop !== 'variantType'
-})<CustomButtonProps>(({ theme, variantType = 'default' }) => ({
-  borderRadius: 8,
-  textTransform: 'none',
-  fontWeight: 600,
-  fontSize: '1rem',
-  padding: theme.spacing(1.5, 3),
-  transition: 'all 0.3s ease',
-  boxShadow: 'none',
-
-  ...(variantType === 'default' && {
-    backgroundColor: theme.palette.primary.main,
-    color: '#fff',
-    '&:hover': {
-      backgroundColor: theme.palette.primary.dark
+const CustomButton = React.forwardRef<HTMLButtonElement, CustomButtonProps>(
+  ({ variantType = 'default', className, ...props }, ref) => {
+    const getVariant = (): ButtonProps['variant'] => {
+      switch (variantType) {
+        case 'danger':
+          return 'destructive'
+        case 'ghost':
+          return 'ghost'
+        default:
+          return 'default'
+      }
     }
-  }),
 
-  ...(variantType === 'danger' && {
-    backgroundColor: theme.palette.error.main,
-    color: '#fff',
-    '&:hover': {
-      backgroundColor: theme.palette.error.dark
-    }
-  }),
-
-  ...(variantType === 'ghost' && {
-    backgroundColor: 'transparent',
-    border: '1px solid #ccc',
-    color: theme.palette.text.primary,
-    '&:hover': {
-      backgroundColor: theme.palette.action.hover
-    }
-  }),
-
-  // Responsive fontSize, padding
-  [theme.breakpoints.down('sm')]: {
-    fontSize: '0.9rem',
-    padding: theme.spacing(1, 2)
+    return (
+      <Button
+        ref={ref}
+        variant={getVariant()}
+        className={cn(
+          'h-10 px-6 text-base font-semibold rounded-lg transition-all duration-300',
+          'sm:text-sm sm:px-4 sm:h-9',
+          className
+        )}
+        {...props}
+      />
+    )
   }
-}))
+)
+
+CustomButton.displayName = 'CustomButton'
 
 export default CustomButton

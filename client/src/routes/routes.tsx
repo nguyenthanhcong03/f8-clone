@@ -5,7 +5,7 @@ import EditLessonPage from '@/pages/admin/CourseManagement/EditLessonPage'
 import QuickAddCoursePage from '@/pages/admin/CourseManagement/QuickAddCoursePage'
 import BlogPage from '@/pages/public/BlogPage/BlogPage'
 import CourseDetail from '@/pages/public/CourseDetail/CourseDetail'
-import CoursePage from '@/pages/public/CoursePage/CoursePage'
+import HomePage from '@/pages/public/HomePage/HomePage'
 import RoadMapPage from '@/pages/public/RoadMapPage/RoadMapPage'
 import LearningPage from '@/pages/student/StudyPage/LearningPage'
 import { createBrowserRouter, type RouteObject } from 'react-router-dom'
@@ -14,9 +14,9 @@ import AdminLayout from './layouts/AdminLayout'
 import MainLayout from './layouts/MainLayout'
 
 const publicRoutes: RouteObject[] = [
-  { index: true, element: <CoursePage /> },
-  { path: ':id', element: <CourseDetail /> },
-  { path: 'learning-paths', element: <RoadMapPage /> },
+  { index: true, element: <HomePage /> },
+  { path: ':slug', element: <CourseDetail /> },
+  { path: 'roadmap', element: <RoadMapPage /> },
   { path: 'blog', element: <BlogPage /> }
 ]
 
@@ -27,7 +27,7 @@ const publicRoutes: RouteObject[] = [
 const adminRoutes: RouteObject[] = [
   { path: 'courses', element: <CourseIndex /> },
   { path: 'courses/add', element: <QuickAddCoursePage /> },
-  { path: 'courses/:id', element: <EditCoursePage /> },
+  { path: 'courses/:courseId', element: <EditCoursePage /> },
   { path: 'courses/:courseId/sections/:sectionId/lessons/:lessonId', element: <EditLessonPage /> }
 ]
 
@@ -47,9 +47,9 @@ const routes: RouteObject[] = [
   {
     path: 'admin',
     element: (
-      <ProtectedRoute roles={['admin']}>
-        <AdminLayout />
-      </ProtectedRoute>
+      // <ProtectedRoute roles={['admin']}>
+      <AdminLayout />
+      // </ProtectedRoute>
     ),
     errorElement: <NotFound />,
     children: adminRoutes

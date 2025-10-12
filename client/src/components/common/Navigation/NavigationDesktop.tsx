@@ -1,68 +1,49 @@
-import HomeIcon from '@mui/icons-material/Home'
-import MapIcon from '@mui/icons-material/Map'
-import NewspaperIcon from '@mui/icons-material/Newspaper'
-import { Box } from '@mui/material'
-import { styled } from '@mui/material/styles'
+import { Home, Map, Newspaper } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
-
-const StyledNavLink = styled(NavLink)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  textDecoration: 'none',
-  color: '#000',
-  fontSize: '12px',
-  width: 70,
-  height: 70,
-  borderRadius: 15,
-  '&:hover': {
-    backgroundColor: '#F5F5F5'
-  }
-}))
+import { cn } from '@/lib/utils'
 
 const NavigationDesktop = () => {
   return (
-    <Box
-      sx={{
-        height: '100%',
-        display: 'flex',
-        gap: 1,
-        flexDirection: 'column',
-        width: '96px',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        padding: '16px 0'
-      }}
-    >
-      <StyledNavLink
+    <div className='h-full flex flex-col gap-2 w-[96px] justify-start items-center py-4'>
+      <NavLink
         to='/'
-        style={({ isActive }) => ({
-          backgroundColor: isActive ? '#E8EBED' : undefined
-        })}
+        className={({ isActive }) =>
+          cn(
+            'flex flex-col items-center justify-center no-underline text-foreground text-xs w-[70px] h-[70px] rounded-2xl transition-colors hover:bg-muted',
+            isActive && 'bg-muted'
+          )
+        }
       >
-        <HomeIcon sx={{ mb: 0.5 }} />
+        <Home className='mb-1 h-5 w-5' />
         Trang chủ
-      </StyledNavLink>
-      <StyledNavLink
+      </NavLink>
+
+      <NavLink
         to='/learning-paths'
-        style={({ isActive }) => ({
-          backgroundColor: isActive ? '#E8EBED' : undefined
-        })}
+        className={({ isActive }) =>
+          cn(
+            'flex flex-col items-center justify-center no-underline text-foreground text-xs w-[70px] h-[70px] rounded-2xl transition-colors hover:bg-muted',
+            isActive && 'bg-muted'
+          )
+        }
       >
-        <MapIcon sx={{ mb: 0.5 }} />
+        <Map className='mb-1 h-5 w-5' />
         Lộ trình
-      </StyledNavLink>
-      <StyledNavLink
+      </NavLink>
+
+      <NavLink
         to='/blog'
-        style={({ isActive }) => ({
-          backgroundColor: isActive ? '#E8EBED' : undefined
-        })}
+        className={({ isActive }) =>
+          cn(
+            'flex flex-col items-center justify-center no-underline text-foreground text-xs w-[70px] h-[70px] rounded-2xl transition-colors hover:bg-muted',
+            isActive && 'bg-muted'
+          )
+        }
       >
-        <NewspaperIcon sx={{ mb: 0.5 }} />
+        <Newspaper className='mb-1 h-5 w-5' />
         Bài viết
-      </StyledNavLink>
-    </Box>
+      </NavLink>
+    </div>
   )
 }
 

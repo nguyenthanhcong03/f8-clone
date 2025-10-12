@@ -1,12 +1,10 @@
 import { useAppDispatch, useAppSelector } from '@/store/hook'
-import { fetchLessonById } from '@/store/lessonSlice'
-import { saveProgress } from '@/store/progressSlice'
-import { Menu } from '@mui/icons-material'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
-import FactCheckIcon from '@mui/icons-material/FactCheck'
-import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled'
-import { Box, Button, IconButton, Paper, Stack, Typography } from '@mui/material'
+import { fetchLessonById } from '@/store/features/courses/lessonSlice'
+import { saveProgress } from '@/store/features/courses/progressSlice'
+import { Menu, ArrowLeft, ArrowRight, CheckCircle, PlayCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 import { useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import ReactPlayer from 'react-player'
@@ -20,8 +18,9 @@ const LessonArea = ({ handleDrawerToggle }: { handleDrawerToggle?: () => void })
   const { loading: progressLoading, isCompleted } = useAppSelector((state) => state.progress)
   const { currentCourse } = useAppSelector((state) => state.courses)
 
-  const previousLessonId = currentLesson?.previousLessonId
-  const nextLessonId = currentLesson?.nextLessonId
+  // TODO: Implement lesson navigation logic
+  const previousLessonId = null
+  const nextLessonId = null
 
   useEffect(() => {
     if (lessonId) {
@@ -33,11 +32,12 @@ const LessonArea = ({ handleDrawerToggle }: { handleDrawerToggle?: () => void })
   const getSectionTitle = () => {
     if (!currentLesson) return ''
     const section =
-      currentCourse?.sections && currentCourse.sections.find((section) => section.id === currentLesson.section_id)
+      currentCourse?.sections &&
+      currentCourse.sections.find((section) => section.id === currentLesson.section_id.toString())
     return section?.title || ''
   }
 
-  const navigateToLesson = (lessonId: number) => {
+  const navigateToLesson = (lessonId: number | null) => {
     if (lessonId) {
       setSearchParams({ lessonId: String(lessonId) })
     }
@@ -45,90 +45,37 @@ const LessonArea = ({ handleDrawerToggle }: { handleDrawerToggle?: () => void })
 
   if (!currentLesson && !lessonLoading) {
     return (
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100%',
-          width: '100%',
-          p: 3
-        }}
-      >
-        <Typography variant='h6' color='text.secondary' sx={{ mb: 2 }}>
-          Chọn bài học từ danh sách để bắt đầu
-        </Typography>
-        <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 400, textAlign: 'center' }}>
+      <div className='flex flex-col justify-center items-center h-full w-full p-6'>
+        <h3 className='text-lg font-medium text-muted-foreground mb-4'>Chọn bài học từ danh sách để bắt đầu</h3>
+        <p className='text-sm text-muted-foreground max-w-sm text-center'>
           Hãy chọn một bài học từ menu bên trái để xem nội dung
-        </Typography>
-      </Box>
+        </p>
+      </div>
     )
   }
 
   return (
-    <Box
-      sx={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden'
-      }}
-    >
+    <div className='w-full h-full flex flex-col overflow-hidden'>
       {/* Lesson header */}
-      <Stack
-        direction={'row'}
-        justifyContent='space-between'
-        alignItems='center'
-        sx={{
-          p: 2,
-          borderBottom: '1px solid',
-          borderColor: 'divider'
-        }}
-      >
+      <div className='flex justify-between items-center p-4 border-b border-border'>
         <div>
-          <Typography variant='body2' color='text.secondary'>
-            {getSectionTitle()}
-          </Typography>
-          <Typography variant='h6' sx={{ fontWeight: 'bold' }}>
-            {currentLesson?.title}
-          </Typography>
+          <p className='text-sm text-muted-foreground'>{getSectionTitle()}</p>
+          <h2 className='text-lg font-bold'>{currentLesson?.title}</h2>
         </div>
-        {isCompleted ? (
-          <Button size='small' loading={progressLoading}>
-            <FactCheckIcon fontSize='small' sx={{ mr: 1 }} />
-            Đánh dấu đã học
-          </Button>
-        ) : (
-          <Button size='small' loading={progressLoading}>
-            <FactCheckIcon fontSize='small' sx={{ mr: 1 }} />
-            Đánh dấu đã học
-          </Button>
-        )}
-      </Stack>
+        <Button
+          size='sm'
+          disabled={progressLoading}
+          className={cn('flex items-center gap-2', isCompleted && 'bg-green-600 hover:bg-green-700')}
+        >
+          <CheckCircle className='h-4 w-4' />
+          Đánh dấu đã học
+        </Button>
+      </div>
 
       {/* Lesson content */}
-      <Box
-        sx={{
-          p: 3,
-          overflow: 'auto',
-          flex: 1,
-          bgcolor: 'background.default'
-        }}
-      >
+      <div className='p-6 overflow-auto flex-1 bg-background'>
         {currentLesson?.video_url ? (
-          <Box
-            sx={{
-              position: 'relative',
-              paddingTop: '56.25%', // 16:9 Aspect Ratio
-              width: '100%',
-              maxWidth: '100%',
-              mb: 3,
-              overflow: 'hidden',
-              borderRadius: 1
-            }}
-          >
+          <div className='relative pt-[56.25%] w-full mb-6 overflow-hidden rounded-lg'>
             <ReactPlayer
               src={currentLesson.video_url}
               width='100%'
@@ -145,105 +92,59 @@ const LessonArea = ({ handleDrawerToggle }: { handleDrawerToggle?: () => void })
                 }
               }}
             />
-          </Box>
+          </div>
         ) : (
-          <Box
-            sx={{
-              position: 'relative',
-              paddingTop: '56.25%', // 16:9 Aspect Ratio
-              width: '100%',
-              maxWidth: '100%',
-              mb: 3
-            }}
-          >
-            <Box
-              sx={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                border: 'none',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                bgcolor: 'grey.200',
-                borderRadius: 1,
-                textAlign: 'center',
-                color: 'text.secondary'
-              }}
-            >
-              <PlayCircleFilledIcon sx={{ fontSize: 60, opacity: 0.7 }} />
-              <Typography variant='body1' sx={{ mt: 2 }}>
-                Video không khả dụng
-              </Typography>
-            </Box>
-          </Box>
+          <div className='relative pt-[56.25%] w-full mb-6'>
+            <div className='absolute inset-0 flex flex-col justify-center items-center bg-muted rounded-lg text-center'>
+              <PlayCircle className='h-15 w-15 opacity-70 text-muted-foreground' />
+              <p className='mt-4 text-muted-foreground'>Video không khả dụng</p>
+            </div>
+          </div>
         )}
 
-        <Paper elevation={0} sx={{ p: 3, mb: 3 }}>
-          {currentLesson?.content ? (
-            <ReactMarkdown>{currentLesson.content}</ReactMarkdown>
-          ) : (
-            <Typography variant='body1'>Không có nội dung cho bài học này.</Typography>
-          )}
-        </Paper>
-      </Box>
+        <Card className='mb-6'>
+          <CardContent className='p-6'>
+            {currentLesson?.content ? (
+              <ReactMarkdown>{currentLesson.content}</ReactMarkdown>
+            ) : (
+              <p>Không có nội dung cho bài học này.</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Lesson navigation */}
-      <Box
-        sx={{
-          p: 2,
-          display: 'flex',
-          justifyContent: 'space-between',
-          borderTop: '1px solid',
-          borderColor: 'divider'
-        }}
-      >
+      <div className='p-4 flex justify-between border-t border-border'>
         {/* Mobile Drawer Toggle Button */}
+        <div className='flex lg:hidden justify-center items-center gap-2'>
+          <Button onClick={handleDrawerToggle} variant='outline' size='sm' className='border border-border'>
+            <Menu className='h-4 w-4' />
+          </Button>
+          <span className='font-bold text-sm whitespace-nowrap'>{currentLesson?.title}</span>
+        </div>
 
-        <Box
-          sx={{
-            display: { xs: 'flex', lg: 'none' },
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 1
-          }}
-        >
-          <IconButton
-            onClick={handleDrawerToggle}
-            sx={{
-              border: '1px solid'
-            }}
-          >
-            <Menu fontSize='small' />
-          </IconButton>
-          <Typography sx={{ fontWeight: 'bold', fontSize: 14, width: 'max-content' }}>
-            {currentLesson?.title}
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', gap: 2, width: '100%', justifyContent: { xs: 'end', lg: 'space-between' } }}>
+        <div className='flex gap-4 w-full justify-end lg:justify-between'>
           <Button
-            startIcon={<ArrowBackIcon />}
             disabled={!previousLessonId}
             onClick={() => navigateToLesson(previousLessonId)}
-            variant='outlined'
+            variant='outline'
+            className='flex items-center gap-2'
           >
+            <ArrowLeft className='h-4 w-4' />
             Bài trước
           </Button>
 
           <Button
-            endIcon={<ArrowForwardIcon />}
             disabled={!nextLessonId}
             onClick={() => navigateToLesson(nextLessonId)}
-            variant='contained'
+            className='flex items-center gap-2'
           >
             Bài tiếp theo
+            <ArrowRight className='h-4 w-4' />
           </Button>
-        </Box>
-      </Box>
-    </Box>
+        </div>
+      </div>
+    </div>
   )
 }
 

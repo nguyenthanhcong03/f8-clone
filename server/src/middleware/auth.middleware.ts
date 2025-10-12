@@ -14,6 +14,8 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     token = req.headers.authorization.split(' ')[1]
   }
 
+  console.log('token', token)
+
   if (!token) {
     return res.status(401).json({
       success: false,
@@ -24,8 +26,9 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string)
+    console.log('decoded', decoded)
 
-    const currentUser = await User.findByPk(decoded.id, {
+    const currentUser = await User.findByPk(decoded.user_id, {
       attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
     })
 

@@ -1,40 +1,19 @@
-import { useAppSelector } from '@/store/hook'
-import { Category, Menu as MenuIcon, ShoppingBag } from '@mui/icons-material'
-import AddCircleIcon from '@mui/icons-material/AddCircle'
-import {
-  Box,
-  Divider,
-  Drawer,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Toolbar,
-  Tooltip,
-  Typography
-} from '@mui/material'
+import { BookOpen, Menu, PlusCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { useState } from 'react'
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
-
-// Định nghĩa chiều rộng của sidebar
-const drawerWidth = 340
-const collapsedWidth = 65
+import { NavLink, useLocation } from 'react-router-dom'
 
 // Menu items
 const SIDEBAR_ITEMS = [
-  { name: 'Tạo khóa học', icon: <AddCircleIcon />, href: '/admin/courses/add' },
-  { name: 'Khóa học', icon: <Category />, href: '/admin/courses' }
+  { name: 'Tạo khóa học', icon: PlusCircle, href: '/admin/courses/add' },
+  { name: 'Khóa học', icon: BookOpen, href: '/admin/courses' }
 ]
 
 const AdminSidebar = () => {
-  const navigate = useNavigate()
   const location = useLocation()
-  const { user } = useAppSelector((state) => state.auth)
   const [isCollapsed, setIsCollapsed] = useState(false)
 
-  // Check if menu item is active
   const isActive = (path: string) => {
     return location.pathname === path
   }
@@ -44,102 +23,59 @@ const AdminSidebar = () => {
   }
 
   return (
-    <Drawer
-      variant='permanent'
-      sx={{
-        '& .MuiDrawer-paper': {
-          position: 'static',
-          height: '100vh',
-          width: isCollapsed ? collapsedWidth : drawerWidth,
-          boxSizing: 'border-box',
-          overflowX: 'hidden',
-          transition: 'width 0.3s ease',
-          borderRight: '1px solid rgba(0, 0, 0, 0.12)'
-        }
-      }}
-      open
+    <div
+      className={cn(
+        'h-screen bg-background border-r border-border overflow-hidden transition-all duration-300 ease-in-out',
+        isCollapsed ? 'w-20' : 'w-80'
+      )}
     >
-      <Toolbar
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: isCollapsed ? 'center' : 'space-between',
-          py: 1,
-          px: isCollapsed ? 1 : 2
-        }}
+      {/* Header */}
+      <div
+        className={cn(
+          'flex items-center py-4 border-b border-border',
+          isCollapsed ? 'justify-center px-2' : 'justify-between px-6'
+        )}
       >
         {!isCollapsed && (
-          <>
-            <Box component='img' src='/src/assets/images/logo.png' alt='Logo' sx={{ height: 40, borderRadius: 1 }} />
-            <Typography variant='h6' noWrap component='div'>
-              F8 Admin
-            </Typography>
-          </>
+          <div className='flex items-center gap-3'>
+            <img src='/src/assets/images/logo.png' alt='Logo' className='h-10 rounded-lg' />
+            <h2 className='text-lg font-semibold whitespace-nowrap'>F8 Admin</h2>
+          </div>
         )}
-        <IconButton onClick={handleToggle}>
-          <MenuIcon />
-        </IconButton>
-      </Toolbar>
+        <Button variant='ghost' size='sm' onClick={handleToggle} className='h-8 w-8 p-0'>
+          <Menu className='h-4 w-4' />
+        </Button>
+      </div>
 
-      <Divider />
+      {/* Navigation */}
+      <nav className='flex-1 p-4'>
+        <ul className='space-y-2'>
+          {SIDEBAR_ITEMS.map((item) => {
+            const Icon = item.icon
+            const active = isActive(item.href)
 
-      <List sx={{ flexGrow: 1 }}>
-        {SIDEBAR_ITEMS.map((item) => (
-          <ListItem key={item.href} disablePadding>
-            {isCollapsed ? (
-              <Tooltip title={item.name} placement='right'>
-                <ListItemButton
-                  component={NavLink}
+            return (
+              <li key={item.href}>
+                <NavLink
                   to={item.href}
-                  selected={isActive(item.href)}
-                  sx={{
-                    minHeight: 48,
-                    justifyContent: 'center',
-                    px: 2.5,
-                    '&.Mui-selected': {
-                      bgcolor: 'primary.light',
-                      '&:hover': {
-                        bgcolor: 'primary.light'
-                      }
-                    }
-                  }}
+                  className={cn(
+                    'flex items-center rounded-lg transition-colors duration-200',
+                    isCollapsed ? 'justify-center p-3' : 'gap-3 px-4 py-3',
+                    active
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  )}
+                  title={isCollapsed ? item.name : undefined}
                 >
-                  <ListItemIcon
-                    sx={{
-                      minWidth: 0,
-                      mr: 'auto',
-                      justifyContent: 'center',
-                      color: isActive(item.href) ? 'primary.main' : 'inherit'
-                    }}
-                  >
-                    {item.icon}
-                  </ListItemIcon>
-                </ListItemButton>
-              </Tooltip>
-            ) : (
-              <ListItemButton
-                component={NavLink}
-                to={item.href}
-                selected={isActive(item.href)}
-                sx={{
-                  minHeight: 48,
-                  px: 2.5,
-                  '&.Mui-selected': {
-                    bgcolor: 'primary.light',
-                    '&:hover': {
-                      bgcolor: 'primary.light'
-                    }
-                  }
-                }}
-              >
-                <ListItemIcon sx={{ color: isActive(item.href) ? '#fff' : 'inherit' }}>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.name} sx={{ color: isActive(item.href) ? '#fff' : 'inherit' }} />
-              </ListItemButton>
-            )}
-          </ListItem>
-        ))}
-      </List>
-    </Drawer>
+                  <Icon className={cn('flex-shrink-0', isCollapsed ? 'h-5 w-5' : 'h-5 w-5')} />
+                  {!isCollapsed && <span className='font-medium whitespace-nowrap'>{item.name}</span>}
+                </NavLink>
+              </li>
+            )
+          })}
+        </ul>
+      </nav>
+    </div>
   )
 }
 
