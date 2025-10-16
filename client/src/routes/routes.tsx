@@ -31,7 +31,7 @@ const adminRoutes: RouteObject[] = [
   { path: 'courses/:courseId/sections/:sectionId/lessons/:lessonId', element: <EditLessonPage /> }
 ]
 
-// Main router configuration
+// Main router
 const routes: RouteObject[] = [
   {
     path: '/',
@@ -40,7 +40,7 @@ const routes: RouteObject[] = [
     children: [...publicRoutes]
   },
   {
-    path: '/learning/:courseId',
+    path: '/learning/:slug',
     element: <LearningPage />,
     errorElement: <NotFound />
   },

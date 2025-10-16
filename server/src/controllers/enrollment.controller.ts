@@ -26,7 +26,6 @@ const enrollCourse = catchAsync(async (req: Request, res: Response) => {
 const checkEnrollment = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user?.id
   const courseId = parseInt(req.params.courseId, 10)
-  console.log('Checking enrollment for userId:', userId, 'and courseId:', courseId)
 
   if (!userId) {
     return res.status(401).json({ message: 'Unauthorized' })

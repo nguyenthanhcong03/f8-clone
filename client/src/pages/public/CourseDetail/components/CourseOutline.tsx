@@ -3,7 +3,7 @@ import { Plus, Minus, PlayCircle } from 'lucide-react'
 import { useAppSelector } from '@/store/hook'
 import { cn } from '@/lib/utils'
 
-const CourseContent = () => {
+const CourseOutline = () => {
   const { currentCourse } = useAppSelector((state) => state.courses)
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({})
 
@@ -71,4 +71,4 @@ const CourseContent = () => {
   )
 }
 
-export default CourseContent
+export default CourseOutline

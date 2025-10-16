@@ -14,14 +14,17 @@ import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 
 interface CourseDetailsProps {
-  course?: Course | null
+  course: Course
 }
 
-const CourseInfo: React.FC<CourseDetailsProps> = () => {
+const CourseInfo: React.FC<CourseDetailsProps> = ({ course }) => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
+  const [previewThumbnail, setPreviewThumbnail] = useState<string | null>(null)
+  console.log('>>>>>>>>>>>course: ', course)
 
   const {
     control,
@@ -31,13 +34,13 @@ const CourseInfo: React.FC<CourseDetailsProps> = () => {
   } = useForm<CourseFormInput>({
     resolver: zodResolver(courseFormSchema),
     defaultValues: {
-      title: '',
-      slug: '',
-      description: '',
-      level: 'beginner',
-      is_paid: false,
-      price: 0,
-      thumbnail: undefined
+      title: course?.title || '',
+      slug: course?.slug || '',
+      description: course?.description || '',
+      level: course?.level || 'beginner',
+      is_paid: course?.is_paid || false,
+      price: course?.price || 0,
+      thumbnail: course?.thumbnail || null
     }
   })
 
@@ -45,7 +48,6 @@ const CourseInfo: React.FC<CourseDetailsProps> = () => {
 
   const onSubmit = async (data: CourseFormInput) => {
     try {
-      // Convert form data to create course format
       const courseData = {
         ...data,
         price: data.is_paid ? (typeof data.price === 'string' ? parseFloat(data.price) : data.price) : undefined
@@ -85,6 +87,23 @@ const CourseInfo: React.FC<CourseDetailsProps> = () => {
                     className={errors.title ? 'border-red-500' : ''}
                   />
                   {errors.title && <p className='text-sm text-red-500'>{errors.title.message}</p>}
+                </div>
+              )}
+            />
+
+            <Controller
+              name='description'
+              control={control}
+              render={({ field }) => (
+                <div className='space-y-2'>
+                  <Label htmlFor='title'>Mô tả khóa học</Label>
+                  <Input
+                    id='description'
+                    {...field}
+                    placeholder='Nhập mô tả khóa học'
+                    className={errors.description ? 'border-red-500' : ''}
+                  />
+                  {errors.description && <p className='text-sm text-red-500'>{errors.description.message}</p>}
                 </div>
               )}
             />
@@ -183,41 +202,48 @@ const CourseInfo: React.FC<CourseDetailsProps> = () => {
           <Controller
             name='thumbnail'
             control={control}
-            render={({ field: { onChange, value, ...field } }) => (
-              <div>
-                <input
-                  {...field}
-                  type='file'
-                  accept='image/*'
-                  onChange={(e) => {
-                    const file = e.target.files?.[0]
-                    onChange(file)
-                  }}
-                  className='hidden'
-                  id='thumbnail-upload'
-                />
-                <label htmlFor='thumbnail-upload'>
-                  <Button
-                    variant='outline'
-                    asChild
-                    className={`h-14 w-full max-w-md border-2 border-dashed cursor-pointer ${
-                      errors.thumbnail ? 'border-red-500' : 'border-muted-foreground/30'
-                    }`}
-                  >
-                    <span className='flex items-center gap-2'>
-                      <ImageIcon className='h-4 w-4' />
-                      {value
-                        ? `Đã chọn: ${value instanceof File ? value.name : 'Current thumbnail'}`
-                        : 'Chọn hình ảnh minh họa'}
-                    </span>
-                  </Button>
-                </label>
-                {errors.thumbnail && <p className='text-sm text-red-500 mt-2'>{errors.thumbnail.message}</p>}
-                {!errors.thumbnail && (
-                  <p className='text-sm text-muted-foreground mt-2'>Định dạng: JPEG, PNG, WebP (Tối đa 5MB)</p>
-                )}
-              </div>
-            )}
+            render={({ field: { onChange, value, ...field } }) => {
+              return (
+                <div>
+                  <input
+                    {...field}
+                    type='file'
+                    accept='image/*'
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      console.log('file', file)
+                      setPreviewThumbnail(file ? URL.createObjectURL(file) : null)
+                      onChange(file)
+                    }}
+                    className='hidden'
+                    id='thumbnail-upload'
+                  />
+                  {previewThumbnail && (
+                    <img src={previewThumbnail} alt='Preview' className='w-32 h-32 object-cover rounded-lg border' />
+                  )}
+                  <label htmlFor='thumbnail-upload'>
+                    <Button
+                      variant='outline'
+                      asChild
+                      className={`h-14 w-full max-w-md border-2 border-dashed cursor-pointer ${
+                        errors.thumbnail ? 'border-red-500' : 'border-muted-foreground/30'
+                      }`}
+                    >
+                      <span className='flex items-center gap-2'>
+                        <ImageIcon className='h-4 w-4' />
+                        {value
+                          ? `Đã chọn: ${value instanceof File ? value.name : 'Current thumbnail'}`
+                          : 'Chọn hình ảnh minh họa'}
+                      </span>
+                    </Button>
+                  </label>
+                  {errors.thumbnail && <p className='text-sm text-red-500 mt-2'>{errors.thumbnail.message}</p>}
+                  {!errors.thumbnail && (
+                    <p className='text-sm text-muted-foreground mt-2'>Định dạng: JPEG, PNG, WebP (Tối đa 5MB)</p>
+                  )}
+                </div>
+              )
+            }}
           />
         </div>
         <div className='flex justify-end gap-2 mt-6'>

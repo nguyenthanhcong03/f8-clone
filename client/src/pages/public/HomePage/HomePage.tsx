@@ -2,14 +2,12 @@ import CourseCard from '@/components/common/CourseCard/CourseCard'
 import { fetchCourses } from '@/store/features/courses/courseSlice'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import AdSlider from './components/AdSlider'
 import Loader from '@/components/common/Loading/Loader'
 
 const HomePage = () => {
-  const { courses, loading, error } = useAppSelector((state) => state.courses)
+  const { courses, loading } = useAppSelector((state) => state.courses)
   const dispatch = useAppDispatch()
-  const navigate = useNavigate()
 
   useEffect(() => {
     const getCourses = async () => {

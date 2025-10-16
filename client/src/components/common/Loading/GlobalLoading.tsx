@@ -8,7 +8,6 @@ const GlobalLoading = () => {
 
   useEffect(() => {
     if (globalLoading) {
-      console.log('Global loading is active')
       setIsLoading(true)
     } else {
       setTimeout(() => {

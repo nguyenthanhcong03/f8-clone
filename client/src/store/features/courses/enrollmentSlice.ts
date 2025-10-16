@@ -3,13 +3,11 @@ import enrollmentAPI from '@/services/enrollmetAPI'
 
 interface EnrollmentState {
   loading: boolean
-  enrolled: boolean
   error: string | null
 }
 
 const initialState: EnrollmentState = {
   loading: false,
-  enrolled: false,
   error: null
 }
 
@@ -58,9 +56,8 @@ const enrollmentSlice = createSlice({
         state.loading = true
         state.error = null
       })
-      .addCase(enrollCourse.fulfilled, (state, action) => {
+      .addCase(enrollCourse.fulfilled, (state) => {
         state.loading = false
-        state.enrolled = true
       })
       .addCase(enrollCourse.rejected, (state, action) => {
         state.loading = false
@@ -71,9 +68,8 @@ const enrollmentSlice = createSlice({
         state.loading = true
         state.error = null
       })
-      .addCase(checkEnrollment.fulfilled, (state, action) => {
+      .addCase(checkEnrollment.fulfilled, (state) => {
         state.loading = false
-        state.enrolled = action.payload.enrolled
       })
       .addCase(checkEnrollment.rejected, (state, action) => {
         state.loading = false

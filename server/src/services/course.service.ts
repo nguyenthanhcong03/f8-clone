@@ -1,4 +1,4 @@
-import { Lesson, Section } from '@/models'
+import { Enrollment, Lesson, Section, User } from '@/models'
 import Course from '../models/course.model'
 import uploadService from './upload.service'
 import ApiError from '@/utils/ApiError'
@@ -68,7 +68,7 @@ export const CourseService = {
     return { course }
   },
 
-  async getCourseBySlug(slug: string) {
+  async getCourseBySlug(slug: string, req_user: any) {
     const course = await Course.findOne({
       where: { slug },
       include: [
@@ -94,7 +94,17 @@ export const CourseService = {
     if (!course) {
       throw new ApiError(404, 'Khóa học không tồn tại')
     }
-    return { course }
+
+    let isEnrolled = false
+    if (req_user) {
+      const enrollment = await Enrollment.findOne({
+        where: { user_id: req_user.id, course_id: course.course_id }
+      })
+      isEnrolled = !!enrollment // true nếu có dòng trong bảng enrollments
+    }
+    // console.log(course)
+
+    return { course: { ...course.toJSON(), isEnrolled } }
   },
 
   async updateCourse(course_id: string, courseData: any) {

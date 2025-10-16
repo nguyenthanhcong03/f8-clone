@@ -97,7 +97,6 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
 
 const getCurrentUser = catchAsync(async (req: Request, res: Response) => {
   const user = req.user
-  console.log('req.user', user)
   if (!user) {
     throw new ApiError(401, 'Unauthorized')
   }

@@ -14,6 +14,7 @@ import type { SyntheticEvent } from 'react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import CourseStructure from './components/CourseStructure'
+import Loader from '@/components/common/Loading/Loader'
 
 const EditCoursePage = () => {
   const { courseId } = useParams<{ courseId: string }>()
@@ -127,11 +128,7 @@ const EditCoursePage = () => {
   }
 
   if (loading) {
-    return (
-      <div className='flex justify-center p-6'>
-        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary'></div>
-      </div>
-    )
+    return <Loader />
   }
 
   return (

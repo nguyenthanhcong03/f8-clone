@@ -6,6 +6,7 @@ import ThemeProvider from './theme/ThemeProvider'
 import Loader from './components/common/Loading/Loader'
 import { getCurrentUser, logout } from './store/features/auth/authSlice'
 import { useAppDispatch, useAppSelector } from './store/hook'
+import AppLoader from './components/common/Loading/AppLoader'
 
 function App() {
   const dispatch = useAppDispatch()
@@ -32,7 +33,7 @@ function App() {
   }, [user, isAuthenticated, dispatch])
 
   if (isLoading || isCheckingAuth) {
-    return <Loader />
+    return <AppLoader />
   }
 
   return (

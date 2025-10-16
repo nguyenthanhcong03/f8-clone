@@ -77,7 +77,8 @@ const getCourseById = catchAsync(async (req: Request, res: Response) => {
 
 const getCourseBySlug = catchAsync(async (req: Request, res: Response) => {
   const slug = req.params.slug
-  const response = await courseService.getCourseBySlug(slug)
+  const user = req?.user
+  const response = await courseService.getCourseBySlug(slug, user)
   res.status(200).json({
     success: true,
     data: {

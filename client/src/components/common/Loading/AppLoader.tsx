@@ -1,6 +1,6 @@
 'use client'
 
-export default function BookLoader() {
+export default function AppLoader() {
   return (
     <div className='fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-300 bg-opacity-80 backdrop-blur-md'>
       <div className='flex flex-col items-center'>
@@ -32,8 +32,8 @@ export default function BookLoader() {
         </svg>
 
         {/* Loading Text */}
-        <p className='mt-6 text-xl font-semibold text-gray-700'>Đang tải Books...</p>
-        <p className='mt-2 text-sm text-gray-500'>Bài đọc yêu thích tiếp theo của bạn đang trên đường của nó!</p>
+        <p className='mt-6 text-xl font-semibold text-gray-700'>Đang tải...</p>
+        <p className='mt-2 text-sm text-gray-500'>Học lập trình để đi làm!</p>
       </div>
     </div>
   )

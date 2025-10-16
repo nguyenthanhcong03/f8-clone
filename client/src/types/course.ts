@@ -40,6 +40,7 @@ export interface Course {
   createdAt?: string
   updatedAt?: string
   sections?: Section[]
+  isEnrolled?: boolean
 }
 
 export interface CourseCreateInput {

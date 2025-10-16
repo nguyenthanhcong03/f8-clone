@@ -1,12 +1,13 @@
 import { Router } from 'express'
 import courseController from '@/controllers/course.controller'
 import upload from '../middleware/upload.middleware'
+import authMiddleware from '@/middleware/auth.middleware'
 
 const router = Router()
 
 router.get('/', courseController.getAllCourses)
 
-router.get('/slug/:slug', courseController.getCourseBySlug)
+router.get('/slug/:slug', authMiddleware.authOptional, courseController.getCourseBySlug)
 
 router.get('/:id/sections', courseController.getCourseSections)
 router.get('/:course_id', courseController.getCourseById)

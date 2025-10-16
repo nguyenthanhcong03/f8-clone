@@ -24,9 +24,9 @@ const MainLayout = () => {
           <Outlet />
         </div>
 
-        {/* Desktop Navigation - hidden on mobile, visible on md+ */}
+        {/* Desktop Navigation - hidden on mobile */}
         <div
-          className='hidden md:block fixed left-0 bg-background border-r z-[1000]'
+          className='hidden md:block fixed left-0 bg-background border-r'
           style={{
             top: '66px',
             width: NAVIGATION_WIDTH,
@@ -36,7 +36,7 @@ const MainLayout = () => {
           <NavigationDesktop />
         </div>
 
-        {/* Mobile Navigation - visible on mobile, hidden on md+ */}
+        {/* Mobile Navigation - visible on mobile */}
         <div className='block md:hidden fixed left-0 bottom-0 w-full bg-background border-t z-[1000]'>
           <NavigationMobile />
         </div>

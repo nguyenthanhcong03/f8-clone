@@ -1,4 +1,4 @@
-import Loader from '@/components/common/Loading/Loader'
+import AppLoader from '@/components/common/Loading/AppLoader'
 import { Button } from '@/components/ui/button'
 import { fetchCourseBySlug } from '@/store/features/courses/courseSlice'
 import { checkEnrollment, enrollCourse } from '@/store/features/courses/enrollmentSlice'
@@ -8,36 +8,42 @@ import { translateLevel } from '@/utils/courseUtils'
 import { BarChart3, GraduationCap, Monitor } from 'lucide-react'
 import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import CourseContent from './components/CourseContent'
+import CourseOutline from './components/CourseOutline'
 
 const CourseDetail = () => {
   const { slug } = useParams()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const { currentCourse, loading } = useAppSelector((state) => state.courses)
-  const { loading: enrollCourseLoading, enrolled } = useAppSelector((state) => state.enrollment)
-  const { isAuthenticated, user } = useAppSelector((state) => state.auth)
+  console.log('🚀 ~ CourseDetail.tsx:18 ~ CourseDetail ~ currentCourse:', currentCourse)
+
+  const { loading: enrollCourseLoading } = useAppSelector((state) => state.enrollment)
+  const { isAuthenticated } = useAppSelector((state) => state.auth)
 
   const totalSections = currentCourse?.sections ? currentCourse.sections.length : 0
   const totalLessons =
     currentCourse?.sections && currentCourse?.sections.reduce((acc, section) => acc + section.lessons!.length, 0)
 
   const handleEnrollCourse = (slug: string) => {
+    if (!isAuthenticated) {
+      dispatch(
+        showSnackbar({
+          message: 'Vui lòng đăng nhập để đăng ký khóa học',
+          severity: 'warning'
+        })
+      )
+      return
+    }
     dispatch(enrollCourse(slug))
   }
 
   const handleNavigateToStudy = async (slug: string) => {
-    try {
-      const result = await dispatch(checkEnrollment(slug)).unwrap()
-      const isEnrolled = result.enrolled
-
-      if (isEnrolled) {
-        navigate(`/learning/${slug}`)
-      }
-    } catch (error: any) {
+    if (currentCourse?.isEnrolled) {
+      navigate(`/learning/${slug}`)
+    } else {
       dispatch(
         showSnackbar({
-          message: error.message || 'Đã xảy ra lỗi khi kiểm tra đăng ký khóa học',
+          message: 'Vui lòng đăng nhập',
           severity: 'error'
         })
       )
@@ -48,18 +54,15 @@ const CourseDetail = () => {
     if (slug) {
       dispatch(fetchCourseBySlug(slug))
     }
-
-    if (slug && isAuthenticated && user) {
-      dispatch(checkEnrollment(slug))
-    }
-  }, [dispatch, slug, isAuthenticated, user])
+  }, [dispatch, slug])
 
   if (loading) {
-    return <Loader />
+    return <AppLoader />
   }
 
   return (
     <div className='flex flex-row gap-4 items-start'>
+      {/* Left */}
       <div className='flex-[4] overflow-y-auto scrollbar-none'>
         <div className='min-h-screen'>
           <h1 className='text-3xl font-bold'>{currentCourse?.title || 'Thông tin khóa học'}</h1>
@@ -79,10 +82,11 @@ const CourseDetail = () => {
                 </div>
               </div>
             </div>
-            <CourseContent />
+            <CourseOutline />
           </div>
         </div>
       </div>
+      {/* Right */}
       <div className='flex-[2] p-6 flex flex-col justify-center items-center gap-4 sticky top-0'>
         {/* Thumbnail */}
         <div className='overflow-hidden rounded-lg w-full'>
@@ -98,7 +102,7 @@ const CourseDetail = () => {
           {currentCourse?.is_paid === true ? `${(currentCourse?.price || 0).toLocaleString('vi-VN')} ₫` : 'Miễn phí'}
         </h3>
 
-        {enrolled ? (
+        {currentCourse?.isEnrolled ? (
           <Button
             variant='secondary'
             className='w-48'
