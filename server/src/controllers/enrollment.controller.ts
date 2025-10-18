@@ -5,21 +5,14 @@ import ApiError from '@/utils/ApiError'
 
 const enrollCourse = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user?.id
-  const courseId = req.body.id
+  const courseId = req.body.course_id
 
-  if (!userId) {
-    throw new ApiError(401, 'Unauthorized')
-  }
-
-  // Convert courseId to number if it's a string
-  const courseIdNumber = typeof courseId === 'string' ? parseInt(courseId, 10) : courseId
-
-  const enrollment = await enrollmentService.enrollInCourse(userId, courseIdNumber)
+  const enrollment = await enrollmentService.enrollInCourse(userId!, courseId)
 
   res.status(201).json({
     success: true,
     message: 'Đăng ký khóa học thành công',
-    data: enrollment
+    data: { enrollment }
   })
 })
 

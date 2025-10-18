@@ -4,21 +4,22 @@ import type { Lesson } from '@/types/course'
 
 interface LessonState {
   currentLesson: Lesson | null
-  lessonLoading: boolean
-  lessonError: string | null
+  loading: boolean
+  error: string | null
 }
 
 const initialState: LessonState = {
   currentLesson: null,
-  lessonLoading: false,
-  lessonError: null
+  loading: false,
+  error: null
 }
 
 export const fetchLessonById = createAsyncThunk(
   'lessons/fetchLessonById',
-  async (lessonId: number, { rejectWithValue }) => {
+  async (lessonId: string, { rejectWithValue }) => {
     try {
       const response = await lessonAPI.getLessonById(lessonId)
+      console.log(response)
       return response.data
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : `Failed to fetch lesson ${lessonId}`
@@ -29,7 +30,7 @@ export const fetchLessonById = createAsyncThunk(
 
 export const fetchSectionLessons = createAsyncThunk(
   'lessons/fetchSectionLessons',
-  async (sectionId: number, { rejectWithValue }) => {
+  async (sectionId: string, { rejectWithValue }) => {
     try {
       const response = await lessonAPI.getSectionLessons(sectionId)
       return response.data
@@ -44,13 +45,14 @@ export const createLesson = createAsyncThunk(
   'lessons/createLesson',
   async (
     {
+      course_id,
       section_id,
       title,
       content,
       video_url,
-      video_public_id,
       videoFile
     }: {
+      course_id: string
       section_id: string
       title: string
       content?: string
@@ -62,11 +64,11 @@ export const createLesson = createAsyncThunk(
   ) => {
     try {
       const response = await lessonAPI.createLesson({
+        course_id,
         section_id,
         title,
         content,
         video_url,
-        video_public_id,
         videoFile
       })
       return response.data
@@ -85,14 +87,12 @@ export const updateLesson = createAsyncThunk(
       title,
       content,
       video_url,
-      video_public_id,
       videoFile
     }: {
-      lessonId: number
+      lessonId: string
       title?: string
       content?: string
       video_url?: string
-      video_public_id?: string
       videoFile?: File
     },
     { rejectWithValue }
@@ -102,7 +102,6 @@ export const updateLesson = createAsyncThunk(
         title,
         content,
         video_url,
-        video_public_id,
         videoFile
       })
       return response.data
@@ -127,8 +126,8 @@ const lessonSlice = createSlice({
   name: 'lessons',
   initialState,
   reducers: {
-    clearLessonError: (state) => {
-      state.lessonError = null
+    clearerror: (state) => {
+      state.error = null
     },
     clearCurrentLesson: (state) => {
       state.currentLesson = null
@@ -138,40 +137,40 @@ const lessonSlice = createSlice({
     // Fetch lesson by ID
     builder
       .addCase(fetchLessonById.pending, (state) => {
-        state.lessonLoading = true
-        state.lessonError = null
+        state.loading = true
+        state.error = null
       })
       .addCase(fetchLessonById.fulfilled, (state, action) => {
-        state.lessonLoading = false
+        state.loading = false
         state.currentLesson = action.payload
       })
       .addCase(fetchLessonById.rejected, (state, action) => {
-        state.lessonLoading = false
-        state.lessonError = action.payload as string
+        state.loading = false
+        state.error = action.payload as string
       })
 
     // Create lesson
     builder
       .addCase(createLesson.pending, (state) => {
-        state.lessonLoading = true
+        state.loading = true
       })
       .addCase(createLesson.fulfilled, (state, action) => {
-        state.lessonLoading = false
+        state.loading = false
         // state.lessons.push(action.payload)
         state.currentLesson = action.payload
       })
       .addCase(createLesson.rejected, (state, action) => {
-        state.lessonLoading = false
-        state.lessonError = action.payload as string
+        state.loading = false
+        state.error = action.payload as string
       })
 
     // Update lesson
     builder
       .addCase(updateLesson.pending, (state) => {
-        state.lessonLoading = true
+        state.loading = true
       })
       .addCase(updateLesson.fulfilled, (state, action) => {
-        state.lessonLoading = false
+        state.loading = false
         const updatedLesson = action.payload.data
         const index = state.lessons.findIndex((lesson) => lesson.id === updatedLesson.id)
         if (index !== -1) {
@@ -180,8 +179,8 @@ const lessonSlice = createSlice({
         state.currentLesson = updatedLesson
       })
       .addCase(updateLesson.rejected, (state, action) => {
-        state.lessonLoading = false
-        state.lessonError = action.payload as string
+        state.loading = false
+        state.error = action.payload as string
       })
 
     // Delete lesson
@@ -204,5 +203,5 @@ const lessonSlice = createSlice({
   }
 })
 
-export const { clearLessonError, clearCurrentLesson } = lessonSlice.actions
+export const { clearerror, clearCurrentLesson } = lessonSlice.actions
 export default lessonSlice.reducer

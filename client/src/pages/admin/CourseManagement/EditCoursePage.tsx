@@ -97,12 +97,13 @@ const EditCoursePage = () => {
     setCurrentSectionId(sectionId)
   }
 
-  const handleSaveLesson = async (title: string, sectionId: string) => {
+  const handleSaveLesson = async (title: string, courseId: string, sectionId: string) => {
     setLessonSubmitLoading(true)
 
     try {
       await dispatch(
         createLesson({
+          course_id: courseId,
           section_id: sectionId,
           title
         })
@@ -132,9 +133,9 @@ const EditCoursePage = () => {
   }
 
   return (
-    <div className='p-6 mx-auto'>
+    <div className='mx-auto p-6'>
       {/* Header */}
-      <div className='flex items-center gap-4 mb-6'>
+      <div className='mb-6 flex items-center gap-4'>
         <Button variant='outline' onClick={() => navigate('/admin/courses')} className='flex items-center gap-2'>
           <ArrowLeft className='h-4 w-4' />
           Trở về
@@ -142,17 +143,17 @@ const EditCoursePage = () => {
         <h1 className='text-3xl font-bold'>Chỉnh sửa khóa học</h1>
       </div>
 
-      <div className='w-full mb-8'>
+      <div className='mb-8 w-full'>
         {/* Tabs */}
-        <div className='border border-border rounded-lg mb-6'>
+        <div className='mb-6 rounded-lg border border-border'>
           <nav className='flex justify-center' aria-label='course edit tabs'>
             <button
               onClick={(e) => handleChangeTab(e, 'info')}
               className={cn(
-                'px-6 py-3 text-sm font-medium border-b-2 transition-colors',
+                'border-b-2 px-6 py-3 text-sm font-medium transition-colors',
                 activeTab === 'info'
-                  ? 'border-primary text-primary bg-accent'
-                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                  ? 'border-primary bg-accent text-primary'
+                  : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground'
               )}
             >
               Thông tin
@@ -160,10 +161,10 @@ const EditCoursePage = () => {
             <button
               onClick={(e) => handleChangeTab(e, 'lessons')}
               className={cn(
-                'px-6 py-3 text-sm font-medium border-b-2 transition-colors',
+                'border-b-2 px-6 py-3 text-sm font-medium transition-colors',
                 activeTab === 'lessons'
-                  ? 'border-primary text-primary bg-accent'
-                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                  ? 'border-primary bg-accent text-primary'
+                  : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground'
               )}
             >
               Bài học
@@ -200,6 +201,7 @@ const EditCoursePage = () => {
         open={isOpenFormLesson}
         onClose={() => setIsOpenFormLesson(false)}
         onSave={handleSaveLesson}
+        courseId={courseId!}
         sectionId={currentSectionId!}
         isLoading={lessonSubmitLoading}
       />

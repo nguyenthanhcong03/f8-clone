@@ -3,14 +3,15 @@ import Enrollment from '../models/enrollment.model'
 import Course from '../models/course.model'
 import User from '../models/user.model'
 
-const enrollInCourse = async (userId: number, courseId: number): Promise<Enrollment> => {
+const enrollInCourse = async (userId: string, courseId: string): Promise<Enrollment> => {
   // Kiểm tra khóa học có tồn tại hay không
   const course = await Course.findByPk(courseId)
+  console.log(courseId)
   if (!course) {
     throw new ApiError(404, 'Khóa học không tồn tại')
   }
 
-  // Kiểm trangười dùng có tồn tại hay không
+  // Kiểm tra người dùng có tồn tại hay không
   const user = await User.findByPk(userId)
   if (!user) {
     throw new ApiError(404, 'Người dùng không tồn tại')
@@ -39,7 +40,7 @@ const enrollInCourse = async (userId: number, courseId: number): Promise<Enrollm
   return enrollment
 }
 
-const isEnrolled = async (userId: number, courseId: number): Promise<boolean> => {
+const isEnrolled = async (userId: string, courseId: string): Promise<boolean> => {
   const enrollment = await Enrollment.findOne({
     where: {
       user_id: userId,
@@ -50,7 +51,7 @@ const isEnrolled = async (userId: number, courseId: number): Promise<boolean> =>
   return !!enrollment
 }
 
-const getUserEnrollments = async (userId: number): Promise<Enrollment[]> => {
+const getUserEnrollments = async (userId: string): Promise<Enrollment[]> => {
   // Kiểm tra người dùng có tồn tại hay không
   const user = await User.findByPk(userId)
   if (!user) {
@@ -73,7 +74,7 @@ const getUserEnrollments = async (userId: number): Promise<Enrollment[]> => {
   return enrollments
 }
 
-const unenrollFromCourse = async (userId: number, courseId: number): Promise<void> => {
+const unenrollFromCourse = async (userId: string, courseId: string): Promise<void> => {
   // Kiểm tra đã đăng ký khóa học hay chưa
   const enrollment = await Enrollment.findOne({
     where: {

@@ -2,8 +2,8 @@ import axiosInstance from '../config/axios'
 
 const API_ENDPOINT = '/enrollments'
 
-export const enrollCourse = async (slug: string) => {
-  const response = await axiosInstance.post(API_ENDPOINT, { slug })
+export const enrollCourse = async (course_id: string) => {
+  const response = await axiosInstance.post(API_ENDPOINT, { course_id })
   return response
 }
 

@@ -1,3 +1,10 @@
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
+import { Switch } from '@/components/ui/switch'
 import { courseFormSchema, type CourseFormInput } from '@/schemas/course.schema'
 import { createCourse } from '@/store/features/courses/courseSlice'
 import { useAppDispatch } from '@/store/hook'
@@ -5,27 +12,18 @@ import { showSnackbar } from '@/store/snackbarSlice'
 import type { Course } from '@/types/course'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ImageIcon } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
-import { Separator } from '@/components/ui/separator'
+import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
 
 interface CourseDetailsProps {
-  course: Course
+  course: Course | null
 }
 
 const CourseInfo: React.FC<CourseDetailsProps> = ({ course }) => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const [previewThumbnail, setPreviewThumbnail] = useState<string | null>(null)
-  console.log('>>>>>>>>>>>course: ', course)
-
   const {
     control,
     handleSubmit,
@@ -40,7 +38,7 @@ const CourseInfo: React.FC<CourseDetailsProps> = ({ course }) => {
       level: course?.level || 'beginner',
       is_paid: course?.is_paid || false,
       price: course?.price || 0,
-      thumbnail: course?.thumbnail || null
+      thumbnail: course?.thumbnail || undefined
     }
   })
 
@@ -156,14 +154,14 @@ const CourseInfo: React.FC<CourseDetailsProps> = ({ course }) => {
 
         {/* Pricing */}
         <div>
-          <h3 className='text-lg font-semibold mb-2'>Trả phí</h3>
+          <h3 className='mb-2 text-lg font-semibold'>Trả phí</h3>
 
           <div className='space-y-4'>
             <Controller
               name='is_paid'
               control={control}
               render={({ field }) => (
-                <label className='flex items-center gap-2 w-fit cursor-pointer'>
+                <label className='flex w-fit cursor-pointer items-center gap-2'>
                   <Switch checked={field.value} onCheckedChange={field.onChange} />
                   <span>Đây là khóa học trả phí</span>
                 </label>
@@ -197,7 +195,7 @@ const CourseInfo: React.FC<CourseDetailsProps> = ({ course }) => {
         <Separator className='my-6' />
 
         <div>
-          <h3 className='text-lg font-semibold mb-2'>Hình ảnh minh họa</h3>
+          <h3 className='mb-2 text-lg font-semibold'>Hình ảnh minh họa</h3>
 
           <Controller
             name='thumbnail'
@@ -219,13 +217,13 @@ const CourseInfo: React.FC<CourseDetailsProps> = ({ course }) => {
                     id='thumbnail-upload'
                   />
                   {previewThumbnail && (
-                    <img src={previewThumbnail} alt='Preview' className='w-32 h-32 object-cover rounded-lg border' />
+                    <img src={previewThumbnail} alt='Preview' className='h-32 w-32 rounded-lg border object-cover' />
                   )}
                   <label htmlFor='thumbnail-upload'>
                     <Button
                       variant='outline'
                       asChild
-                      className={`h-14 w-full max-w-md border-2 border-dashed cursor-pointer ${
+                      className={`h-14 w-full max-w-md cursor-pointer border-2 border-dashed ${
                         errors.thumbnail ? 'border-red-500' : 'border-muted-foreground/30'
                       }`}
                     >
@@ -237,16 +235,16 @@ const CourseInfo: React.FC<CourseDetailsProps> = ({ course }) => {
                       </span>
                     </Button>
                   </label>
-                  {errors.thumbnail && <p className='text-sm text-red-500 mt-2'>{errors.thumbnail.message}</p>}
+                  {errors.thumbnail && <p className='mt-2 text-sm text-red-500'>{errors.thumbnail.message}</p>}
                   {!errors.thumbnail && (
-                    <p className='text-sm text-muted-foreground mt-2'>Định dạng: JPEG, PNG, WebP (Tối đa 5MB)</p>
+                    <p className='mt-2 text-sm text-muted-foreground'>Định dạng: JPEG, PNG, WebP (Tối đa 5MB)</p>
                   )}
                 </div>
               )
             }}
           />
         </div>
-        <div className='flex justify-end gap-2 mt-6'>
+        <div className='mt-6 flex justify-end gap-2'>
           {isDirty && <Button variant='outline'>Khôi phục</Button>}
           <Button
             variant='default'

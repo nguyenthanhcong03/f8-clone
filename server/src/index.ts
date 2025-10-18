@@ -41,7 +41,11 @@ const startServer = async () => {
     console.log('Database connected successfully')
 
     // Sync database (creates tables if they don't exist)
-    await sequelize.sync() // hoặc sync({ force: true }) nếu muốn reset DB
+    // Có 3 chế độ:
+    // 1. sync() -> chỉ tạo bảng nếu chưa có
+    // 2. sync({ alter: true }) -> cập nhật cột/tên nếu khác model
+    // 3. sync({ force: true }) -> xóa bảng cũ & tạo lại (mất dữ liệu!)
+    await sequelize.sync({ alter: true })
     console.log('Database synchronized')
 
     // Start server

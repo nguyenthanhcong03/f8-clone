@@ -71,11 +71,11 @@ const authRequired = async (req: Request, res: Response, next: NextFunction) => 
     }
     // Giải mã và xác minh token
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as jwt.JwtPayload
-    if (!decoded || !decoded.userId) {
+    if (!decoded || !decoded.user_id) {
       throw new ApiError(401, 'Token không hợp lệ')
     }
     // Gắn thông tin người dùng vào request để sử dụng trong các middleware hoặc route tiếp theo
-    req.user = { id: decoded.userId, role: decoded.role }
+    req.user = { id: decoded.user_id, role: decoded.role }
     next()
   } catch (error) {
     throw new ApiError(401, 'Token không hợp lệ hoặc đã hết hạn')

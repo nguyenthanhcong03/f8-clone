@@ -11,6 +11,7 @@ import progressReducer from './features/courses/progressSlice'
 
 export const store = configureStore({
   reducer: {
+    [baseApi.reducerPath]: baseApi.reducer,
     theme: themeReducer,
     app: appReducer,
     snackbar: snackbarReducer,

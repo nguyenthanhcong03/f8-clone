@@ -4,38 +4,38 @@ import axiosInstance from '../config/axios'
 
 const API_ENDPOINT = '/lessons'
 
-export const getLessonById = async (lessonId: number) => {
-  const response = await axiosInstance.get<ApiResponse<Lesson>>(`${API_ENDPOINT}/${lessonId}`)
+export const getLessonById = async (lesson_id: string) => {
+  const response = await axiosInstance.get(`${API_ENDPOINT}/${lesson_id}`)
   return response
 }
 
-export const getSectionLessons = async (sectionId: number) => {
-  const response = await axiosInstance.get<ApiResponse<Lesson[]>>(`/sections/${sectionId}/lessons`)
+export const getSectionLessons = async (sectionId: string) => {
+  const response = await axiosInstance.get(`/sections/${sectionId}/lessons`)
   return response
 }
 
 export const createLesson = async (lessonData: {
+  course_id: string
   section_id: string
   title: string
   content?: string
+  video_url?: string
   videoFile?: File
 }) => {
   const formData = new FormData()
-
-  // Add text fields to FormData
-  formData.append('section_id', lessonData.section_id.toString())
+  formData.append('course_id', lessonData.course_id)
+  formData.append('section_id', lessonData.section_id)
   formData.append('title', lessonData.title)
 
   if (lessonData.content) {
     formData.append('content', lessonData.content)
   }
 
-  // Add video file if present
   if (lessonData.videoFile) {
     formData.append('videoFile', lessonData.videoFile)
   }
 
-  const response = await axiosInstance.post<ApiResponse<Lesson>>(API_ENDPOINT, formData, {
+  const response = await axiosInstance.post(API_ENDPOINT, formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }
@@ -48,6 +48,7 @@ export const updateLesson = async (
   lessonData: {
     title?: string
     content?: string
+    video_url?: string
     videoFile?: File
   }
 ) => {
@@ -62,12 +63,15 @@ export const updateLesson = async (
     formData.append('content', lessonData.content)
   }
 
-  // Add video file if present
+  if (lessonData.video_url) {
+    formData.append('video_url', lessonData.video_url)
+  }
+
   if (lessonData.videoFile) {
     formData.append('videoFile', lessonData.videoFile)
   }
 
-  const response = await axiosInstance.put<ApiResponse<Lesson>>(`${API_ENDPOINT}/${lessonId}`, formData, {
+  const response = await axiosInstance.put(`${API_ENDPOINT}/${lessonId}`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }
@@ -76,7 +80,7 @@ export const updateLesson = async (
 }
 
 export const deleteLesson = async (lessonId: string) => {
-  const response = await axiosInstance.delete<ApiResponse<Lesson>>(`${API_ENDPOINT}/${lessonId}`)
+  const response = await axiosInstance.delete(`${API_ENDPOINT}/${lessonId}`)
   return response
 }
 

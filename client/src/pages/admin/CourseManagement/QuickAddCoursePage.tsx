@@ -1,18 +1,17 @@
-import { courseFormSchema, type CourseFormInput } from '@/schemas/course.schema'
-import { createCourse } from '@/store/features/courses/courseSlice'
-import { useAppDispatch } from '@/store/hook'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, Image, Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { Editor } from '@tinymce/tinymce-react'
+import { courseFormSchema, type CourseFormInput } from '@/schemas/course.schema'
+import { createCourse } from '@/store/features/courses/courseSlice'
+import { useAppDispatch } from '@/store/hook'
+import { showSnackbar } from '@/store/snackbarSlice'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Save } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
-import { showSnackbar } from '@/store/snackbarSlice'
 
 const QuickAddCoursePage = () => {
   const dispatch = useAppDispatch()
@@ -58,7 +57,7 @@ const QuickAddCoursePage = () => {
   }
 
   return (
-    <div className='p-6 max-w-4xl mx-auto'>
+    <div className='mx-auto max-w-4xl p-6'>
       {/* Header */}
       <div className='mb-6 flex items-center gap-4'>
         <h1 className='text-3xl font-bold'>Thêm khóa học mới</h1>
@@ -70,7 +69,7 @@ const QuickAddCoursePage = () => {
             <div className='flex flex-col gap-6'>
               {/* Basic Information */}
               <div>
-                <h2 className='text-xl font-semibold text-primary mb-4'>Thông tin khóa học</h2>
+                <h2 className='mb-4 text-xl font-semibold text-primary'>Thông tin khóa học</h2>
 
                 <div className='flex flex-col gap-4'>
                   <Controller
@@ -165,14 +164,14 @@ const QuickAddCoursePage = () => {
 
               {/* Pricing */}
               <div>
-                <h2 className='text-xl font-semibold text-primary mb-4'>Giá khóa học</h2>
+                <h2 className='mb-4 text-xl font-semibold text-primary'>Giá khóa học</h2>
 
                 <div className='flex flex-col gap-4'>
                   <Controller
                     name='is_paid'
                     control={control}
                     render={({ field }) => (
-                      <div className='flex items-center space-x-2 w-fit'>
+                      <div className='flex w-fit items-center space-x-2'>
                         <Switch id='is_paid' checked={field.value} onCheckedChange={field.onChange} />
                         <Label htmlFor='is_paid'>Khóa học trả phí</Label>
                       </div>
@@ -184,7 +183,7 @@ const QuickAddCoursePage = () => {
                       name='price'
                       control={control}
                       render={({ field }) => (
-                        <div className='space-y-2 max-w-xs'>
+                        <div className='max-w-xs space-y-2'>
                           <Label htmlFor='price'>Giá tiền (VNĐ)</Label>
                           <Input
                             {...field}
@@ -207,12 +206,12 @@ const QuickAddCoursePage = () => {
 
               {/* Thumbnail */}
               <div>
-                <h2 className='text-xl font-semibold text-primary mb-4'>Ảnh thumbnail</h2>
+                <h2 className='mb-4 text-xl font-semibold text-primary'>Ảnh thumbnail</h2>
 
                 <Controller
                   name='thumbnail'
                   control={control}
-                  render={({ field: { onChange, value, ...field } }) => (
+                  render={({ field: { onChange, value } }) => (
                     <div className='space-y-2'>
                       <div className='grid w-full max-w-sm items-center gap-3'>
                         <Label>Ảnh nền</Label>
@@ -228,7 +227,6 @@ const QuickAddCoursePage = () => {
                           }}
                         />
 
-                        {/* Button custom thay thế */}
                         <Button asChild variant='outline'>
                           <label htmlFor='picture' className='cursor-pointer'>
                             {value ? `Đã chọn: ${value.name}` : 'Chọn ảnh...'}
@@ -236,9 +234,9 @@ const QuickAddCoursePage = () => {
                         </Button>
                       </div>
 
-                      {errors.thumbnail && <p className='text-sm text-red-500 mt-2'>{errors.thumbnail.message}</p>}
+                      {errors.thumbnail && <p className='mt-2 text-sm text-red-500'>{errors.thumbnail.message}</p>}
                       {!errors.thumbnail && (
-                        <p className='text-sm text-muted-foreground mt-2'>
+                        <p className='mt-2 text-sm text-muted-foreground'>
                           Định dạng: JPEG, PNG, WebP (Dung lượng tối đa 5MB)
                         </p>
                       )}
@@ -250,11 +248,11 @@ const QuickAddCoursePage = () => {
               <hr className='my-6' />
 
               {/* Form Actions */}
-              <div className='flex gap-4 justify-end pt-4'>
+              <div className='flex justify-end gap-4 pt-4'>
                 <Button variant='outline' onClick={() => navigate('/admin/courses')} disabled={isSubmitting}>
                   Hủy
                 </Button>
-                <Button type='submit' disabled={isSubmitting} className='min-w-[120px] flex items-center gap-2'>
+                <Button type='submit' disabled={isSubmitting} className='flex min-w-[120px] items-center gap-2'>
                   <Save className='h-4 w-4' />
                   {isSubmitting ? 'Đang thêm...' : 'Thêm khóa học'}
                 </Button>

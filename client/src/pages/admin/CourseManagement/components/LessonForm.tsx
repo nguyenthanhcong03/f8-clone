@@ -8,12 +8,13 @@ import { useState, useEffect } from 'react'
 interface LessonFormProps {
   open: boolean
   onClose: () => void
-  onSave: (title: string, sectionId: string) => void
+  onSave: (title: string, courseId: string, sectionId: string) => void
+  courseId: string
   sectionId: string
   isLoading: boolean
 }
 
-const LessonForm: React.FC<LessonFormProps> = ({ open, onClose, onSave, sectionId, isLoading }) => {
+const LessonForm: React.FC<LessonFormProps> = ({ open, onClose, onSave, courseId, sectionId, isLoading }) => {
   const [title, setTitle] = useState('')
   const [error, setError] = useState('')
 
@@ -27,7 +28,7 @@ const LessonForm: React.FC<LessonFormProps> = ({ open, onClose, onSave, sectionI
       setError('Vui lòng nhập tên bài học')
       return
     }
-    onSave(title, sectionId)
+    onSave(title, courseId, sectionId)
   }
 
   return (
@@ -59,7 +60,7 @@ const LessonForm: React.FC<LessonFormProps> = ({ open, onClose, onSave, sectionI
           <Button onClick={handleSave} disabled={isLoading}>
             {isLoading ? (
               <div className='flex items-center gap-2'>
-                <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-current'></div>
+                <div className='h-4 w-4 animate-spin rounded-full border-b-2 border-current'></div>
                 Đang tạo...
               </div>
             ) : (

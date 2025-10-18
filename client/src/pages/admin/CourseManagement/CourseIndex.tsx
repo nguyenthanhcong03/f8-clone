@@ -1,27 +1,19 @@
-import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
-import type { AppDispatch, RootState } from '@/store/store'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Plus } from 'lucide-react'
-import { fetchCourses, deleteCourse, clearError } from '@/store/features/courses/courseSlice'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { clearError, deleteCourse, fetchCourses } from '@/store/features/courses/courseSlice'
+import { useAppDispatch, useAppSelector } from '@/store/hook'
+import { showSnackbar } from '@/store/snackbarSlice'
 import type { Course } from '@/types/course'
+import { Plus } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import CourseGrid from '../../../components/common/CourseGridAdmin/CourseGridAdmin'
 
-// Level colors moved to CourseGrid component if needed
-
 const CourseIndex = () => {
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
-  const { loading, error } = useSelector((state: RootState) => state.courses)
+  const { loading, error } = useAppSelector((state) => state.courses)
 
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: '',
-    severity: 'success' as 'success' | 'error'
-  })
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [courseToDelete, setCourseToDelete] = useState<Course | null>(null)
 
@@ -31,14 +23,10 @@ const CourseIndex = () => {
 
   useEffect(() => {
     if (error) {
-      showSnackbar(error, 'error')
+      dispatch(showSnackbar({ message: error, severity: 'error' }))
       dispatch(clearError())
     }
   }, [error, dispatch])
-
-  const showSnackbar = (message: string, severity: 'success' | 'error') => {
-    setSnackbar({ open: true, message, severity })
-  }
 
   const handleAddCourse = () => {
     navigate('/admin/courses/add')
@@ -48,19 +36,19 @@ const CourseIndex = () => {
     if (!courseToDelete) return
 
     try {
-      await dispatch(deleteCourse(parseInt(courseToDelete.id))).unwrap()
-      showSnackbar('Course deleted successfully', 'success')
+      await dispatch(deleteCourse(courseToDelete.course_id)).unwrap()
+      dispatch(showSnackbar({ message: 'Xóa khóa học thành công', severity: 'success' }))
       setDeleteDialogOpen(false)
       setCourseToDelete(null)
     } catch {
-      showSnackbar('Failed to delete course', 'error')
+      dispatch(showSnackbar({ message: 'Xóa khóa học thất bại', severity: 'error' }))
     }
   }
 
   if (loading) {
     return (
       <div className='flex justify-center p-6'>
-        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary'></div>
+        <div className='h-8 w-8 animate-spin rounded-full border-b-2 border-primary'></div>
       </div>
     )
   }
@@ -68,9 +56,9 @@ const CourseIndex = () => {
   return (
     <div className='p-6'>
       {/* Header */}
-      <div className='flex justify-between items-center mb-6'>
+      <div className='mb-6 flex items-center justify-between'>
         <h1 className='text-3xl font-bold'>Danh sách khóa học</h1>
-        <Button onClick={handleAddCourse} className='flex items-center gap-2 min-w-[150px]'>
+        <Button onClick={handleAddCourse} className='flex min-w-[150px] items-center gap-2'>
           <Plus className='h-4 w-4' />
           Thêm khóa học
         </Button>
@@ -98,15 +86,6 @@ const CourseIndex = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Snackbar replacement with Alert */}
-      {snackbar.open && (
-        <div className='fixed bottom-4 right-4 z-50'>
-          <Alert className={`${snackbar.severity === 'error' ? 'border-destructive' : 'border-green-500'}`}>
-            <AlertDescription>{snackbar.message}</AlertDescription>
-          </Alert>
-        </div>
-      )}
     </div>
   )
 }

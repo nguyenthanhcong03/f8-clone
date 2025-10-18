@@ -1,25 +1,30 @@
 import lessonService from '@/services/lesson.service'
 import uploadService from '@/services/upload.service'
+import ApiError from '@/utils/ApiError'
 import catchAsync from '@/utils/catchAsync'
 import { Request, Response } from 'express'
 
 const createLesson = catchAsync(async (req: Request, res: Response) => {
-  const { section_id, title, content } = req.body
+  console.log('jjj')
+  const { course_id, section_id, title, content, video_url } = req.body
 
   // Tạo object course data
   const lessonData: {
-    section_id: number
+    course_id: string
+    section_id: string
     title: string
     content: string
     video_url?: string
     video_public_id?: string
   } = {
-    section_id: parseInt(section_id),
+    course_id,
+    section_id,
     title,
-    content
+    content,
+    video_url
   }
 
-  // Nếu có file thumbnail được upload
+  // Nếu có file video được upload
   if (req.file) {
     try {
       const uploadResult = await uploadService.uploadVideo(req.file.buffer, 'lesson-videos')
@@ -27,11 +32,7 @@ const createLesson = catchAsync(async (req: Request, res: Response) => {
       lessonData.video_public_id = uploadResult.public_id
       console.log('Video uploaded successfully:', uploadResult)
     } catch (error) {
-      return res.status(400).json({
-        success: false,
-        message: 'Có lỗi khi upload video',
-        error: error instanceof Error ? error.message : 'Unknown error'
-      })
+      throw new ApiError(400, 'Có lỗi khi upload video')
     }
   }
 
@@ -46,8 +47,8 @@ const createLesson = catchAsync(async (req: Request, res: Response) => {
 const updateLesson = catchAsync(async (req: Request, res: Response) => {
   console.log('--------------------------------')
 
-  const lessonId = parseInt(req.params.id)
-  const { title, content } = req.body
+  const lessonId = req.params.lesson_id
+  const { title, content, video_url } = req.body
 
   // Tạo object course data
   const lessonData: {
@@ -58,7 +59,8 @@ const updateLesson = catchAsync(async (req: Request, res: Response) => {
     duration?: number
   } = {
     title,
-    content
+    content,
+    video_url
   }
 
   // Nếu có file thumbnail được upload
@@ -86,13 +88,13 @@ const updateLesson = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getLessonById = catchAsync(async (req: Request, res: Response) => {
-  const lessonId = parseInt(req.params.id)
+  const lessonId = req.params.lesson_id
 
   const response = await lessonService.getLessonById(lessonId)
 
   res.status(200).json({
     success: true,
-    message: 'Lấy danh sách bài học thành công',
+    message: 'Lấy bài học thành công',
     data: response
   })
 })

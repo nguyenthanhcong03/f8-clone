@@ -4,9 +4,9 @@ import authMiddleware from '../middleware/auth.middleware'
 
 const router = Router()
 
-router.post('/', authMiddleware.verifyToken, enrollmentController.enrollCourse)
-router.get('/', authMiddleware.verifyToken, enrollmentController.getUserEnrollments)
-router.get('/check/:courseId', authMiddleware.verifyToken, enrollmentController.checkEnrollment)
-router.delete('/:courseId', authMiddleware.verifyToken, enrollmentController.unenrollCourse)
+router.post('/', authMiddleware.authRequired, enrollmentController.enrollCourse)
+router.get('/', authMiddleware.authRequired, enrollmentController.getUserEnrollments)
+router.get('/check/:courseId', authMiddleware.authRequired, enrollmentController.checkEnrollment)
+router.delete('/:courseId', authMiddleware.authRequired, enrollmentController.unenrollCourse)
 
 export default router

@@ -2,25 +2,30 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import enrollmentAPI from '@/services/enrollmetAPI'
 
 interface EnrollmentState {
+  enrolled: boolean
   loading: boolean
   error: string | null
 }
 
 const initialState: EnrollmentState = {
+  enrolled: false,
   loading: false,
   error: null
 }
 
 // Async thunks
-export const enrollCourse = createAsyncThunk('enrollment/enrollCourse', async (slug: string, { rejectWithValue }) => {
-  try {
-    const response = await enrollmentAPI.enrollCourse(slug)
-    return response.data
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Có lỗi xảy ra khi đăng ký khóa học'
-    return rejectWithValue(message)
+export const enrollCourse = createAsyncThunk(
+  'enrollment/enrollCourse',
+  async (course_id: string, { rejectWithValue }) => {
+    try {
+      const response = await enrollmentAPI.enrollCourse(course_id)
+      return response.data
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Có lỗi xảy ra khi đăng ký khóa học'
+      return rejectWithValue(message)
+    }
   }
-})
+)
 
 export const checkEnrollment = createAsyncThunk(
   'enrollment/checkEnrollment',
@@ -57,6 +62,7 @@ const enrollmentSlice = createSlice({
         state.error = null
       })
       .addCase(enrollCourse.fulfilled, (state) => {
+        state.enrolled = true
         state.loading = false
       })
       .addCase(enrollCourse.rejected, (state, action) => {

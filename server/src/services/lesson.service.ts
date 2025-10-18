@@ -15,71 +15,40 @@ export class LessonService {
     return lessons
   }
 
-  async getLessonById(id: number) {
-    const lesson = await Lesson.findByPk(id, {
-      include: {
-        model: Section,
-        as: 'section',
-        attributes: ['id', 'course_id']
-      }
-    })
+  async getLessonById(lesson_id: string) {
+    const lesson = await Lesson.findByPk(lesson_id)
 
     if (!lesson) {
-      throw new Error('Lesson not found')
+      throw new ApiError(404, 'Bài học không tồn tại')
     }
 
-    const courseId = lesson?.section.course_id
-
-    // 2. Lấy tất cả sections của khóa học
-    const sections = await Section.findAll({
-      where: { course_id: courseId },
-      attributes: ['id', 'order'],
-      order: [['order', 'ASC']]
-    })
-
-    // Tạo map để lưu thứ tự của các section
-    const sectionOrderMap: Record<number, number> = {}
-    sections.forEach((section) => {
-      if (section.id && section.order !== undefined) {
-        sectionOrderMap[section.id] = section.order
-      }
-    })
-
-    // 3. Lấy tất cả bài học trong các section của khóa học
-    const courseLessons = await Lesson.findAll({
-      where: {
-        section_id: { [Op.in]: sections.map((s) => s.id || 0) }
-      },
-      attributes: ['id', 'title', 'section_id', 'order'],
-      raw: true
-    })
-
-    // 4. Sắp xếp theo section.order rồi lesson.order
-    const sortedLessons = courseLessons.sort((a, b) => {
-      const secOrderA = sectionOrderMap[a.section_id] || 0
-      const secOrderB = sectionOrderMap[b.section_id] || 0
-
-      if (secOrderA === secOrderB) {
-        return (a.order || 0) - (b.order || 0)
-      }
-      return secOrderA - secOrderB
-    })
-
-    // 5. Tìm vị trí bài học hiện tại
-    const currentIndex = sortedLessons.findIndex((l) => l.id === lesson.id)
-
-    const previousLessonId = currentIndex > 0 ? sortedLessons[currentIndex - 1].id : null
-    const nextLessonId = currentIndex < sortedLessons.length - 1 ? sortedLessons[currentIndex + 1].id : null
+    // Lấy bài trước và sau trong cùng course
+    const [prevLesson, nextLesson] = await Promise.all([
+      Lesson.findOne({
+        where: {
+          course_id: lesson.course_id,
+          order: { [Op.lt]: lesson.order }
+        },
+        order: [['order', 'DESC']]
+      }),
+      Lesson.findOne({
+        where: {
+          course_id: lesson.course_id,
+          order: { [Op.gt]: lesson.order }
+        },
+        order: [['order', 'ASC']]
+      })
+    ])
 
     return {
       ...lesson.toJSON(),
-      previousLessonId,
-      nextLessonId
+      prevLesson: prevLesson ? { id: prevLesson.lesson_id, title: prevLesson.title } : null,
+      nextLesson: nextLesson ? { id: nextLesson.lesson_id, title: nextLesson.title } : null
     }
   }
 
-  async updateLesson(id: number, lessonData: any) {
-    const lesson = await Lesson.findByPk(id)
+  async updateLesson(lesson_id: string, lessonData: any) {
+    const lesson = await Lesson.findByPk(lesson_id)
     if (!lesson) {
       throw new Error('Lesson not found')
     }

@@ -13,7 +13,6 @@ const createSection = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getCourseSections = catchAsync(async (req: Request, res: Response) => {
-  console.log('hahah')
   const courseId = parseInt(req.params.id)
   const sections = await sectionService.getCourseSectionsById(courseId)
   res.status(200).json({

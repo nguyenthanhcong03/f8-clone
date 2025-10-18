@@ -24,7 +24,6 @@ export const getCourseBySlug = async (slug: string) => {
 export const createCourse = async (courseData: CreateCourseInput) => {
   const formData = new FormData()
 
-  // Append all form fields
   formData.append('title', courseData.title)
 
   if (courseData.slug) {

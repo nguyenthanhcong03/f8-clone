@@ -4,12 +4,12 @@ import { cn } from '@/lib/utils'
 
 const NavigationDesktop = () => {
   return (
-    <div className='h-full flex flex-col gap-2 w-[96px] justify-start items-center py-4'>
+    <div className='flex h-full w-[96px] flex-col items-center justify-start gap-2 py-4'>
       <NavLink
         to='/'
         className={({ isActive }) =>
           cn(
-            'flex flex-col items-center justify-center no-underline text-foreground text-xs w-[70px] h-[70px] rounded-2xl transition-colors hover:bg-muted',
+            'flex h-[70px] w-[70px] flex-col items-center justify-center rounded-2xl text-xs text-foreground no-underline transition-colors hover:bg-muted',
             isActive && 'bg-muted'
           )
         }
@@ -19,10 +19,10 @@ const NavigationDesktop = () => {
       </NavLink>
 
       <NavLink
-        to='/learning-paths'
+        to='/roadmap'
         className={({ isActive }) =>
           cn(
-            'flex flex-col items-center justify-center no-underline text-foreground text-xs w-[70px] h-[70px] rounded-2xl transition-colors hover:bg-muted',
+            'flex h-[70px] w-[70px] flex-col items-center justify-center rounded-2xl text-xs text-foreground no-underline transition-colors hover:bg-muted',
             isActive && 'bg-muted'
           )
         }
@@ -35,7 +35,7 @@ const NavigationDesktop = () => {
         to='/blog'
         className={({ isActive }) =>
           cn(
-            'flex flex-col items-center justify-center no-underline text-foreground text-xs w-[70px] h-[70px] rounded-2xl transition-colors hover:bg-muted',
+            'flex h-[70px] w-[70px] flex-col items-center justify-center rounded-2xl text-xs text-foreground no-underline transition-colors hover:bg-muted',
             isActive && 'bg-muted'
           )
         }
