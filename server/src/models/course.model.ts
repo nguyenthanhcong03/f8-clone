@@ -45,7 +45,7 @@ class Course extends Model<CourseAttributes, CourseCreationAttributes> implement
 
 Course.init(
   {
-    course_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), unique: true, primaryKey: true },
+    course_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), primaryKey: true },
     title: {
       type: DataTypes.STRING(255),
       allowNull: false

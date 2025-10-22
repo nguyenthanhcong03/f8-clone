@@ -25,7 +25,7 @@ class Roadmap extends Model<RoadmapAttributes, RoadmapCreationAttributes> implem
 
 Roadmap.init(
   {
-    roadmap_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), unique: true, primaryKey: true },
+    roadmap_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), primaryKey: true },
 
     title: {
       type: DataTypes.STRING(255)

@@ -28,7 +28,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
 
 User.init(
   {
-    user_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), unique: true, primaryKey: true },
+    user_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), primaryKey: true },
 
     name: {
       type: DataTypes.STRING(100),

@@ -20,7 +20,7 @@ class Enrollment extends Model<EnrollmentAttributes, EnrollmentCreationAttribute
 
 Enrollment.init(
   {
-    enrollment_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), unique: true, primaryKey: true },
+    enrollment_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), primaryKey: true },
     user_id: {
       type: DataTypes.STRING,
       allowNull: false,

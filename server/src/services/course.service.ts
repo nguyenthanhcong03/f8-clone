@@ -65,7 +65,7 @@ export const CourseService = {
     if (!course) {
       throw new ApiError(404, 'Khóa học không tồn tại')
     }
-    return { course }
+    return course
   },
 
   async getCourseBySlug(slug: string, req_user: any) {
@@ -102,9 +102,8 @@ export const CourseService = {
       })
       isEnrolled = !!enrollment // true nếu có dòng trong bảng enrollments
     }
-    // console.log(course)
 
-    return { course: { ...course.toJSON(), isEnrolled } }
+    return { ...course.toJSON(), isEnrolled }
   },
 
   async updateCourse(course_id: string, courseData: any) {

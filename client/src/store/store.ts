@@ -1,27 +1,31 @@
 import { configureStore } from '@reduxjs/toolkit'
-import courseReducer from './features/courses/courseSlice'
-import themeReducer from './features/theme/themeSlice'
-import authReducer from './features/auth/authSlice'
-import sectionReducer from './features/courses/sectionSlice'
-import lessonReducer from './features/courses/lessonSlice'
-import enrollmentReducer from './features/courses/enrollmentSlice'
+import { baseApi } from './api/baseApi'
 import appReducer from './appSlice'
+import authReducer from './features/auth/authSlice'
+import themeReducer from './features/theme/themeSlice'
 import snackbarReducer from './snackbarSlice'
-import progressReducer from './features/courses/progressSlice'
 
 export const store = configureStore({
   reducer: {
+    // API reducers
     [baseApi.reducerPath]: baseApi.reducer,
+
+    // Application state
     theme: themeReducer,
     app: appReducer,
     snackbar: snackbarReducer,
-    courses: courseReducer,
-    auth: authReducer,
-    sections: sectionReducer,
-    lessons: lessonReducer,
-    enrollment: enrollmentReducer,
-    progress: progressReducer
-  }
+
+    // Authentication
+    auth: authReducer
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // Bỏ qua các trường không serializable trong FormData
+        ignoredActions: ['courseApi/executeMutation', 'lessonApi/executeMutation'],
+        ignoredPaths: ['courses.formData']
+      }
+    }).concat(baseApi.middleware)
 })
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

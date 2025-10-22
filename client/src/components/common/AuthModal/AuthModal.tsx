@@ -1,27 +1,26 @@
 'use client'
 
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog'
+import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Eye, EyeOff, Loader2, X } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogClose
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
-import { Eye, EyeOff, X } from 'lucide-react'
 
 import Logo from '@/assets/images/logo.png'
-import { useAppDispatch } from '@/store/hook'
-import { showSnackbar } from '@/store/snackbarSlice'
-import { login, register } from '@/store/features/auth/authSlice'
+import { useLoginMutation, useRegisterMutation } from '@/store/api/authApi'
+import { toast } from 'react-toastify'
 
 interface ModalAuthProps {
   open: boolean
@@ -45,10 +44,10 @@ type LoginFormValues = z.infer<typeof loginSchema>
 type RegisterFormValues = z.infer<typeof registerSchema>
 
 const ModalAuth = ({ open, onClose, type: initialType }: ModalAuthProps) => {
-  const dispatch = useAppDispatch()
   const [type, setType] = useState<'login' | 'register'>(initialType)
-  const [showEmailForm, setShowEmailForm] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [register, { isLoading: registerIsLoading }] = useRegisterMutation()
+  const [login, { isLoading: loginIsLoading }] = useLoginMutation()
 
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -62,42 +61,39 @@ const ModalAuth = ({ open, onClose, type: initialType }: ModalAuthProps) => {
 
   const onLoginSubmit = async (data: LoginFormValues) => {
     try {
-      await dispatch(login(data)).unwrap()
-      dispatch(showSnackbar({ message: 'Đăng nhập thành công.', severity: 'success' }))
+      await login(data).unwrap()
+      toast.success('Đăng nhập thành công!')
       onClose()
     } catch (err) {
-      console.error('Login failed:', err)
+      console.log(err)
+      toast.error('Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.')
     }
   }
 
   const onRegisterSubmit = async (data: RegisterFormValues) => {
     try {
-      await dispatch(register(data)).unwrap()
-      dispatch(showSnackbar({ message: 'Đăng ký thành công! Vui lòng đăng nhập.', severity: 'success' }))
+      await register(data).unwrap()
+      toast.success('Đăng ký thành công! Vui lòng đăng nhập.')
       setType('login')
       loginForm.reset({ email: data.email, password: '' })
     } catch (err) {
-      console.error('Register failed:', err)
+      console.log(err)
+      toast.error('Đăng ký thất bại. Vui lòng kiểm tra lại thông tin.')
     }
   }
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className='max-w-md p-6 rounded-2xl'>
+      <DialogContent className='max-w-md rounded-2xl p-6'>
         <div className='flex justify-between'>
-          {showEmailForm && (
-            <Button variant='ghost' onClick={() => setShowEmailForm(false)}>
-              Quay lại
-            </Button>
-          )}
-          <DialogClose className='absolute right-4 top-4 bg-[#E9F1F8] p-2 rounded-full'>
+          <DialogClose className='absolute right-4 top-4 rounded-full bg-[#E9F1F8] p-2'>
             <X className='h-5 w-5' />
           </DialogClose>
         </div>
         <DialogHeader>
           <DialogTitle>
-            <div className='flex items-center flex-col justify-center gap-4 '>
-              <img src={Logo} alt='Logo' className='w-10 h-10 rounded-lg' />
+            <div className='flex flex-col items-center justify-center gap-4'>
+              <img src={Logo} alt='Logo' className='h-10 w-10 rounded-lg' />
               <h1 className='text-3xl font-bold'>{type === 'login' ? 'Đăng nhập vào F8' : 'Đăng ký tài khoản F8'}</h1>
             </div>
           </DialogTitle>
@@ -105,116 +101,96 @@ const ModalAuth = ({ open, onClose, type: initialType }: ModalAuthProps) => {
             Mỗi người nên sử dụng riêng một tài khoản, tài khoản dùng chung sẽ bị khóa.
           </DialogDescription>
         </DialogHeader>
-
-        {/* Form chính */}
-        {showEmailForm ? (
-          type === 'login' ? (
-            <Form {...loginForm}>
-              <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className='flex flex-col gap-4 mt-4'>
-                <FormField
-                  control={loginForm.control}
-                  name='email'
-                  render={({ field }) => (
-                    <FormItem>
-                      <Label>Email</Label>
-                      <Input placeholder='Email' type='email' {...field} />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={loginForm.control}
-                  name='password'
-                  render={({ field }) => (
-                    <FormItem>
-                      <Label>Mật khẩu</Label>
-                      <div className='relative'>
-                        <Input placeholder='Mật khẩu' type={showPassword ? 'text' : 'password'} {...field} />
-                        <button
-                          type='button'
-                          className='absolute right-2 top-1/2 -translate-y-1/2'
-                          onClick={() => setShowPassword(!showPassword)}
-                        >
-                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                        </button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type='submit' className='w-full rounded-lg'>
-                  Đăng nhập
-                </Button>
-              </form>
-            </Form>
-          ) : (
-            <Form {...registerForm}>
-              <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className='flex flex-col gap-4 mt-4'>
-                <FormField
-                  control={registerForm.control}
-                  name='name'
-                  render={({ field }) => (
-                    <FormItem>
-                      <Label>Họ và tên</Label>
-                      <Input placeholder='Họ và tên' {...field} />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={registerForm.control}
-                  name='email'
-                  render={({ field }) => (
-                    <FormItem>
-                      <Label>Email</Label>
-                      <Input placeholder='Email' type='email' {...field} />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={registerForm.control}
-                  name='password'
-                  render={({ field }) => (
-                    <FormItem>
-                      <Label>Mật khẩu</Label>
-                      <div className='relative'>
-                        <Input placeholder='Mật khẩu' type={showPassword ? 'text' : 'password'} {...field} />
-                        <button
-                          type='button'
-                          className='absolute right-2 top-1/2 -translate-y-1/2'
-                          onClick={() => setShowPassword(!showPassword)}
-                        >
-                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                        </button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type='submit' className='w-full rounded-lg'>
-                  Đăng ký
-                </Button>
-              </form>
-            </Form>
-          )
+        {type === 'login' ? (
+          <Form {...loginForm}>
+            <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className='mt-4 flex flex-col gap-4'>
+              <FormField
+                control={loginForm.control}
+                name='email'
+                render={({ field }) => (
+                  <FormItem>
+                    <Label>Email</Label>
+                    <Input placeholder='Email' type='email' {...field} />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={loginForm.control}
+                name='password'
+                render={({ field }) => (
+                  <FormItem>
+                    <Label>Mật khẩu</Label>
+                    <div className='relative'>
+                      <Input placeholder='Mật khẩu' type={showPassword ? 'text' : 'password'} {...field} />
+                      <button
+                        type='button'
+                        className='absolute right-2 top-1/2 -translate-y-1/2'
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type='submit' className='w-full rounded-lg' disabled={loginIsLoading}>
+                {loginIsLoading ? <Loader2 className='mr-2 h-4 w-4 animate-spin' /> : 'Đăng nhập'}
+              </Button>
+            </form>
+          </Form>
         ) : (
-          <div className='flex flex-col gap-3 mt-4'>
-            <Button variant='outline' className='rounded-full' onClick={() => setShowEmailForm(true)}>
-              Sử dụng email / số điện thoại
-            </Button>
-            <Button variant='outline' className='rounded-full'>
-              {type === 'login' ? 'Đăng nhập với Google' : 'Đăng ký với Google'}
-            </Button>
-            <Button variant='outline' className='rounded-full'>
-              {type === 'login' ? 'Đăng nhập với Facebook' : 'Đăng ký với Facebook'}
-            </Button>
-            <Button variant='outline' className='rounded-full'>
-              {type === 'login' ? 'Đăng nhập với Github' : 'Đăng ký với Github'}
-            </Button>
-          </div>
+          <Form {...registerForm}>
+            <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className='mt-4 flex flex-col gap-4'>
+              <FormField
+                control={registerForm.control}
+                name='name'
+                render={({ field }) => (
+                  <FormItem>
+                    <Label>Họ và tên</Label>
+                    <Input placeholder='Họ và tên' {...field} />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={registerForm.control}
+                name='email'
+                render={({ field }) => (
+                  <FormItem>
+                    <Label>Email</Label>
+                    <Input placeholder='Email' type='email' {...field} />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={registerForm.control}
+                name='password'
+                render={({ field }) => (
+                  <FormItem>
+                    <Label>Mật khẩu</Label>
+                    <div className='relative'>
+                      <Input placeholder='Mật khẩu' type={showPassword ? 'text' : 'password'} {...field} />
+                      <button
+                        type='button'
+                        className='absolute right-2 top-1/2 -translate-y-1/2'
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type='submit' className='w-full rounded-lg' disabled={registerIsLoading}>
+                {registerIsLoading ? <Loader2 className='mr-2 h-4 w-4 animate-spin' /> : 'Đăng ký'}
+              </Button>
+            </form>
+          </Form>
         )}
-
         {/* Footer */}
         <div className='mt-6 text-center text-sm'>
           {type === 'login' ? (
@@ -236,10 +212,9 @@ const ModalAuth = ({ open, onClose, type: initialType }: ModalAuthProps) => {
             <button className='text-primary hover:underline'>Quên mật khẩu?</button>
           </p>
         </div>
-
-        <p className='text-xs text-muted-foreground mt-4 text-center'>
+        <p className='mt-4 text-center text-xs text-muted-foreground'>
           Việc bạn tiếp tục sử dụng đồng nghĩa bạn đồng ý với{' '}
-          <span className='text-primary hover:underline cursor-pointer'>điều khoản sử dụng</span>.
+          <span className='cursor-pointer text-primary hover:underline'>điều khoản sử dụng</span>.
         </p>
       </DialogContent>
     </Dialog>

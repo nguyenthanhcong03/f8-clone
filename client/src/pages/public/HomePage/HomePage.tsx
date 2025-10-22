@@ -1,23 +1,20 @@
 import CourseCard from '@/components/common/CourseCard/CourseCard'
-import { fetchCourses } from '@/store/features/courses/courseSlice'
-import { useAppDispatch, useAppSelector } from '@/store/hook'
-import { useEffect } from 'react'
+import { useGetAllCoursesQuery } from '@/store/api/courseApi'
 import AdSlider from './components/AdSlider'
 import Loader from '@/components/common/Loading/Loader'
 
 const HomePage = () => {
-  const { courses, loading } = useAppSelector((state) => state.courses)
-  const dispatch = useAppDispatch()
+  // Sử dụng RTK Query hook để lấy danh sách khóa học
+  const { data: courses, isLoading, error } = useGetAllCoursesQuery()
 
-  useEffect(() => {
-    const getCourses = async () => {
-      await dispatch(fetchCourses())
-    }
-    getCourses()
-  }, [dispatch])
-
-  if (loading) {
+  // Xử lý trường hợp đang tải dữ liệu
+  if (isLoading) {
     return <Loader />
+  }
+
+  // Xử lý trường hợp có lỗi
+  if (error) {
+    return <div className='p-4 text-red-500'>Có lỗi xảy ra khi tải danh sách khóa học</div>
   }
 
   return (
@@ -25,10 +22,8 @@ const HomePage = () => {
       <AdSlider />
 
       <div className='mt-6 px-4 md:px-8'>
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
-          {courses.map((course) => (
-            <CourseCard key={course.course_id} course={course} />
-          ))}
+        <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+          {courses && courses.map((course) => <CourseCard key={course.course_id} course={course} />)}
         </div>
       </div>
     </div>

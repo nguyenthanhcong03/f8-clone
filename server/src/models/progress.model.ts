@@ -22,7 +22,7 @@ class Progress extends Model<ProgressAttributes, ProgressCreationAttributes> imp
 
 Progress.init(
   {
-    progress_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), unique: true, primaryKey: true },
+    progress_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), primaryKey: true },
     user_id: {
       type: DataTypes.STRING,
       allowNull: false

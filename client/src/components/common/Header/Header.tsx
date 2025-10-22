@@ -16,48 +16,55 @@ import { Link, useNavigate } from 'react-router-dom'
 import ModalAuth from '../AuthModal/AuthModal'
 import ThemeToggle from '../ThemeToggle/ThemeToggle'
 import { logout } from '@/store/features/auth/authSlice'
+import { useLogoutMutation } from '@/store/api/authApi'
+import { toast } from 'react-toastify'
 
 // Main component
 const Header = () => {
   const navigate = useNavigate()
   const { user, isAuthenticated } = useAppSelector((state) => state.auth)
-
-  const dispatch = useAppDispatch()
+  const [logout, { data, isSuccess }] = useLogoutMutation()
 
   const [openModalAuth, setOpenModalAuth] = useState(false)
   const [typeModalAuth, setTypeModalAuth] = useState<'login' | 'register'>('login')
+
   const handleOpenModalAuth = (type: 'register' | 'login') => {
     setTypeModalAuth(type)
     setOpenModalAuth(true)
   }
   const handleCloseModalAuth = () => setOpenModalAuth(false)
 
-  const handleLogout = () => {
-    dispatch(logout())
+  const handleLogout = async () => {
+    try {
+      await logout({}).unwrap()
+      toast.success('Đăng xuất thành công')
+    } catch (error) {
+      console.log('Failed to logout:', error)
+    }
     navigate('/')
   }
 
   return (
-    <header className='sticky top-0 z-50 h-[66px] bg-background border-b shadow-sm'>
-      <div className='h-full mx-auto px-7 flex items-center justify-between'>
+    <header className='sticky top-0 z-50 h-[66px] border-b bg-background shadow-sm'>
+      <div className='mx-auto flex h-full items-center justify-between px-7'>
         {/* Logo */}
-        <Link to='/' className='flex items-center mr-2 hover:opacity-80 transition-opacity'>
+        <Link to='/' className='mr-2 flex items-center transition-opacity hover:opacity-80'>
           <div className='flex items-center'>
-            <div className='rounded-lg w-[38px] h-[38px] overflow-hidden'>
+            <div className='h-[38px] w-[38px] overflow-hidden rounded-lg'>
               <img src={Logo} alt='Logo' width={38} height={38} />
             </div>
 
-            <span className='hidden md:block ml-4 text-sm font-bold sm:block whitespace-nowrap'>
+            <span className='ml-4 hidden whitespace-nowrap text-sm font-bold sm:block md:block'>
               Học lập trình để đi làm
             </span>
           </div>
         </Link>
 
         {/* Search bar */}
-        <div className='flex-1 max-w-md mx-4 h-10 flex items-center border-2 border-[#e8e8e8]  rounded-full px-3 py-1 overflow-hidden'>
+        <div className='mx-4 flex h-10 max-w-md flex-1 items-center overflow-hidden rounded-full border-2 border-[#e8e8e8] px-3 py-1'>
           <Search />
           <Input
-            className='border-0 focus-visible:ring-offset-0 focus-visible:ring-0'
+            className='border-0 focus-visible:ring-0 focus-visible:ring-offset-0'
             placeholder='Tìm kiếm khóa học, bài viết...'
             aria-label='search'
           />
@@ -70,7 +77,7 @@ const Header = () => {
           {/* Notification icon */}
           <Button variant='ghost' size='icon' className='relative'>
             <Bell className='h-5 w-5' />
-            <span className='absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center'>
+            <span className='absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white'>
               5
             </span>
           </Button>
@@ -79,16 +86,19 @@ const Header = () => {
           {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant='ghost' size='icon' className='rounded-full'>
-                  {user?.avatar ? (
-                    <Avatar className='h-8 w-8'>
-                      <AvatarImage src={user.avatar} alt={user.name} />
-                      <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                  ) : (
-                    <User className='h-5 w-5' />
-                  )}
-                </Button>
+                <div className='flex cursor-pointer items-center gap-2'>
+                  <Button variant='ghost' size='icon' className='rounded-full'>
+                    {user?.avatar ? (
+                      <Avatar className='h-8 w-8'>
+                        <AvatarImage src={user.avatar} alt={user.name} />
+                        <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                    ) : (
+                      <User className='h-5 w-5' />
+                    )}
+                  </Button>
+                  {user?.name}
+                </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end' className='w-56'>
                 <div className='px-2 py-1.5'>
@@ -122,7 +132,7 @@ const Header = () => {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className='text-red-600 focus:text-red-600'>
-                  <LogOut className='h-4 w-4 mr-2' />
+                  <LogOut className='mr-2 h-4 w-4' />
                   Đăng xuất
                 </DropdownMenuItem>
               </DropdownMenuContent>

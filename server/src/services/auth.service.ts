@@ -78,7 +78,7 @@ const login = async (loginData: LoginAccountInput['body']) => {
   }
 }
 
-const changePassword = async (id: number, currentPassword: string, newPassword: string) => {
+const changePassword = async (id: string, currentPassword: string, newPassword: string) => {
   const user = await User.findByPk(id)
   if (!user) {
     throw new ApiError(404, 'Người dùng không tồn tại')
@@ -136,9 +136,42 @@ const refreshToken = async (refreshToken: string) => {
   }
 }
 
+const getProfile = async (userId: string) => {
+  const user = await User.findByPk(userId, {
+    attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
+  })
+  if (!user) {
+    throw new ApiError(404, 'Người dùng không tồn tại')
+  }
+  return user
+}
+
+const updateProfile = async (userId: string, updateData: any, file?: Express.Multer.File) => {
+  const user = await User.findByPk(userId)
+  if (!user) {
+    throw new ApiError(404, 'Người dùng không tồn tại')
+  }
+  const { name, phone } = updateData
+
+  // Cập nhật avatar nếu có file
+  if (file) {
+    user.avatar = file.path // Giả sử bạn lưu đường dẫn file trong trường avatar
+  }
+  if (name) {
+    user.name = name
+  }
+  if (phone) {
+    user.phone = phone
+  }
+  await user.save()
+  return user
+}
+
 export default {
   register,
   login,
   changePassword,
-  refreshToken
+  refreshToken,
+  getProfile,
+  updateProfile
 }

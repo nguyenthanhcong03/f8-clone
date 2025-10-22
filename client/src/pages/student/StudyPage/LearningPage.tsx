@@ -1,29 +1,55 @@
-import Logo from '@/assets/images/logo.png'
-import { fetchCourseBySlug } from '@/store/features/courses/courseSlice'
-import { useAppDispatch, useAppSelector } from '@/store/hook'
-import { useEffect, useState } from 'react'
+import { useGetCourseBySlugQuery } from '@/store/api/courseApi'
+import { useGetLessonByIdQuery } from '@/store/api/lessonApi'
+import { skipToken } from '@/store/hook'
+import { useState, useEffect } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import LessonContent from './components/LessonContent'
 import LessonSidebar from './components/LessonSidebar'
+import AppLoader from '@/components/common/Loading/AppLoader'
+import LearningHeader from './components/LearningHeader'
 
 const LearningPage = () => {
-  const dispatch = useAppDispatch()
   const { slug } = useParams()
   const [params, setParams] = useSearchParams()
-  const { currentCourse } = useAppSelector((state) => state.courses)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const lessonId = params.get('lessonId')
 
-  useEffect(() => {
-    if (slug) {
-      dispatch(fetchCourseBySlug(slug))
-    }
-  }, [dispatch, slug])
+  // Sử dụng RTK Query để lấy thông tin khóa học theo slug
+  const {
+    data: courseData,
+    isLoading: getCourseIsLoading,
+    isError: getCourseIsError
+  } = useGetCourseBySlugQuery(slug ?? skipToken)
 
+  // Lấy thông tin bài học hiện tại
+  const { data: lessonData, isLoading: lessonIsLoading } = useGetLessonByIdQuery(lessonId ?? skipToken)
+
+  const isLoading = getCourseIsLoading || (lessonId && lessonIsLoading)
+
+  // Tự động chọn bài học đầu tiên nếu chưa có bài học nào được chọn
+  // và khóa học đã được tải
   useEffect(() => {
-    if (!params.get('lessonId') && currentCourse?.sections?.length && currentCourse?.sections[0].lessons?.length) {
-      setParams({ lessonId: String(currentCourse.sections[0].lessons[0].lesson_id) })
+    if (!params.get('lessonId') && courseData?.sections?.length && courseData?.sections[0].lessons?.length) {
+      setParams({ lessonId: String(courseData.sections[0].lessons[0].lesson_id) })
     }
-  }, [params, setParams])
+  }, [courseData, params, setParams])
+
+  // Hiển thị loading khi đang tải dữ liệu
+  if (isLoading) {
+    return <AppLoader />
+  }
+
+  // Hiển thị lỗi nếu có
+  if (getCourseIsError) {
+    return (
+      <div className='flex h-screen items-center justify-center'>
+        <div className='text-center'>
+          <h2 className='text-2xl font-bold text-red-500'>Có lỗi xảy ra</h2>
+          <p className='mt-2'>Không thể tải thông tin khóa học. Vui lòng thử lại sau.</p>
+        </div>
+      </div>
+    )
+  }
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -32,20 +58,7 @@ const LearningPage = () => {
   return (
     <div className='flex h-screen flex-col'>
       {/* Header */}
-      <header className='flex h-[50px] items-center justify-center border-b border-gray-200 bg-[#29303B] px-2 text-white'>
-        {/* Logo */}
-        <Link to='/' className='mx-2 h-[30px] w-[30px] overflow-hidden rounded'>
-          <img src={Logo} alt='Logo' className='h-[30px] w-[30px]' />
-        </Link>
-
-        {/* Title */}
-        <h1 className='flex-grow text-[14px] font-bold'>{currentCourse?.title || 'Khóa học'}</h1>
-
-        {/* User Avatar */}
-        <div className='mr-2 flex cursor-pointer items-center gap-2'>
-          <img src='/path-to-avatar.jpg' alt='User avatar' className='h-8 w-8 rounded-full' />
-        </div>
-      </header>
+      <LearningHeader title={courseData?.title} />
 
       {/* Main Content */}
       <div className='relative flex flex-1 overflow-hidden'>
@@ -53,7 +66,13 @@ const LearningPage = () => {
         <nav
           className={`h-full bg-white transition-all duration-300 ${mobileOpen ? 'absolute left-0 top-0 z-50 block w-full shadow-lg' : 'hidden'} lg:relative lg:block lg:w-[23%]`}
         >
-          <LessonSidebar params={params} setParams={setParams} handleDrawerToggle={handleDrawerToggle} />
+          <LessonSidebar
+            params={params}
+            setParams={setParams}
+            handleDrawerToggle={handleDrawerToggle}
+            courseData={courseData}
+            lessonData={lessonData}
+          />
         </nav>
 
         {/* Overlay khi mở sidebar trên mobile */}

@@ -106,11 +106,38 @@ const getCurrentUser = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const getProfile = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user?.id
+  if (!userId) {
+    throw new ApiError(401, 'Unauthorized')
+  }
+  const user = await authService.getProfile(userId)
+  res.status(200).json({
+    success: true,
+    data: user
+  })
+})
+
+const updateProfile = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user?.id
+  if (!userId) {
+    throw new ApiError(401, 'Unauthorized')
+  }
+  const updatedUser = await authService.updateProfile(userId, req.body, req.file)
+  res.status(200).json({
+    success: true,
+    data: updatedUser,
+    message: 'Cập nhật hồ sơ thành công'
+  })
+})
+
 export default {
   registerAccount,
   loginAccount,
   logout,
   changePassword,
   refreshToken,
-  getCurrentUser
+  getCurrentUser,
+  getProfile,
+  updateProfile
 }

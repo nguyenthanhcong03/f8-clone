@@ -29,7 +29,7 @@ class Blog extends Model<BlogAttributes, BlogCreationAttributes> implements Blog
 
 Blog.init(
   {
-    blog_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), unique: true, primaryKey: true },
+    blog_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), primaryKey: true },
     title: {
       type: DataTypes.STRING(255)
     },

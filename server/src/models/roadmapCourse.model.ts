@@ -23,7 +23,7 @@ class RoadmapCourse
 
 RoadmapCourse.init(
   {
-    roadmap_course_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), unique: true, primaryKey: true },
+    roadmap_course_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), primaryKey: true },
 
     roadmap_id: {
       type: DataTypes.STRING,

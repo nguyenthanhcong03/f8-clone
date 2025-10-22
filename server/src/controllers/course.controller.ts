@@ -56,10 +56,7 @@ const getAllCourses = catchAsync(async (req: Request, res: Response) => {
   const courses = await courseService.getAllCourses()
   res.status(200).json({
     success: true,
-    data: {
-      courses,
-      total: courses.length
-    },
+    data: courses,
     message: 'Lấy danh sách khóa học thành công'
   })
 })
@@ -69,9 +66,7 @@ const getCourseById = catchAsync(async (req: Request, res: Response) => {
   const response = await courseService.getCourseById(course_id)
   res.status(200).json({
     success: true,
-    data: {
-      course: response.course
-    }
+    data: response
   })
 })
 
@@ -81,9 +76,7 @@ const getCourseBySlug = catchAsync(async (req: Request, res: Response) => {
   const response = await courseService.getCourseBySlug(slug, user)
   res.status(200).json({
     success: true,
-    data: {
-      course: response.course
-    }
+    data: response
   })
 })
 

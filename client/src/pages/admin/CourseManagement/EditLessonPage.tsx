@@ -3,18 +3,19 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { lessonSchema, type LessonFormValues } from '@/schemas/lesson.schema'
-import { fetchCourseById } from '@/store/features/courses/courseSlice'
-import { fetchLessonById, updateLesson } from '@/store/features/courses/lessonSlice'
-import { useAppDispatch, useAppSelector } from '@/store/hook'
+import { useGetCourseByIdQuery } from '@/store/api/courseApi'
+import { useGetLessonByIdQuery, useUpdateLessonMutation } from '@/store/api/lessonApi'
+import { useAppDispatch, skipToken } from '@/store/hook'
 import { showSnackbar } from '@/store/snackbarSlice'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Editor } from '@tinymce/tinymce-react'
 import { ArrowLeft, Loader2, Trash2, Upload } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Control, FieldErrors, UseFormWatch } from 'react-hook-form'
 import { Controller, useForm } from 'react-hook-form'
 import ReactPlayer from 'react-player'
 import { useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 type VideoPlayerProps = {
   url: string | null | undefined
@@ -195,10 +196,18 @@ const EditLessonPage = () => {
     lessonId?: string
   }>()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
 
-  const { currentCourse } = useAppSelector((state) => state.courses)
-  const { currentLesson, loading: lessonLoading } = useAppSelector((state) => state.lessons)
+  // Sử dụng RTK Query để lấy dữ liệu khóa học
+  const { data: courseData, isLoading: isCourseLoading } = useGetCourseByIdQuery(courseId ?? skipToken)
+
+  // Sử dụng RTK Query để lấy dữ liệu bài học
+  const { data: lessonData, isLoading: isLessonLoading } = useGetLessonByIdQuery(lessonId ?? skipToken)
+
+  // Mutation để cập nhật bài học
+  const [updateLessonApi, { isLoading: isUpdating }] = useUpdateLessonMutation()
+
+  const currentCourse = courseData?.course
+  const currentLesson = lessonData
   console.log('currentLesson', currentLesson)
 
   const {
@@ -217,31 +226,27 @@ const EditLessonPage = () => {
     }
   })
 
-  const fetchData = useCallback(async () => {
-    setIsLoading(true)
-    try {
-      if (courseId) {
-        await dispatch(fetchCourseById(courseId)).unwrap()
-      }
+  // RTK Query tự động lấy dữ liệu khi component được render
+  // Xử lý lỗi khi không thể tải dữ liệu
+  useEffect(() => {
+    if (courseData === undefined && !isCourseLoading && courseId) {
+      dispatch(
+        showSnackbar({
+          message: 'Không thể tải dữ liệu khóa học. Vui lòng thử lại sau.',
+          severity: 'error'
+        })
+      )
+    }
 
-      if (lessonId) {
-        await dispatch(fetchLessonById(lessonId)).unwrap()
-      }
-    } catch {
+    if (lessonData === undefined && !isLessonLoading && lessonId) {
       dispatch(
         showSnackbar({
           message: 'Không thể tải dữ liệu bài học. Vui lòng thử lại sau.',
           severity: 'error'
         })
       )
-    } finally {
-      setIsLoading(false)
     }
-  }, [dispatch, courseId, lessonId])
-
-  useEffect(() => {
-    fetchData()
-  }, [fetchData])
+  }, [courseData, lessonData, isCourseLoading, isLessonLoading, courseId, lessonId, dispatch])
 
   useEffect(() => {
     if (currentLesson) {
@@ -255,7 +260,7 @@ const EditLessonPage = () => {
 
   const onSubmit = async (data: LessonFormValues) => {
     if (!sectionId) {
-      dispatch(showSnackbar({ message: 'Không tìm thấy thông tin phần học.', severity: 'error' }))
+      toast.error('Chương không hợp lệ. Vui lòng thử lại.')
       return
     }
 
@@ -263,12 +268,11 @@ const EditLessonPage = () => {
 
     try {
       if (lessonId) {
-        await dispatch(
-          updateLesson({
-            lessonId: lessonId,
-            ...data
-          })
-        ).unwrap()
+        // Sử dụng RTK Query mutation
+        await updateLessonApi({
+          lessonId: lessonId,
+          data: data
+        }).unwrap()
 
         dispatch(
           showSnackbar({
@@ -298,7 +302,7 @@ const EditLessonPage = () => {
     navigate(`/admin/courses/${courseId}`)
   }
 
-  if (isLoading || lessonLoading) {
+  if (isCourseLoading || isLessonLoading) {
     return (
       <div className='flex h-[80vh] items-center justify-center'>
         <Loader2 className='h-8 w-8 animate-spin text-primary' />

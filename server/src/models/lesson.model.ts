@@ -33,7 +33,7 @@ class Lesson extends Model<LessonAttributes, LessonCreationAttributes> implement
 
 Lesson.init(
   {
-    lesson_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), unique: true, primaryKey: true },
+    lesson_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), primaryKey: true },
     course_id: {
       type: DataTypes.STRING,
       allowNull: false,

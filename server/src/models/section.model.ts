@@ -20,7 +20,7 @@ class Section extends Model<SectionAttributes, SectionCreationAttributes> implem
 
 Section.init(
   {
-    section_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), unique: true, primaryKey: true },
+    section_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), primaryKey: true },
     title: {
       type: DataTypes.STRING(255),
       allowNull: false

@@ -20,7 +20,7 @@ class BlogComment extends Model<BlogCommentAttributes, BlogCommentCreationAttrib
 
 BlogComment.init(
   {
-    blog_comment_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), unique: true, primaryKey: true },
+    blog_comment_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), primaryKey: true },
     blog_id: {
       type: DataTypes.STRING,
       allowNull: false,

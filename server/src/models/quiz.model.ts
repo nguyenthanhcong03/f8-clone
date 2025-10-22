@@ -22,7 +22,7 @@ class Quiz extends Model<QuizAttributes, QuizCreationAttributes> implements Quiz
 
 Quiz.init(
   {
-    quiz_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), unique: true, primaryKey: true },
+    quiz_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), primaryKey: true },
     lesson_id: {
       type: DataTypes.STRING,
       allowNull: false,

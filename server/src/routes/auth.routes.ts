@@ -12,5 +12,7 @@ router.put('/:id/password', validate(changePasswordSchema), authController.chang
 router.post('/logout', authController.logout)
 router.post('/refresh-token', authController.refreshToken)
 router.get('/me', authMiddleware.verifyToken, authController.getCurrentUser)
+router.get('/profile', authMiddleware.authRequired, authController.getProfile)
+router.put('/profile', authMiddleware.authRequired, authController.updateProfile)
 
 export default router

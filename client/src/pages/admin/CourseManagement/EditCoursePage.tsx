@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import CourseStructure from './components/CourseStructure'
 import Loader from '@/components/common/Loading/Loader'
+import { toast } from 'react-toastify'
 
 const EditCoursePage = () => {
   const { courseId } = useParams<{ courseId: string }>()
@@ -55,9 +56,9 @@ const EditCoursePage = () => {
     const sectionIds = newSections.map((section) => section.section_id)
     try {
       await dispatch(updateSectionOrder({ courseId, sectionIds })).unwrap()
-      dispatch(showSnackbar({ message: 'Cập nhật thứ tự chương thành công', severity: 'success' }))
+      toast.success('Cập nhật thứ tự chương thành công')
     } catch {
-      dispatch(showSnackbar({ message: 'Có lỗi khi cập nhật thứ tự chương', severity: 'error' }))
+      toast.error('Có lỗi khi Cập nhật thứ tự chương')
     }
   }
 
@@ -65,9 +66,9 @@ const EditCoursePage = () => {
     const lessonIds = newLessons.map((lesson) => lesson.lesson_id)
     try {
       await dispatch(updateLessonOrder({ sectionId, lessonIds })).unwrap()
-      dispatch(showSnackbar({ message: 'Cập nhật thứ tự bài học th�nh c�ng', severity: 'success' }))
+      toast.success('Cập nhật thứ tự bài học thành công')
     } catch {
-      dispatch(showSnackbar({ message: 'Có lỗi khi Cập nhật thứ tự bài học', severity: 'error' }))
+      toast.error('Có lỗi khi Cập nhật thứ tự bài học')
     }
   }
 
@@ -85,9 +86,9 @@ const EditCoursePage = () => {
     if (window.confirm('Bạn có chắc chắn muốn xóa chương này không?')) {
       try {
         await dispatch(removeSection(sectionId)).unwrap()
-        dispatch(showSnackbar({ message: 'Xóa chương thành công', severity: 'success' }))
+        toast.success('Xóa chương thành công')
       } catch {
-        dispatch(showSnackbar({ message: 'Có lỗi xảy ra khi xóa chương', severity: 'error' }))
+        toast.error('Có lỗi xảy ra khi xóa chương')
       }
     }
   }
@@ -109,9 +110,9 @@ const EditCoursePage = () => {
         })
       ).unwrap()
       setIsOpenFormLesson(false)
-      dispatch(showSnackbar({ message: 'Tạo bài học thành công', severity: 'success' }))
+      toast.success('Tạo bài học thành công')
     } catch {
-      dispatch(showSnackbar({ message: 'Có lỗi xảy ra khi tạo bài học', severity: 'error' }))
+      toast.error('Có lỗi xảy ra khi tạo bài học')
     } finally {
       setLessonSubmitLoading(false)
     }
@@ -121,9 +122,9 @@ const EditCoursePage = () => {
     if (window.confirm('Bạn có chắc muốn xóa bài học này không?')) {
       try {
         await dispatch(deleteLesson(lessonId)).unwrap()
-        dispatch(showSnackbar({ message: 'Xóa bài học thành công', severity: 'success' }))
+        toast.success('Xóa bài học thành công')
       } catch {
-        dispatch(showSnackbar({ message: 'Có lỗi xảy ra khi xóa bài học', severity: 'error' }))
+        toast.error('Có lỗi xảy ra khi xóa bài học')
       }
     }
   }

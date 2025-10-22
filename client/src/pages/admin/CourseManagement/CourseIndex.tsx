@@ -1,32 +1,35 @@
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { clearError, deleteCourse, fetchCourses } from '@/store/features/courses/courseSlice'
-import { useAppDispatch, useAppSelector } from '@/store/hook'
-import { showSnackbar } from '@/store/snackbarSlice'
+import { useDeleteCourseMutation, useGetAllCoursesQuery } from '@/store/api/courseApi'
+import { useAppDispatch } from '@/store/hook'
 import type { Course } from '@/types/course'
 import { Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import CourseGrid from '../../../components/common/CourseGridAdmin/CourseGridAdmin'
+import { toast } from 'react-toastify'
+import { CourseTable } from './components/CourseTable'
 
 const CourseIndex = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-  const { loading, error } = useAppSelector((state) => state.courses)
+
+  // Sử dụng RTK Query để lấy danh sách khóa học
+  const { data: courses, isLoading, error: coursesError, refetch } = useGetAllCoursesQuery()
+
+  // Mutation để xóa khóa học
+  const [deleteCourseApi, { isLoading: isDeleting }] = useDeleteCourseMutation()
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [courseToDelete, setCourseToDelete] = useState<Course | null>(null)
 
+  // Xử lý lỗi khi fetch data
   useEffect(() => {
-    dispatch(fetchCourses())
-  }, [dispatch])
-
-  useEffect(() => {
-    if (error) {
-      dispatch(showSnackbar({ message: error, severity: 'error' }))
-      dispatch(clearError())
+    if (coursesError && 'data' in coursesError) {
+      const errorMessage =
+        (coursesError.data as { message: string })?.message || 'Đã xảy ra lỗi khi tải danh sách khóa học'
+      toast.error(errorMessage)
     }
-  }, [error, dispatch])
+  }, [coursesError, dispatch])
 
   const handleAddCourse = () => {
     navigate('/admin/courses/add')
@@ -36,16 +39,19 @@ const CourseIndex = () => {
     if (!courseToDelete) return
 
     try {
-      await dispatch(deleteCourse(courseToDelete.course_id)).unwrap()
-      dispatch(showSnackbar({ message: 'Xóa khóa học thành công', severity: 'success' }))
+      await deleteCourseApi(courseToDelete.course_id).unwrap()
+      toast.success('Xóa khóa học thành công')
       setDeleteDialogOpen(false)
       setCourseToDelete(null)
+      // Gọi refetch để cập nhật lại danh sách khóa học
+      // RTK Query sẽ tự động invalidate cache, nhưng gọi refetch để đảm bảo
+      refetch()
     } catch {
-      dispatch(showSnackbar({ message: 'Xóa khóa học thất bại', severity: 'error' }))
+      toast.error('Xóa khóa học thất bại, vui lòng thử lại')
     }
   }
 
-  if (loading) {
+  if (isLoading || isDeleting) {
     return (
       <div className='flex justify-center p-6'>
         <div className='h-8 w-8 animate-spin rounded-full border-b-2 border-primary'></div>
@@ -65,7 +71,7 @@ const CourseIndex = () => {
       </div>
 
       {/* Danh sách khóa học */}
-      <CourseGrid />
+      <CourseTable />
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

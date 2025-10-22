@@ -12,6 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Save } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 const QuickAddCoursePage = () => {
   const dispatch = useAppDispatch()
@@ -46,13 +47,13 @@ const QuickAddCoursePage = () => {
       console.log('course Data:', courseData)
 
       await dispatch(createCourse(courseData)).unwrap()
-      dispatch(showSnackbar({ message: 'Course created successfully!', severity: 'success' }))
+      toast.success('Tạo khóa học thành công')
       // setTimeout(() => {
       //   navigate('/admin/courses')
       // }, 1500)
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to create course'
-      dispatch(showSnackbar({ message: errorMessage, severity: 'error' }))
+      toast.error(`Tạo khóa học thất bại: ${errorMessage}`)
     }
   }
 

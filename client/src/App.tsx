@@ -1,44 +1,51 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { RouterProvider } from 'react-router-dom'
 import GlobalSnackbar from './components/common/GlobaSnackbar/GlobalSnackbar'
 import router from './routes/routes'
 import ThemeProvider from './theme/ThemeProvider'
-import Loader from './components/common/Loading/Loader'
-import { getCurrentUser, logout } from './store/features/auth/authSlice'
-import { useAppDispatch, useAppSelector } from './store/hook'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import AppLoader from './components/common/Loading/AppLoader'
+import { useGetCurrentUserQuery } from './store/api/authApi'
+import { useAppDispatch } from './store/hook'
+import { logout } from './store/features/auth/authSlice'
 
 function App() {
   const dispatch = useAppDispatch()
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
-  const { user, isAuthenticated, isLoading } = useAppSelector((state) => state.auth)
+  // Kiểm tra xem có accessToken trong local storage không
+  const hasToken = Boolean(localStorage.getItem('accessToken'))
 
+  // Sử dụng RTK Query để lấy thông tin user hiện tại
+  const { isLoading, isError } = useGetCurrentUserQuery(undefined, {
+    // Chỉ gọi API nếu có accessToken
+    skip: !hasToken
+  })
+
+  // Logout nếu có lỗi khi xác thực
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        await dispatch(getCurrentUser()).unwrap()
-      } catch (error) {
-        console.error('Error verifying auth:', error)
-        dispatch(logout())
-      } finally {
-        setIsCheckingAuth(false)
-      }
+    if (isError) {
+      dispatch(logout())
     }
+  }, [isError, dispatch])
 
-    if (!user && !isAuthenticated && localStorage.getItem('accessToken')) {
-      checkAuth()
-    } else {
-      setIsCheckingAuth(false)
-    }
-  }, [user, isAuthenticated, dispatch])
-
-  if (isLoading || isCheckingAuth) {
+  if (isLoading) {
     return <AppLoader />
   }
 
   return (
     <ThemeProvider>
       <GlobalSnackbar />
+      <ToastContainer
+        position='bottom-right'
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <RouterProvider router={router} />
     </ThemeProvider>
   )
