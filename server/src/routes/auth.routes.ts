@@ -11,7 +11,7 @@ router.post('/login', authController.loginAccount)
 router.put('/:id/password', validate(changePasswordSchema), authController.changePassword)
 router.post('/logout', authController.logout)
 router.post('/refresh-token', authController.refreshToken)
-router.get('/me', authMiddleware.verifyToken, authController.getCurrentUser)
+router.get('/me', authMiddleware.authRequired, authController.getCurrentUser)
 router.get('/profile', authMiddleware.authRequired, authController.getProfile)
 router.put('/profile', authMiddleware.authRequired, authController.updateProfile)
 

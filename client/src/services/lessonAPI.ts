@@ -4,8 +4,8 @@ import axiosInstance from '../config/axios'
 
 const API_ENDPOINT = '/lessons'
 
-export const getLessonById = async (lesson_id: string) => {
-  const response = await axiosInstance.get(`${API_ENDPOINT}/${lesson_id}`)
+export const getLessonById = async (lessonId: string) => {
+  const response = await axiosInstance.get(`${API_ENDPOINT}/${lessonId}`)
   return response
 }
 
@@ -15,16 +15,16 @@ export const getSectionLessons = async (sectionId: string) => {
 }
 
 export const createLesson = async (lessonData: {
-  course_id: string
-  section_id: string
+  courseId: string
+  sectionId: string
   title: string
   content?: string
   video_url?: string
   videoFile?: File
 }) => {
   const formData = new FormData()
-  formData.append('course_id', lessonData.course_id)
-  formData.append('section_id', lessonData.section_id)
+  formData.append('courseId', lessonData.courseId)
+  formData.append('sectionId', lessonData.sectionId)
   formData.append('title', lessonData.title)
 
   if (lessonData.content) {

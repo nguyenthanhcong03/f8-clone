@@ -1,4 +1,4 @@
-import AppLoader from '@/components/common/Loading/AppLoader'
+import { Loading } from '@/components/common/Loading/Loading'
 import { Button } from '@/components/ui/button'
 import { useGetCourseBySlugQuery } from '@/store/api/courseApi'
 import { useEnrollCourseMutation } from '@/store/api/enrollmentApi'
@@ -14,14 +14,8 @@ const CourseDetail = () => {
   const navigate = useNavigate()
   const { isAuthenticated } = useAppSelector((state) => state.auth)
 
-  // Sử dụng RTK Query để lấy thông tin khóa học
-  const { data: courseData, isLoading: getCourseIsLoading, refetch } = useGetCourseBySlugQuery(slug ?? skipToken)
-  // Mutation để đăng ký khóa học
+  const { data, isFetching: getCourseIsFetching, refetch } = useGetCourseBySlugQuery(slug ?? skipToken)
   const [enrollCourseApi, { isLoading: isEnrolling }] = useEnrollCourseMutation()
-
-  const totalSections = courseData?.sections ? courseData.sections.length : 0
-  const totalLessons =
-    courseData?.sections && courseData?.sections.reduce((acc, section) => acc + section.lessons!.length, 0)
 
   const handleEnrollCourse = async (courseId: string) => {
     if (!isAuthenticated) {
@@ -46,14 +40,19 @@ const CourseDetail = () => {
     }
   }
 
-  if (getCourseIsLoading) {
-    return <AppLoader />
+  if (getCourseIsFetching) {
+    return <Loading />
   }
 
+  const courseData = data?.data
+  const totalSections = courseData?.sections ? courseData.sections.length : 0
+  const totalLessons =
+    courseData?.sections && courseData?.sections.reduce((acc, section) => acc + section.lessons!.length, 0)
+
   return (
-    <div className='flex flex-row items-start gap-4'>
+    <div className='flex h-[3000px] flex-row items-start justify-between'>
       {/* Left */}
-      <div className='scrollbar-none flex-[4] overflow-y-auto'>
+      <div className='flex-[4]'>
         <div className='min-h-screen'>
           <h1 className='text-3xl font-bold'>{courseData?.title || 'Thông tin khóa học'}</h1>
           <p className='mt-2 text-muted-foreground'>{courseData?.description || 'Không có mô tả.'}</p>
@@ -91,7 +90,7 @@ const CourseDetail = () => {
             className='w-48'
             disabled={isEnrolling}
             isLoading={isEnrolling}
-            onClick={() => courseData && handleEnrollCourse(courseData.course_id)}
+            onClick={() => courseData && handleEnrollCourse(courseData.courseId)}
           >
             ĐĂNG KÝ HỌC
           </Button>

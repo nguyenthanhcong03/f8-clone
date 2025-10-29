@@ -3,8 +3,8 @@ import type { Lesson } from '@/types/course'
 import { baseApi } from './baseApi'
 
 interface CreateLessonRequest {
-  course_id: string
-  section_id: string
+  courseId: string
+  sectionId: string
   title: string
   content?: string
   video_url?: string
@@ -37,7 +37,7 @@ export const lessonApi = baseApi.injectEndpoints({
       providesTags: (result) =>
         result
           ? [
-              ...result.map(({ lesson_id }) => ({ type: 'Lesson' as const, id: lesson_id })),
+              ...result.map(({ lessonId }) => ({ type: 'Lesson' as const, id: lessonId })),
               { type: 'Lesson', id: 'LIST' }
             ]
           : [{ type: 'Lesson', id: 'LIST' }]
@@ -47,8 +47,8 @@ export const lessonApi = baseApi.injectEndpoints({
     createLesson: builder.mutation<ApiResponse<Lesson>, CreateLessonRequest>({
       query: (lessonData) => {
         const formData = new FormData()
-        formData.append('course_id', lessonData.course_id)
-        formData.append('section_id', lessonData.section_id)
+        formData.append('courseId', lessonData.courseId)
+        formData.append('sectionId', lessonData.sectionId)
         formData.append('title', lessonData.title)
 
         if (lessonData.content) {
@@ -66,9 +66,9 @@ export const lessonApi = baseApi.injectEndpoints({
           formData: true
         }
       },
-      invalidatesTags: (_result, _error, { section_id }) => [
+      invalidatesTags: (_result, _error, { sectionId }) => [
         { type: 'Lesson', id: 'LIST' },
-        { type: 'Section', id: section_id }
+        { type: 'Section', id: sectionId }
       ]
     }),
 

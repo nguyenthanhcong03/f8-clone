@@ -45,27 +45,27 @@ export const createLesson = createAsyncThunk(
   'lessons/createLesson',
   async (
     {
-      course_id,
-      section_id,
+      courseId,
+      sectionId,
       title,
       content,
       video_url,
       videoFile
     }: {
-      course_id: string
-      section_id: string
+      courseId: string
+      sectionId: string
       title: string
       content?: string
       video_url?: string
-      video_public_id?: string
+      video_publicId?: string
       videoFile?: File
     },
     { rejectWithValue }
   ) => {
     try {
       const response = await lessonAPI.createLesson({
-        course_id,
-        section_id,
+        courseId,
+        sectionId,
         title,
         content,
         video_url,

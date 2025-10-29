@@ -24,7 +24,7 @@ const SortableSection: React.FC<SortableSectionProps> = ({
   onToggleExpand
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: section.section_id
+    id: section.sectionId
   })
 
   const style = {
@@ -36,14 +36,14 @@ const SortableSection: React.FC<SortableSectionProps> = ({
   }
 
   return (
-    <div ref={setNodeRef} style={style} className='mb-6 bg-white rounded-lg border'>
-      <div className='border border-border rounded-lg'>
+    <div ref={setNodeRef} style={style} className='mb-6 rounded-lg border bg-white'>
+      <div className='rounded-lg border border-border'>
         {/* Section Header */}
         <button
           onClick={onToggleExpand}
-          className='w-full p-4 text-left flex items-center justify-between hover:bg-accent transition-colors'
-          aria-controls={`panel-${section.section_id}-content`}
-          id={`panel-${section.section_id}-header`}
+          className='flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-accent'
+          aria-controls={`panel-${section.sectionId}-content`}
+          id={`panel-${section.sectionId}-header`}
         >
           <div className='flex items-center gap-3'>
             <div {...attributes} {...listeners} className='cursor-grab hover:cursor-grabbing'>
@@ -72,7 +72,7 @@ const SortableSection: React.FC<SortableSectionProps> = ({
               size='sm'
               onClick={(e) => {
                 e.stopPropagation()
-                onDelete(section.section_id)
+                onDelete(section.sectionId)
               }}
               className='text-destructive hover:text-destructive'
             >
@@ -89,8 +89,8 @@ const SortableSection: React.FC<SortableSectionProps> = ({
               <div className='mt-4'>
                 <Button
                   variant='outline'
-                  className='w-full flex items-center gap-2'
-                  onClick={() => onAddLesson(section.section_id)}
+                  className='flex w-full items-center gap-2'
+                  onClick={() => onAddLesson(section.sectionId)}
                 >
                   <Plus className='h-4 w-4' />
                   Thêm bài học

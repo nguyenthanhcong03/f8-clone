@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
 import catchAsync from '@/utils/catchAsync'
-import enrollmentService from '../services/enrollment.service'
-import ApiError from '@/utils/ApiError'
+import enrollmentService from '@/services/enrollment.service'
 
 const enrollCourse = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user?.id

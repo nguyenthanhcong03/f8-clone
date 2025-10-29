@@ -45,7 +45,7 @@ const startServer = async () => {
     // 1. sync() -> chỉ tạo bảng nếu chưa có
     // 2. sync({ alter: true }) -> cập nhật cột/tên nếu khác model
     // 3. sync({ force: true }) -> xóa bảng cũ & tạo lại (mất dữ liệu!)
-    await sequelize.sync()
+    await sequelize.sync({ alter: true })
     console.log('Database synchronized')
 
     // Start server

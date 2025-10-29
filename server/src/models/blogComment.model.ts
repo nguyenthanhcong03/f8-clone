@@ -3,35 +3,42 @@ import sequelize from '../config/database'
 import { v4 as uuidv4 } from 'uuid'
 
 interface BlogCommentAttributes {
-  blog_comment_id: string
-  blog_id: string
-  user_id: string
+  blogCommentId: string
+  blogId: string
+  userId: string
   content?: string
 }
 
-type BlogCommentCreationAttributes = Optional<BlogCommentAttributes, 'blog_comment_id' | 'content'>
+type BlogCommentCreationAttributes = Optional<BlogCommentAttributes, 'blogCommentId' | 'content'>
 
 class BlogComment extends Model<BlogCommentAttributes, BlogCommentCreationAttributes> implements BlogCommentAttributes {
-  public blog_comment_id!: string
-  public blog_id!: string
-  public user_id!: string
+  public blogCommentId!: string
+  public blogId!: string
+  public userId!: string
   public content?: string
 }
 
 BlogComment.init(
   {
-    blog_comment_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), primaryKey: true },
-    blog_id: {
+    blogCommentId: {
+      type: DataTypes.STRING,
+      defaultValue: () => uuidv4(),
+      primaryKey: true,
+      field: 'blog_comment_id'
+    },
+    blogId: {
       type: DataTypes.STRING,
       allowNull: false,
+      field: 'blog_id',
       references: {
         model: 'blogs',
         key: 'blog_id'
       }
     },
-    user_id: {
+    userId: {
       type: DataTypes.STRING,
       allowNull: false,
+      field: 'user_id',
       references: {
         model: 'users',
         key: 'user_id'

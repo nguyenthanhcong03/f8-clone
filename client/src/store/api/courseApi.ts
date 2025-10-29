@@ -1,20 +1,25 @@
 import type { CreateCourseInput, UpdateCourseInput } from '@/schemas/course.schema'
-import type { ApiResponse } from '@/types/api'
+import type { ApiResponse, PaginationResponse } from '@/types/api'
 import type { Course } from '@/types/course'
 import { baseApi } from './baseApi'
 
 export const courseApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Lấy tất cả khóa học
-    getAllCourses: builder.query<Course[], void>({
-      query: () => '/courses',
-      transformResponse: (response: ApiResponse<Course[]>) => response.data!,
+    getAllCourses: builder.query<
+      ApiResponse<PaginationResponse<Course>>,
+      { page: number; limit: number; sort: string; order: string }
+    >({
+      query: (params: { page: number; limit: number; sort: string; order: string }) => {
+        return { url: '/courses', method: 'GET', params: params }
+      },
+      // transformResponse: (response: ApiResponse<PaginationResponse<Course>>) => response.data?.data ?? [],
 
-      // response.data có hiệu lực ở đây
+      // transformResponse có hiệu lực ở đây
       providesTags: (result) =>
-        result
+        result?.data?.data
           ? [
-              ...result.map(({ course_id }) => ({ type: 'Course' as const, id: course_id })),
+              ...result.data.data.map(({ courseId }) => ({ type: 'Course' as const, id: courseId })),
               { type: 'Course', id: 'LIST' }
             ]
           : [{ type: 'Course', id: 'LIST' }]
@@ -27,45 +32,19 @@ export const courseApi = baseApi.injectEndpoints({
     }),
 
     // Lấy khóa học theo slug
-    getCourseBySlug: builder.query<Course, string>({
+    getCourseBySlug: builder.query<ApiResponse<Course>, string>({
       query: (slug) => `/courses/slug/${slug}`,
-      transformResponse: (response: ApiResponse<Course>) => response.data!,
-      providesTags: (result) => (result ? [{ type: 'Course', id: result.course_id }] : [])
+      // transformResponse: (response: ApiResponse<Course>) => response.data!,
+      providesTags: (result) => (result?.data ? [{ type: 'Course', id: result.data.courseId }] : [])
     }),
 
     // Tạo khóa học=> mới
     createCourse: builder.mutation<ApiResponse<Course>, CreateCourseInput>({
       query: (courseData) => {
-        const formData = new FormData()
-
-        formData.append('title', courseData.title)
-
-        if (courseData.slug) {
-          formData.append('slug', courseData.slug)
-        }
-
-        if (courseData.description) {
-          formData.append('description', courseData.description)
-        }
-
-        if (courseData.level) {
-          formData.append('level', courseData.level)
-        }
-
-        formData.append('is_paid', courseData.is_paid.toString())
-
-        if (courseData.price) {
-          formData.append('price', courseData.price.toString())
-        }
-
-        if (courseData.thumbnail instanceof File) {
-          formData.append('thumbnail', courseData.thumbnail)
-        }
-
         return {
           url: '/courses',
           method: 'POST',
-          body: formData,
+          body: courseData,
           formData: true // Thông báo cho RTK Query đây là FormData
         }
       },

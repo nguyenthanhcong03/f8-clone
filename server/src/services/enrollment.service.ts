@@ -20,8 +20,8 @@ const enrollInCourse = async (userId: string, courseId: string): Promise<Enrollm
   // Kiểm tra nếu người dùng đã đăng ký khóa học
   const existingEnrollment = await Enrollment.findOne({
     where: {
-      user_id: userId,
-      course_id: courseId
+      userId: userId,
+      courseId: courseId
     }
   })
 
@@ -31,11 +31,11 @@ const enrollInCourse = async (userId: string, courseId: string): Promise<Enrollm
 
   // Đăng ký khóa học
   const enrollment = await Enrollment.create({
-    user_id: userId,
-    course_id: courseId
+    userId: userId,
+    courseId: courseId
   })
 
-  course.increment('enrollment_count', { by: 1 })
+  course.increment('enrollmentCount', { by: 1 })
 
   return enrollment
 }
@@ -43,8 +43,8 @@ const enrollInCourse = async (userId: string, courseId: string): Promise<Enrollm
 const isEnrolled = async (userId: string, courseId: string): Promise<boolean> => {
   const enrollment = await Enrollment.findOne({
     where: {
-      user_id: userId,
-      course_id: courseId
+      userId,
+      courseId
     }
   })
 
@@ -60,13 +60,13 @@ const getUserEnrollments = async (userId: string): Promise<Enrollment[]> => {
 
   const enrollments = await Enrollment.findAll({
     where: {
-      user_id: userId
+      userId: userId
     },
     include: [
       {
         model: Course,
         as: 'course',
-        attributes: ['id', 'title', 'thumbnail', 'description']
+        attributes: ['courseId', 'title', 'thumbnail', 'description']
       }
     ]
   })
@@ -78,8 +78,8 @@ const unenrollFromCourse = async (userId: string, courseId: string): Promise<voi
   // Kiểm tra đã đăng ký khóa học hay chưa
   const enrollment = await Enrollment.findOne({
     where: {
-      user_id: userId,
-      course_id: courseId
+      userId: userId,
+      courseId: courseId
     }
   })
 

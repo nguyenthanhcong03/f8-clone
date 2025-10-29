@@ -10,9 +10,9 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
-import { Bell, BookOpen, LogOut, Search, User } from 'lucide-react'
+import { Bell, BookOpen, ChevronLeft, LogOut, Search, User } from 'lucide-react'
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import ModalAuth from '../AuthModal/AuthModal'
 import ThemeToggle from '../ThemeToggle/ThemeToggle'
 import { logout } from '@/store/features/auth/authSlice'
@@ -22,6 +22,8 @@ import { toast } from 'react-toastify'
 // Main component
 const Header = () => {
   const navigate = useNavigate()
+  const location = useLocation()
+  const isProfilePage = location.pathname === '/profile'
   const { user, isAuthenticated } = useAppSelector((state) => state.auth)
   const [logout, { data, isSuccess }] = useLogoutMutation()
 
@@ -54,9 +56,16 @@ const Header = () => {
               <img src={Logo} alt='Logo' width={38} height={38} />
             </div>
 
-            <span className='ml-4 hidden whitespace-nowrap text-sm font-bold sm:block md:block'>
-              Học lập trình để đi làm
-            </span>
+            {!isProfilePage ? (
+              <span className='ml-4 hidden whitespace-nowrap text-sm font-bold sm:block md:block'>
+                Học lập trình để đi làm
+              </span>
+            ) : (
+              <div className='flex items-center text-[#808990]' onClick={() => navigate(-1)}>
+                <ChevronLeft className='ml-2 h-4 w-4' />
+                <p className='text-xs uppercase'>Quay lại</p>
+              </div>
+            )}
           </div>
         </Link>
 
@@ -86,6 +95,7 @@ const Header = () => {
           {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
+                {/* Ảnh và tên người dùng */}
                 <div className='flex cursor-pointer items-center gap-2'>
                   <Button variant='ghost' size='icon' className='rounded-full'>
                     {user?.avatar ? (

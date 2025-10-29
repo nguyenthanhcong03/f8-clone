@@ -1,3 +1,4 @@
+import AppLoader from '@/components/common/Loading/AppLoader'
 import { useGetProfileQuery, useUpdateUserMutation } from '@/store/api/authApi'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
@@ -35,11 +36,7 @@ const ProfilePage = () => {
   }
 
   if (isLoading) {
-    return (
-      <div className='p-6 text-center text-gray-600'>
-        <p>Đang tải thông tin người dùng...</p>
-      </div>
-    )
+    return <AppLoader />
   }
 
   if (isError) {
@@ -49,7 +46,6 @@ const ProfilePage = () => {
         <button onClick={() => refetch()} className='mt-3 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600'>
           Thử lại
         </button>
-        <pre className='mt-2 text-xs text-gray-500'>{JSON.stringify(error, null, 2)}</pre>
       </div>
     )
   }

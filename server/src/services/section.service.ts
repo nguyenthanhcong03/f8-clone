@@ -4,7 +4,7 @@ import Lesson from '../models/lesson.model'
 
 interface CreateSectionData {
   title: string
-  course_id: number
+  courseId: string
   order?: number
 }
 
@@ -13,9 +13,9 @@ const createSection = async (sectionData: CreateSectionData) => {
   return section
 }
 
-const getCourseSectionsById = async (id: number) => {
+const getCourseSectionsById = async (id: string) => {
   const sections = await Section.findAll({
-    where: { course_id: id },
+    where: { courseId: id },
     order: [['order', 'ASC']], // nếu có field order
     include: [
       {
@@ -28,9 +28,9 @@ const getCourseSectionsById = async (id: number) => {
   return sections
 }
 
-const updateSectionOrder = async (courseId: number, sectionIds: number[]) => {
+const updateSectionOrder = async (courseId: string, sectionIds: string[]) => {
   const sections = await Section.findAll({
-    where: { course_id: courseId }
+    where: { courseId: courseId }
   })
 
   if (sections.length !== sectionIds.length) {
@@ -39,7 +39,7 @@ const updateSectionOrder = async (courseId: number, sectionIds: number[]) => {
 
   const updatedSections = await Promise.all(
     sectionIds.map((id, index) => {
-      const section = sections.find((s) => s.id === id)
+      const section = sections.find((s) => s.sectionId === id)
       if (!section) {
         throw new ApiError(404, `Section with ID ${id} not found`)
       }

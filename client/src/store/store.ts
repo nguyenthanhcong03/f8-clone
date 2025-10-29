@@ -18,15 +18,15 @@ export const store = configureStore({
     // Authentication
     auth: authReducer
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        // Bỏ qua các trường không serializable trong FormData
-        ignoredActions: ['courseApi/executeMutation', 'lessonApi/executeMutation'],
-        ignoredPaths: ['courses.formData']
-      }
-    }).concat(baseApi.middleware)
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(baseApi.middleware)
 })
+
+// // Thay vì gọi getCurrentUser trong App.tsx, ta có thể gọi nó ngay khi khởi tạo store
+// const initializeApp = async () => {
+//   const data = await store.dispatch(authApi.endpoints.getCurrentUser.initiate(undefined, { forceRefetch: true }))
+//   console.log('👉check: ', data)
+// }
+// initializeApp()
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>

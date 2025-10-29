@@ -6,7 +6,7 @@ import { NavLink, useLocation } from 'react-router-dom'
 
 // Menu items
 const SIDEBAR_ITEMS = [
-  { name: 'Tạo khóa học', icon: PlusCircle, href: '/admin/courses/add' },
+  { name: 'Tổng quan', icon: BookOpen, href: '/admin' },
   { name: 'Khóa học', icon: BookOpen, href: '/admin/courses' }
 ]
 
@@ -25,21 +25,21 @@ const AdminSidebar = () => {
   return (
     <div
       className={cn(
-        'h-screen bg-background border-r border-border overflow-hidden transition-all duration-300 ease-in-out',
+        'h-screen overflow-hidden border-r border-border bg-background transition-all duration-300 ease-in-out',
         isCollapsed ? 'w-20' : 'w-80'
       )}
     >
       {/* Header */}
       <div
         className={cn(
-          'flex items-center py-4 border-b border-border',
+          'flex items-center border-b border-border py-4',
           isCollapsed ? 'justify-center px-2' : 'justify-between px-6'
         )}
       >
         {!isCollapsed && (
           <div className='flex items-center gap-3'>
             <img src='/src/assets/images/logo.png' alt='Logo' className='h-10 rounded-lg' />
-            <h2 className='text-lg font-semibold whitespace-nowrap'>F8 Admin</h2>
+            <h2 className='whitespace-nowrap text-lg font-semibold'>F8 Admin</h2>
           </div>
         )}
         <Button variant='ghost' size='sm' onClick={handleToggle} className='h-8 w-8 p-0'>
@@ -63,12 +63,12 @@ const AdminSidebar = () => {
                     isCollapsed ? 'justify-center p-3' : 'gap-3 px-4 py-3',
                     active
                       ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                      : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                   )}
                   title={isCollapsed ? item.name : undefined}
                 >
                   <Icon className={cn('flex-shrink-0', isCollapsed ? 'h-5 w-5' : 'h-5 w-5')} />
-                  {!isCollapsed && <span className='font-medium whitespace-nowrap'>{item.name}</span>}
+                  {!isCollapsed && <span className='whitespace-nowrap font-medium'>{item.name}</span>}
                 </NavLink>
               </li>
             )

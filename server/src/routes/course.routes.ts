@@ -5,7 +5,7 @@ import authMiddleware from '@/middleware/auth.middleware'
 
 const router = Router()
 
-router.get('/', courseController.getAllCourses)
+router.get('/', courseController.getAllPublishedCourses)
 
 router.get('/slug/:slug', authMiddleware.authOptional, courseController.getCourseBySlug)
 

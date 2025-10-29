@@ -1,45 +1,40 @@
-import { Enrollment, Lesson, Section, User } from '@/models'
+import { Enrollment, Lesson, Section } from '@/models'
 import Course from '../models/course.model'
 import uploadService from './upload.service'
 import ApiError from '@/utils/ApiError'
-import { Sequelize } from 'sequelize'
 import sequelize from '@/config/database'
-
-interface CreateCourseData {
-  title: string
-  slug: string
-  description?: string
-  level?: 'beginner' | 'intermediate' | 'advanced'
-  is_paid: boolean
-  price?: number
-  thumbnail?: string
-  thumbnail_public_id?: string
-}
+import { CreateCourseData } from '@/types/course.types'
 
 export const CourseService = {
-  async createCourse(courseData: CreateCourseData) {
-    try {
-      const course = await Course.create(courseData)
-      return course
-    } catch (error) {
-      console.log('course.service.ts - createCourse - error:', error)
-      throw new ApiError(400, 'Lỗi khi tạo khóa học')
-    }
+  async create(data: CreateCourseData) {
+    return await Course.create(data)
   },
 
-  async getAllCourses() {
-    try {
-      const courses = await Course.findAll({ raw: true, order: [['createdAt', 'ASC']] })
-      return courses
-    } catch (error) {
-      console.log('course.service.ts - getAllCourses - error:', error)
-      throw new ApiError(500, 'Lỗi khi lấy danh sách khóa học')
-    }
+  async existsBySlug(slug: string) {
+    const course = await Course.findOne({ where: { slug } })
+    return !!course
   },
 
-  async getCourseById(course_id: string) {
-    console.log(course_id)
-    const course = await Course.findByPk(course_id, {
+  async getAllPublished(where: any, options: any) {
+    console.log('👉check----: ', options)
+    const { count, rows } = await Course.findAndCountAll({
+      // where,
+      // limit: Number(options.limit),
+      // offset: options.offset,
+      // order: options.order
+    })
+    return { total: count, data: rows }
+  },
+
+  async getAllCoursesAdmin() {
+    const courses = await Course.findAll({
+      order: [['createdAt', 'DESC']]
+    })
+    return courses
+  },
+
+  async getById(courseId: string) {
+    const course = await Course.findByPk(courseId, {
       include: [
         {
           model: Section,
@@ -60,15 +55,13 @@ export const CourseService = {
       ]
     })
 
-    console.log(course)
-
     if (!course) {
       throw new ApiError(404, 'Khóa học không tồn tại')
     }
     return course
   },
 
-  async getCourseBySlug(slug: string, req_user: any) {
+  async getBySlug(slug: string) {
     const course = await Course.findOne({
       where: { slug },
       include: [
@@ -95,19 +88,11 @@ export const CourseService = {
       throw new ApiError(404, 'Khóa học không tồn tại')
     }
 
-    let isEnrolled = false
-    if (req_user) {
-      const enrollment = await Enrollment.findOne({
-        where: { user_id: req_user.id, course_id: course.course_id }
-      })
-      isEnrolled = !!enrollment // true nếu có dòng trong bảng enrollments
-    }
-
-    return { ...course.toJSON(), isEnrolled }
+    return course
   },
 
-  async updateCourse(course_id: string, courseData: any) {
-    const course = await Course.findByPk(course_id)
+  async updateCourse(courseId: string, courseData: Partial<CreateCourseData>) {
+    const course = await Course.findByPk(courseId)
     if (!course) {
       throw new ApiError(404, 'Khóa học không tồn tại')
     }
@@ -115,53 +100,52 @@ export const CourseService = {
     return course
   },
 
-  async deleteCourse(course_id: string) {
+  async deleteCourse(courseId: string) {
     const transaction = await sequelize.transaction()
     try {
       // 1. Kiểm tra khóa học tồn tại
-      const course = await Course.findByPk(course_id, { transaction })
+      const course = await Course.findByPk(courseId, { transaction })
       if (!course) {
         throw new ApiError(404, 'Khóa học không tồn tại')
       }
       // Kiểm tra còn section hay không
       const sectionCount = await Section.count({
-        where: { course_id },
+        where: { courseId },
         transaction
       })
 
       if (sectionCount > 0)
         throw new ApiError(400, 'Không thể xóa khóa học còn chương. Vui lòng xóa tất cả các chương trước.')
 
-      // Xóa khóa học
-      await Course.destroy({ where: { course_id }, transaction })
-      await transaction.commit()
-
-      if (course.thumbnail_public_id) {
-        await uploadService.deleteFile(course.thumbnail_public_id)
+      if (course.thumbnailPublicId) {
+        await uploadService.deleteFile(course.thumbnailPublicId)
       }
 
       // Xóa các liên quan (ví dụ Section, Lesson)
-      await Section.destroy({ where: { course_id: course.course_id }, transaction })
-      await Lesson.destroy({ where: { course_id: course.course_id }, transaction })
+      await Section.destroy({ where: { courseId: course.courseId }, transaction })
+      await Lesson.destroy({ where: { courseId: course.courseId }, transaction })
+
+      // Xóa khóa học
+      await course.destroy({ transaction })
 
       await course.destroy({ transaction })
 
       await transaction.commit()
-      return 'Xóa khóa học thành công'
+      return { message: 'Xóa khóa học thành công' }
     } catch (error) {
       await transaction.rollback()
       throw error
     }
   },
 
-  async uploadThumbnail(id: number, fileBuffer: Buffer) {
+  async uploadThumbnail(id: string, fileBuffer: Buffer) {
     const course = await Course.findByPk(id)
     if (!course) {
       throw new Error('Course not found')
     }
 
     // Xóa thumbnail cũ nếu có
-    const currentPublicId = course.thumbnail_public_id
+    const currentPublicId = course.thumbnailPublicId
     if (currentPublicId) {
       await uploadService.deleteFile(currentPublicId)
     }
@@ -169,29 +153,29 @@ export const CourseService = {
     // Upload thumbnail mới
     const uploadResult = await uploadService.uploadImage(fileBuffer, 'course-thumbnails')
 
-    // Cập nhật course với thumbnail và public_id mới
+    // Cập nhật course với thumbnail và publicId mới
     await course.update({
       thumbnail: uploadResult.url,
-      thumbnail_public_id: uploadResult.public_id
+      thumbnailPublicId: uploadResult.publicId
     })
 
     return course
   },
 
-  async deleteThumbnail(id: number) {
+  async deleteThumbnail(id: string) {
     const course = await Course.findByPk(id)
     if (!course) {
       throw new Error('Course not found')
     }
 
-    const currentPublicId = course.thumbnail_public_id
+    const currentPublicId = course.thumbnailPublicId
     if (currentPublicId) {
       await uploadService.deleteFile(currentPublicId)
     }
 
     await course.update({
       thumbnail: undefined,
-      thumbnail_public_id: undefined
+      thumbnailPublicId: undefined
     })
 
     return course

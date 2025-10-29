@@ -7,59 +7,8 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
-      user?: { id: string; role: 'student' | 'admin' } | null // null nếu chưa login
+      user?: { userId: string; role: 'student' | 'admin' } | null // null nếu chưa login
     }
-  }
-}
-
-interface AuthOptions {
-  required?: boolean // bắt buộc login hay không
-  roles?: string[] // danh sách role được phép truy cập
-}
-
-const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
-  let token
-
-  // Check for token in cookies first
-  if (req.cookies && req.cookies.accessToken) {
-    token = req.cookies.accessToken
-  }
-  // Then check Authorization header as fallback
-  else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-    token = req.headers.authorization.split(' ')[1]
-  }
-
-  if (!token) {
-    return res.status(401).json({
-      success: false,
-      message: 'Không có access token, vui lòng đăng nhập'
-    })
-  }
-
-  try {
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string)
-
-    const currentUser = await User.findByPk(decoded.user_id, {
-      attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
-    })
-
-    if (!currentUser) {
-      return res.status(401).json({
-        success: false,
-        message: 'Người dùng không tồn tại'
-      })
-    }
-
-    // Add user to request
-    req.user = currentUser
-    next()
-  } catch (error: unknown) {
-    res.status(401).json({
-      success: false,
-      message: 'Lỗi xác thực',
-      error: error.message
-    })
   }
 }
 
@@ -71,13 +20,13 @@ const authRequired = async (req: Request, res: Response, next: NextFunction) => 
     }
     // Giải mã và xác minh token
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as jwt.JwtPayload
-    if (!decoded || !decoded.user_id) {
+    if (!decoded || !decoded.userId) {
       throw new ApiError(401, 'Token không hợp lệ')
     }
     // Gắn thông tin người dùng vào request để sử dụng trong các middleware hoặc route tiếp theo
-    req.user = { id: decoded.user_id, role: decoded.role }
+    req.user = { userId: decoded.userId, role: decoded.role }
     next()
-  } catch (error) {
+  } catch {
     throw new ApiError(401, 'Token không hợp lệ hoặc đã hết hạn')
   }
 }
@@ -93,20 +42,15 @@ const authOptional = (req: Request, res: Response, next: NextFunction) => {
   try {
     // Giải mã và xác minh token
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as jwt.JwtPayload
-    if (!decoded || !decoded.user_id) {
+    if (!decoded || !decoded.userId) {
       throw new ApiError(401, 'Token không hợp lệ')
     }
     // Gắn thông tin người dùng vào request để sử dụng trong các middleware hoặc route tiếp theo
-    req.user = { id: decoded.user_id, role: decoded.role }
-    next()
-  } catch (err) {
+    req.user = { userId: decoded.userId, role: decoded.role }
+  } catch {
     req.user = null // token hỏng thì coi như chưa login
-    res.status(401).json({
-      success: false,
-      message: 'Lỗi xác thực',
-      error: error.message
-    })
   }
+  next()
 }
 
 const checkRole = (...allowedRoles: string[]) => {
@@ -129,4 +73,4 @@ const checkRole = (...allowedRoles: string[]) => {
   }
 }
 
-export default { verifyToken, checkRole, authRequired, authOptional }
+export default { checkRole, authRequired, authOptional }

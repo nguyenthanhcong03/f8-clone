@@ -3,43 +3,51 @@ import sequelize from '../config/database'
 import { v4 as uuidv4 } from 'uuid'
 
 interface EnrollmentAttributes {
-  enrollment_id: string
-  user_id: string
-  course_id: string
-  enrolled_at?: Date
+  enrollmentId: string
+  userId: string
+  courseId: string
+  enrolledAt?: Date
 }
 
-type EnrollmentCreationAttributes = Optional<EnrollmentAttributes, 'enrollment_id' | 'enrolled_at'>
+type EnrollmentCreationAttributes = Optional<EnrollmentAttributes, 'enrollmentId' | 'enrolledAt'>
 
 class Enrollment extends Model<EnrollmentAttributes, EnrollmentCreationAttributes> implements EnrollmentAttributes {
-  declare enrollment_id: string
-  declare user_id: string
-  declare course_id: string
-  declare enrolled_at?: Date
+  declare enrollmentId: string
+  declare userId: string
+  declare courseId: string
+  declare enrolledAt?: Date
 }
 
 Enrollment.init(
   {
-    enrollment_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), primaryKey: true },
-    user_id: {
+    enrollmentId: {
+      type: DataTypes.STRING,
+      defaultValue: () => uuidv4(),
+      primaryKey: true,
+      field: 'enrollment_id'
+    },
+    userId: {
       type: DataTypes.STRING,
       allowNull: false,
+      field: 'user_id',
       references: {
         model: 'users',
         key: 'user_id'
       }
     },
-    course_id: {
+    courseId: {
       type: DataTypes.STRING,
       allowNull: false,
+      field: 'course_id',
       references: {
         model: 'courses',
         key: 'course_id'
       }
     },
-    enrolled_at: {
+    enrolledAt: {
       type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
+      defaultValue: DataTypes.NOW,
+      field: 'enrolled_at'
     }
   },
   {

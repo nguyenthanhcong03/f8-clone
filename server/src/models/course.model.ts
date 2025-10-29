@@ -1,51 +1,33 @@
-import { DataTypes, Model, Optional } from 'sequelize'
-import sequelize from '../config/database'
+import { CourseAttributes, CreateCourseData } from '@/types/course.types'
+import { DataTypes, Model } from 'sequelize'
 import { v4 as uuidv4 } from 'uuid'
+import sequelize from '../config/database'
 
-interface CourseAttributes {
-  course_id: string
-  title: string
-  slug: string
-  description?: string
-  thumbnail?: string
-  thumbnail_public_id?: string
-  level?: 'beginner' | 'intermediate' | 'advanced'
-  is_paid?: boolean
-  price?: number
-  enrollment_count?: number
-  created_by?: string
-}
-
-type CourseCreationAttributes = Optional<
-  CourseAttributes,
-  | 'course_id'
-  | 'description'
-  | 'thumbnail'
-  | 'thumbnail_public_id'
-  | 'level'
-  | 'is_paid'
-  | 'price'
-  | 'enrollment_count'
-  | 'created_by'
->
-
-class Course extends Model<CourseAttributes, CourseCreationAttributes> implements CourseAttributes {
-  declare course_id: string
+class Course extends Model<CourseAttributes, CreateCourseData> implements CourseAttributes {
+  declare courseId: string
   declare title: string
   declare slug: string
   declare description?: string
   declare thumbnail?: string
-  declare thumbnail_public_id?: string
-  declare level?: 'beginner' | 'intermediate' | 'advanced'
-  declare is_paid?: boolean
-  declare price?: number
-  declare enrollment_count?: number
-  declare created_by?: string
+  declare thumbnailPublicId?: string
+  declare level: 'beginner' | 'intermediate' | 'advanced'
+  declare isPaid: boolean
+  declare price: number | null
+  declare isPublished: boolean
+  declare enrollmentCount: number
+  declare createdBy: string
+  declare readonly createdAt?: Date
+  declare readonly updatedAt?: Date
 }
 
 Course.init(
   {
-    course_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), primaryKey: true },
+    courseId: {
+      type: DataTypes.STRING,
+      defaultValue: () => uuidv4(),
+      primaryKey: true,
+      field: 'course_id' // map to database column
+    },
     title: {
       type: DataTypes.STRING(255),
       allowNull: false
@@ -60,26 +42,35 @@ Course.init(
     thumbnail: {
       type: DataTypes.STRING(255)
     },
-    thumbnail_public_id: {
-      type: DataTypes.STRING(255)
+    thumbnailPublicId: {
+      type: DataTypes.STRING(255),
+      field: 'thumbnail_public_id' // map to database column
     },
     level: {
       type: DataTypes.ENUM('beginner', 'intermediate', 'advanced'),
       defaultValue: 'beginner'
     },
-    is_paid: {
+    isPaid: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false
+      defaultValue: false,
+      field: 'is_paid' // map to database column
     },
     price: {
       type: DataTypes.DECIMAL(10, 2)
     },
-    enrollment_count: {
-      type: DataTypes.STRING,
-      defaultValue: 0
+    isPublished: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      field: 'is_published' // map to database column
     },
-    created_by: {
+    enrollmentCount: {
       type: DataTypes.STRING,
+      defaultValue: 0,
+      field: 'enrollment_count' // map to database column
+    },
+    createdBy: {
+      type: DataTypes.STRING,
+      field: 'created_by', // map to database column
       references: {
         model: 'users',
         key: 'user_id'

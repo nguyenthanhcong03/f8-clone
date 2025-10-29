@@ -10,9 +10,9 @@ export const getAllCourses = async () => {
   return response
 }
 
-export const getCourseById = async (course_id: string) => {
-  console.log('courseID', course_id)
-  const response = await axiosInstance.get(`${API_ENDPOINT}/${course_id}`)
+export const getCourseById = async (courseId: string) => {
+  console.log('courseID', courseId)
+  const response = await axiosInstance.get(`${API_ENDPOINT}/${courseId}`)
   return response
 }
 

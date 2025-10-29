@@ -3,33 +3,38 @@ import sequelize from '../config/database'
 import { v4 as uuidv4 } from 'uuid'
 
 interface BlogAttributes {
-  blog_id: string
+  blogId: string
   title?: string
   slug?: string
   content?: string
-  author_id?: string
+  authorId?: string
   thumbnail?: string
-  thumbnail_public_id?: string
+  thumbnailPublicId?: string
 }
 
 type BlogCreationAttributes = Optional<
   BlogAttributes,
-  'blog_id' | 'title' | 'slug' | 'content' | 'author_id' | 'thumbnail' | 'thumbnail_public_id'
+  'blogId' | 'title' | 'slug' | 'content' | 'authorId' | 'thumbnail' | 'thumbnailPublicId'
 >
 
 class Blog extends Model<BlogAttributes, BlogCreationAttributes> implements BlogAttributes {
-  public blog_id!: string
+  public blogId!: string
   public title?: string
   public slug?: string
   public content?: string
-  public author_id?: string
+  public authorId?: string
   public thumbnail?: string
-  public thumbnail_public_id?: string
+  public thumbnailPublicId?: string
 }
 
 Blog.init(
   {
-    blog_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), primaryKey: true },
+    blogId: {
+      type: DataTypes.STRING,
+      defaultValue: () => uuidv4(),
+      primaryKey: true,
+      field: 'blog_id'
+    },
     title: {
       type: DataTypes.STRING(255)
     },
@@ -39,8 +44,9 @@ Blog.init(
     content: {
       type: DataTypes.TEXT
     },
-    author_id: {
+    authorId: {
       type: DataTypes.STRING,
+      field: 'author_id',
       references: {
         model: 'users',
         key: 'user_id'
@@ -49,8 +55,9 @@ Blog.init(
     thumbnail: {
       type: DataTypes.STRING(255)
     },
-    thumbnail_public_id: {
-      type: DataTypes.STRING(255)
+    thumbnailPublicId: {
+      type: DataTypes.STRING(255),
+      field: 'thumbnail_public_id'
     }
   },
   {

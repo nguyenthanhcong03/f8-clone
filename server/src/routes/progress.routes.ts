@@ -4,6 +4,6 @@ import authMiddleware from '@/middleware/auth.middleware'
 
 const router = Router()
 
-router.post('/', authMiddleware.verifyToken, progressController.updateProgress)
+router.post('/', authMiddleware.authRequired, progressController.updateProgress)
 
 export default router

@@ -38,13 +38,13 @@ const CourseOutline = ({ courseData, totalSections, totalLessons }: CourseOutlin
       <div className='space-y-2'>
         {courseData?.sections && courseData.sections.length > 0 ? (
           courseData.sections.map((section) => {
-            const isExpanded = expandedSections[section.section_id] || false
+            const isExpanded = expandedSections[section.sectionId] || false
 
             return (
-              <div key={section.section_id} className='mb-2 overflow-hidden rounded-lg border border-gray-200'>
+              <div key={section.sectionId} className='mb-2 overflow-hidden rounded-lg border border-gray-200'>
                 {/* Accordion Header */}
                 <button
-                  onClick={() => toggleSection(section.section_id)}
+                  onClick={() => toggleSection(section.sectionId)}
                   className='w-full rounded-lg border border-gray-200 bg-gray-50 p-4 transition-colors hover:bg-gray-100'
                 >
                   <div className='flex items-center justify-between gap-4'>
@@ -71,7 +71,7 @@ const CourseOutline = ({ courseData, totalSections, totalLessons }: CourseOutlin
                     <div className='border-t border-gray-200'>
                       {section.lessons.map((lesson) => (
                         <div
-                          key={lesson.lesson_id}
+                          key={lesson.lessonId}
                           className='flex items-center border-b border-gray-200 p-4 transition-colors last:border-b-0 hover:bg-gray-50'
                         >
                           <PlayCircle className='mr-3 h-4 w-4 flex-shrink-0 text-primary' />

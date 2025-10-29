@@ -3,29 +3,35 @@ import sequelize from '../config/database'
 import { v4 as uuidv4 } from 'uuid'
 
 interface QuizAttributes {
-  quiz_id: string
-  lesson_id: string
+  quizId: string
+  lessonId: string
   question?: string
   options?: string[]
-  correct_option?: string
+  correctOption?: string
 }
 
-type QuizCreationAttributes = Optional<QuizAttributes, 'quiz_id' | 'question' | 'options' | 'correct_option'>
+type QuizCreationAttributes = Optional<QuizAttributes, 'quizId' | 'question' | 'options' | 'correctOption'>
 
 class Quiz extends Model<QuizAttributes, QuizCreationAttributes> implements QuizAttributes {
-  public quiz_id!: string
-  public lesson_id!: string
+  public quizId!: string
+  public lessonId!: string
   public question?: string
   public options?: string[]
-  public correct_option?: string
+  public correctOption?: string
 }
 
 Quiz.init(
   {
-    quiz_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), primaryKey: true },
-    lesson_id: {
+    quizId: {
+      type: DataTypes.STRING,
+      defaultValue: () => uuidv4(),
+      primaryKey: true,
+      field: 'quiz_id'
+    },
+    lessonId: {
       type: DataTypes.STRING,
       allowNull: false,
+      field: 'lesson_id',
       references: {
         model: 'lessons',
         key: 'lesson_id'
@@ -37,8 +43,9 @@ Quiz.init(
     options: {
       type: DataTypes.JSON
     },
-    correct_option: {
-      type: DataTypes.STRING(10)
+    correctOption: {
+      type: DataTypes.STRING(10),
+      field: 'correct_option'
     }
   },
   {

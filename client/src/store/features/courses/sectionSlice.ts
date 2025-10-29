@@ -29,9 +29,9 @@ export const fetchCourseSections = createAsyncThunk(
 
 export const addSection = createAsyncThunk(
   'sections/addSection',
-  async ({ title, course_id }: { title: string; course_id: string }, { rejectWithValue }) => {
+  async ({ title, courseId }: { title: string; courseId: string }, { rejectWithValue }) => {
     try {
-      const response = await createSection({ title, course_id })
+      const response = await createSection({ title, courseId })
       return response.data
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Failed to create section'

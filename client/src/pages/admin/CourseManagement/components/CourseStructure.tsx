@@ -62,7 +62,7 @@ const CourseStructure: React.FC<CourseStructureProps> = ({
 
   const toggleExpand = (sectionId: string) => {
     setItems((prevItems) =>
-      prevItems.map((section) => (section.section_id === sectionId ? { ...section, isOpen: !section.isOpen } : section))
+      prevItems.map((section) => (section.sectionId === sectionId ? { ...section, isOpen: !section.isOpen } : section))
     )
   }
 
@@ -77,7 +77,7 @@ const CourseStructure: React.FC<CourseStructureProps> = ({
     const { active } = event
 
     if (items) {
-      const draggedSection = items.find((section) => section.section_id === active.id)
+      const draggedSection = items.find((section) => section.sectionId === active.id)
       if (draggedSection) {
         setActiveSection(draggedSection)
       }
@@ -93,8 +93,8 @@ const CourseStructure: React.FC<CourseStructureProps> = ({
       return
     }
 
-    const oldIndex = items.findIndex((section) => section.section_id === active.id)
-    const newIndex = items.findIndex((section) => section.section_id === over.id)
+    const oldIndex = items.findIndex((section) => section.sectionId === active.id)
+    const newIndex = items.findIndex((section) => section.sectionId === over.id)
 
     if (oldIndex !== -1 && newIndex !== -1) {
       const newSections = arrayMove(items, oldIndex, newIndex)
@@ -106,7 +106,7 @@ const CourseStructure: React.FC<CourseStructureProps> = ({
   const handleDragStartLesson = (sectionId: string, lessons: Lesson[]) => (event: DragStartEvent) => {
     const { active } = event
 
-    const draggedLesson = lessons.find((lesson) => lesson.lesson_id === active.id)
+    const draggedLesson = lessons.find((lesson) => lesson.lessonId === active.id)
     if (draggedLesson) {
       setActiveLesson(draggedLesson)
     }
@@ -121,8 +121,8 @@ const CourseStructure: React.FC<CourseStructureProps> = ({
       return
     }
 
-    const oldIndex = lessons.findIndex((lesson) => lesson.lesson_id === active.id)
-    const newIndex = lessons.findIndex((lesson) => lesson.lesson_id === over.id)
+    const oldIndex = lessons.findIndex((lesson) => lesson.lessonId === active.id)
+    const newIndex = lessons.findIndex((lesson) => lesson.lessonId === over.id)
 
     if (oldIndex !== -1 && newIndex !== -1) {
       const newLessons = arrayMove(lessons, oldIndex, newIndex)
@@ -138,7 +138,7 @@ const CourseStructure: React.FC<CourseStructureProps> = ({
         // Update existing section
         await dispatch(
           editSection({
-            sectionId: selectedSection.section_id,
+            sectionId: selectedSection.sectionId,
             title
           })
         ).unwrap()
@@ -148,7 +148,7 @@ const CourseStructure: React.FC<CourseStructureProps> = ({
         await dispatch(
           addSection({
             title,
-            course_id: courseId
+            courseId: courseId
           })
         ).unwrap()
         showSnackbar({ message: 'Tạo chương học thành công', severity: 'success' })
@@ -182,33 +182,30 @@ const CourseStructure: React.FC<CourseStructureProps> = ({
               onDragStart={handleDragStartSection}
               onDragEnd={handleDragEndSection}
             >
-              <SortableContext
-                items={items.map((section) => section.section_id)}
-                strategy={verticalListSortingStrategy}
-              >
+              <SortableContext items={items.map((section) => section.sectionId)} strategy={verticalListSortingStrategy}>
                 {items.map((section) => (
                   <SortableSection
-                    key={section.section_id}
+                    key={section.sectionId}
                     section={section}
                     onEdit={onEditSection}
                     onDelete={onDeleteSection}
                     onAddLesson={onAddLesson}
-                    onToggleExpand={() => toggleExpand(section.section_id)}
+                    onToggleExpand={() => toggleExpand(section.sectionId)}
                   >
                     {section.lessons && section.lessons.length > 0 ? (
                       <DndContext
                         sensors={sensors}
                         collisionDetection={closestCenter}
-                        onDragStart={handleDragStartLesson(section.section_id, section.lessons)}
-                        onDragEnd={handleDragEndLesson(section.section_id, section.lessons)}
+                        onDragStart={handleDragStartLesson(section.sectionId, section.lessons)}
+                        onDragEnd={handleDragEndLesson(section.sectionId, section.lessons)}
                       >
                         <SortableContext
-                          items={section.lessons.map((lesson) => lesson.lesson_id)}
+                          items={section.lessons.map((lesson) => lesson.lessonId)}
                           strategy={verticalListSortingStrategy}
                         >
                           {section.lessons.map((lesson) => (
                             <SortableLesson
-                              key={lesson.lesson_id}
+                              key={lesson.lessonId}
                               lesson={lesson}
                               section={section}
                               id={courseId}
@@ -217,7 +214,7 @@ const CourseStructure: React.FC<CourseStructureProps> = ({
                           ))}
                         </SortableContext>
                         <DragOverlay>
-                          {activeLesson && section.section_id === activeLesson.section_id && (
+                          {activeLesson && section.sectionId === activeLesson.sectionId && (
                             <SortableLesson
                               lesson={activeLesson}
                               section={section}
@@ -244,7 +241,7 @@ const CourseStructure: React.FC<CourseStructureProps> = ({
                     {activeSection?.lessons && activeSection?.lessons.length > 0 ? (
                       activeSection.lessons.map((lesson) => (
                         <SortableLesson
-                          key={lesson.lesson_id}
+                          key={lesson.lessonId}
                           lesson={lesson}
                           section={activeSection}
                           id={courseId}

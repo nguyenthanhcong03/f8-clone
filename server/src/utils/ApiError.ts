@@ -1,12 +1,17 @@
+type Errors = {
+  field: string
+  message: string
+}[]
+
 class ApiError extends Error {
   statusCode: number
-  errors: unknown | null
+  errors: Errors | null
   isOperational: boolean
 
   constructor(
     statusCode: number,
     message: string,
-    errors: unknown | null = null,
+    errors: Errors | null = null,
     isOperational: boolean = true,
     stack: string = ''
   ) {

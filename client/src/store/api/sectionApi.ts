@@ -11,22 +11,22 @@ export const sectionApi = baseApi.injectEndpoints({
       providesTags: (result) =>
         result
           ? [
-              ...result.map(({ section_id }) => ({ type: 'Section' as const, id: section_id })),
+              ...result.map(({ sectionId }) => ({ type: 'Section' as const, id: sectionId })),
               { type: 'Section', id: 'LIST' }
             ]
           : [{ type: 'Section', id: 'LIST' }]
     }),
 
     // Tạo phần mới
-    createSection: builder.mutation<ApiResponse<Section>, { title: string; course_id: string }>({
+    createSection: builder.mutation<ApiResponse<Section>, { title: string; courseId: string }>({
       query: (sectionData) => ({
         url: '/sections',
         method: 'POST',
         body: sectionData
       }),
-      invalidatesTags: (_result, _error, { course_id }) => [
+      invalidatesTags: (_result, _error, { courseId }) => [
         { type: 'Section', id: 'LIST' },
-        { type: 'Course', id: course_id }
+        { type: 'Course', id: courseId }
       ]
     }),
 

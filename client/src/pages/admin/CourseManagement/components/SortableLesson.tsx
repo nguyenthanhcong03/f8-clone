@@ -14,7 +14,7 @@ interface SortableLessonProps {
 
 const SortableLesson: React.FC<SortableLessonProps> = ({ lesson, section, id, handleDeleteLesson }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: lesson.lesson_id
+    id: lesson.lessonId
   })
   const navigate = useNavigate()
 
@@ -29,11 +29,11 @@ const SortableLesson: React.FC<SortableLessonProps> = ({ lesson, section, id, ha
     <div
       ref={setNodeRef}
       style={style}
-      className='flex justify-between items-center mb-4 p-3 border border-border rounded-lg bg-white cursor-pointer hover:bg-accent transition-colors'
-      onClick={() => navigate(`/admin/courses/${id}/sections/${section.section_id}/lessons/${lesson.lesson_id}`)}
+      className='mb-4 flex cursor-pointer items-center justify-between rounded-lg border border-border bg-white p-3 transition-colors hover:bg-accent'
+      onClick={() => navigate(`/admin/courses/${id}/sections/${section.sectionId}/lessons/${lesson.lessonId}`)}
     >
       <div className='flex items-center gap-3'>
-        <div {...attributes} {...listeners} className='cursor-grab hover:cursor-grabbing flex items-center'>
+        <div {...attributes} {...listeners} className='flex cursor-grab items-center hover:cursor-grabbing'>
           <GripVertical className='h-4 w-4 text-muted-foreground' />
         </div>
         <span className='text-sm font-medium'>{lesson.title}</span>
@@ -44,7 +44,7 @@ const SortableLesson: React.FC<SortableLessonProps> = ({ lesson, section, id, ha
           size='sm'
           onClick={(e) => {
             e.stopPropagation()
-            handleDeleteLesson(lesson.lesson_id)
+            handleDeleteLesson(lesson.lessonId)
           }}
           className='text-destructive hover:text-destructive'
         >

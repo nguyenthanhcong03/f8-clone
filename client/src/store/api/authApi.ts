@@ -36,7 +36,12 @@ export const authApi = baseApi.injectEndpoints({
         query: () => ({
           url: '/auth/logout',
           method: 'POST'
-        })
+        }),
+        async onQueryStarted(args, { queryFulfilled, dispatch }) {
+          // Xoá thông tin user khỏi store
+          dispatch(setCredentials(null))
+          dispatch(setToken(null))
+        }
       }),
       getCurrentUser: builder.query<User, void>({
         query: () => '/auth/me',

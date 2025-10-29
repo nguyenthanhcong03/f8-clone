@@ -30,7 +30,7 @@ const LearningPage = () => {
   // và khóa học đã được tải
   useEffect(() => {
     if (!params.get('lessonId') && courseData?.sections?.length && courseData?.sections[0].lessons?.length) {
-      setParams({ lessonId: String(courseData.sections[0].lessons[0].lesson_id) })
+      setParams({ lessonId: String(courseData.sections[0].lessons[0].lessonId) })
     }
   }, [courseData, params, setParams])
 

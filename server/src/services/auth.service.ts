@@ -51,12 +51,12 @@ const login = async (loginData: LoginAccountInput['body']) => {
 
   // Tạo user payload cho JWT
   const userPayload = {
-    user_id: user.user_id,
+    userId: user.userId,
     name: user.name,
     email: user.email,
     phone: user.phone,
     avatar: user.avatar,
-    avatar_public_id: user.avatar_public_id,
+    avatarPublicId: user.avatarPublicId,
     role: user.role
   }
 
@@ -66,7 +66,7 @@ const login = async (loginData: LoginAccountInput['body']) => {
 
   return {
     user: {
-      id: user.user_id,
+      id: user.userId,
       name: user.name,
       phone: user.phone,
       email: user.email,
@@ -103,8 +103,8 @@ const refreshToken = async (refreshToken: string) => {
     throw new ApiError(401, 'Không có refresh token')
   }
   try {
-    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET as string)
-    const user = await User.findByPk(decoded.user_id, {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET as string) as jwt.JwtPayload
+    const user = await User.findByPk(decoded.userId, {
       attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
     })
     if (!user) {
@@ -112,7 +112,7 @@ const refreshToken = async (refreshToken: string) => {
     }
     // Create new tokens
     const newAccessToken = generateAccessToken({
-      user_id: user.user_id,
+      userId: user.userId,
       name: user.name,
       email: user.email,
       phone: user.phone,
@@ -122,7 +122,7 @@ const refreshToken = async (refreshToken: string) => {
     return {
       accessToken: newAccessToken,
       user: {
-        user_id: user.user_id,
+        userId: user.userId,
         name: user.name,
         phone: user.phone,
         email: user.email,
@@ -146,7 +146,11 @@ const getProfile = async (userId: string) => {
   return user
 }
 
-const updateProfile = async (userId: string, updateData: any, file?: Express.Multer.File) => {
+const updateProfile = async (
+  userId: string,
+  updateData: { name?: string; phone?: string },
+  file?: Express.Multer.File
+) => {
   const user = await User.findByPk(userId)
   if (!user) {
     throw new ApiError(404, 'Người dùng không tồn tại')

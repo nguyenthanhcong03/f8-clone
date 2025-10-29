@@ -3,12 +3,12 @@ import sequelize from '../config/database'
 import { v4 as uuidv4 } from 'uuid'
 
 interface LessonAttributes {
-  lesson_id: string
-  course_id: string
-  section_id: string
+  lessonId: string
+  courseId: string
+  sectionId: string
   title?: string
-  video_url?: string
-  video_public_id?: string
+  videoUrl?: string
+  videoPublicId?: string
   duration?: number
   content?: string
   order?: number
@@ -16,16 +16,16 @@ interface LessonAttributes {
 
 type LessonCreationAttributes = Optional<
   LessonAttributes,
-  'lesson_id' | 'title' | 'video_url' | 'video_public_id' | 'duration' | 'content' | 'order'
+  'lessonId' | 'title' | 'videoUrl' | 'videoPublicId' | 'duration' | 'content' | 'order'
 >
 
 class Lesson extends Model<LessonAttributes, LessonCreationAttributes> implements LessonAttributes {
-  declare lesson_id: string
-  declare course_id: string
-  declare section_id: string
+  declare lessonId: string
+  declare courseId: string
+  declare sectionId: string
   declare title?: string
-  declare video_url?: string
-  declare video_public_id?: string
+  declare videoUrl?: string
+  declare videoPublicId?: string
   declare duration?: number
   declare content?: string
   declare order?: number
@@ -33,18 +33,25 @@ class Lesson extends Model<LessonAttributes, LessonCreationAttributes> implement
 
 Lesson.init(
   {
-    lesson_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), primaryKey: true },
-    course_id: {
+    lessonId: {
+      type: DataTypes.STRING,
+      defaultValue: () => uuidv4(),
+      primaryKey: true,
+      field: 'lesson_id'
+    },
+    courseId: {
       type: DataTypes.STRING,
       allowNull: false,
+      field: 'course_id',
       references: {
         model: 'courses',
         key: 'course_id'
       }
     },
-    section_id: {
+    sectionId: {
       type: DataTypes.STRING,
       allowNull: false,
+      field: 'section_id',
       references: {
         model: 'sections',
         key: 'section_id'
@@ -53,11 +60,13 @@ Lesson.init(
     title: {
       type: DataTypes.STRING(255)
     },
-    video_url: {
-      type: DataTypes.STRING(255)
+    videoUrl: {
+      type: DataTypes.STRING(255),
+      field: 'video_url'
     },
-    video_public_id: {
-      type: DataTypes.STRING(255)
+    videoPublicId: {
+      type: DataTypes.STRING(255),
+      field: 'video_public_id'
     },
     duration: {
       type: DataTypes.INTEGER

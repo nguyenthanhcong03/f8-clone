@@ -3,8 +3,8 @@ import { baseApi } from './baseApi'
 
 interface Enrollment {
   id: number
-  user_id: string
-  course_id: string
+  userId: string
+  courseId: string
   course_title?: string
   course_thumbnail?: string
   created_at: string
@@ -29,10 +29,10 @@ export const enrollmentApi = baseApi.injectEndpoints({
 
     // Đăng ký khóa học
     enrollCourse: builder.mutation<ApiResponse<Enrollment>, string>({
-      query: (course_id) => ({
+      query: (courseId) => ({
         url: '/enrollments',
         method: 'POST',
-        body: { course_id }
+        body: { courseId }
       }),
       invalidatesTags: ['Enrollment', 'Course']
     }),

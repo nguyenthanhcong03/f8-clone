@@ -5,23 +5,26 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { courseFormSchema, type CourseFormInput } from '@/schemas/course.schema'
-import { createCourse } from '@/store/features/courses/courseSlice'
-import { useAppDispatch } from '@/store/hook'
-import { showSnackbar } from '@/store/snackbarSlice'
+import type { ApiError } from '@/store/api/baseApi'
+import { useCreateCourseMutation } from '@/store/api/courseApi'
+import { slugify } from '@/utils/helpers'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Save } from 'lucide-react'
+import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
-const QuickAddCoursePage = () => {
-  const dispatch = useAppDispatch()
+const AddCoursePage = () => {
   const navigate = useNavigate()
+
+  const [createCourse, { data, isLoading, isError, isSuccess, error }] = useCreateCourseMutation()
 
   const {
     control,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isSubmitting }
   } = useForm<CourseFormInput>({
     resolver: zodResolver(courseFormSchema),
@@ -37,6 +40,8 @@ const QuickAddCoursePage = () => {
   })
 
   const isPaidValue = watch('is_paid')
+  const titleValue = watch('title')
+  console.log('👉check: ', titleValue)
 
   const onSubmit = async (data: CourseFormInput) => {
     try {
@@ -46,16 +51,21 @@ const QuickAddCoursePage = () => {
       }
       console.log('course Data:', courseData)
 
-      await dispatch(createCourse(courseData)).unwrap()
+      await createCourse(courseData).unwrap()
       toast.success('Tạo khóa học thành công')
-      // setTimeout(() => {
-      //   navigate('/admin/courses')
-      // }, 1500)
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to create course'
-      toast.error(`Tạo khóa học thất bại: ${errorMessage}`)
+      setTimeout(() => {
+        navigate('/admin/courses')
+      }, 1500)
+    } catch (error: ApiError | any) {
+      toast.error(error.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.')
     }
   }
+
+  // Cập nhật slug tự động khi title thay đổi
+  useEffect(() => {
+    const newSlug = slugify(titleValue)
+    setValue('slug', newSlug)
+  }, [titleValue, setValue])
 
   return (
     <div className='mx-auto max-w-4xl p-6'>
@@ -63,7 +73,6 @@ const QuickAddCoursePage = () => {
       <div className='mb-6 flex items-center gap-4'>
         <h1 className='text-3xl font-bold'>Thêm khóa học mới</h1>
       </div>
-
       <Card>
         <CardContent className='p-6'>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -71,7 +80,6 @@ const QuickAddCoursePage = () => {
               {/* Basic Information */}
               <div>
                 <h2 className='mb-4 text-xl font-semibold text-primary'>Thông tin khóa học</h2>
-
                 <div className='flex flex-col gap-4'>
                   <Controller
                     name='title'
@@ -98,6 +106,7 @@ const QuickAddCoursePage = () => {
                         <Label htmlFor='title'>Đường dẫn khóa học</Label>
                         <Input
                           {...field}
+                          onChange={field.onChange}
                           id='slug'
                           placeholder='Nhập đường dẫn khóa học'
                           className={errors.slug ? 'border-red-500' : ''}
@@ -166,7 +175,6 @@ const QuickAddCoursePage = () => {
               {/* Pricing */}
               <div>
                 <h2 className='mb-4 text-xl font-semibold text-primary'>Giá khóa học</h2>
-
                 <div className='flex flex-col gap-4'>
                   <Controller
                     name='is_paid'
@@ -178,7 +186,6 @@ const QuickAddCoursePage = () => {
                       </div>
                     )}
                   />
-
                   {isPaidValue && (
                     <Controller
                       name='price'
@@ -208,7 +215,6 @@ const QuickAddCoursePage = () => {
               {/* Thumbnail */}
               <div>
                 <h2 className='mb-4 text-xl font-semibold text-primary'>Ảnh thumbnail</h2>
-
                 <Controller
                   name='thumbnail'
                   control={control}
@@ -216,8 +222,6 @@ const QuickAddCoursePage = () => {
                     <div className='space-y-2'>
                       <div className='grid w-full max-w-sm items-center gap-3'>
                         <Label>Ảnh nền</Label>
-
-                        {/* Ẩn input thật */}
                         <input
                           id='picture'
                           type='file'
@@ -227,14 +231,12 @@ const QuickAddCoursePage = () => {
                             onChange(file)
                           }}
                         />
-
-                        <Button asChild variant='outline'>
+                        <Button variant='outline'>
                           <label htmlFor='picture' className='cursor-pointer'>
                             {value ? `Đã chọn: ${value.name}` : 'Chọn ảnh...'}
                           </label>
                         </Button>
                       </div>
-
                       {errors.thumbnail && <p className='mt-2 text-sm text-red-500'>{errors.thumbnail.message}</p>}
                       {!errors.thumbnail && (
                         <p className='mt-2 text-sm text-muted-foreground'>
@@ -266,4 +268,4 @@ const QuickAddCoursePage = () => {
   )
 }
 
-export default QuickAddCoursePage
+export default AddCoursePage

@@ -12,65 +12,65 @@ import Progress from './progress.model'
 
 // Define associations
 // User - Course (One-to-Many: User can create many courses)
-User.hasMany(Course, { foreignKey: 'created_by', as: 'courses' })
-Course.belongsTo(User, { foreignKey: 'created_by', as: 'creator' })
+User.hasMany(Course, { foreignKey: 'createdBy', as: 'courses' })
+Course.belongsTo(User, { foreignKey: 'createdBy', as: 'creator' })
 
 // Course - Section (One-to-Many: Course has many sections)
-Course.hasMany(Section, { foreignKey: 'course_id', as: 'sections' })
-Section.belongsTo(Course, { foreignKey: 'course_id', as: 'course' })
+Course.hasMany(Section, { foreignKey: 'courseId', as: 'sections' })
+Section.belongsTo(Course, { foreignKey: 'courseId', as: 'course' })
 
 // Section - Lesson (One-to-Many: Section has many lessons)
-Section.hasMany(Lesson, { foreignKey: 'section_id', as: 'lessons' })
-Lesson.belongsTo(Section, { foreignKey: 'section_id', as: 'section' })
+Section.hasMany(Lesson, { foreignKey: 'sectionId', as: 'lessons' })
+Lesson.belongsTo(Section, { foreignKey: 'sectionId', as: 'section' })
 
 // Lesson - Quiz (One-to-Many: Lesson can have many quizzes)
-Lesson.hasMany(Quiz, { foreignKey: 'lesson_id', as: 'quizzes' })
-Quiz.belongsTo(Lesson, { foreignKey: 'lesson_id', as: 'lesson' })
+Lesson.hasMany(Quiz, { foreignKey: 'lessonId', as: 'quizzes' })
+Quiz.belongsTo(Lesson, { foreignKey: 'lessonId', as: 'lesson' })
 
 // Roadmap - Course (Many-to-Many through RoadmapCourse)
 Roadmap.belongsToMany(Course, {
   through: RoadmapCourse,
-  foreignKey: 'roadmap_id',
-  otherKey: 'course_id',
+  foreignKey: 'roadmapId',
+  otherKey: 'courseId',
   as: 'courses'
 })
 Course.belongsToMany(Roadmap, {
   through: RoadmapCourse,
-  foreignKey: 'course_id',
-  otherKey: 'roadmap_id',
+  foreignKey: 'courseId',
+  otherKey: 'roadmapId',
   as: 'roadmaps'
 })
 
 // User - Course (Many-to-Many through Enrollment)
 User.belongsToMany(Course, {
   through: Enrollment,
-  foreignKey: 'user_id',
-  otherKey: 'course_id',
+  foreignKey: 'userId',
+  otherKey: 'courseId',
   as: 'enrolledCourses'
 })
 Course.belongsToMany(User, {
   through: Enrollment,
-  foreignKey: 'course_id',
-  otherKey: 'user_id',
+  foreignKey: 'courseId',
+  otherKey: 'userId',
   as: 'enrolledUsers'
 })
 
 // User - Blog (One-to-Many: User can write many blogs)
-User.hasMany(Blog, { foreignKey: 'author_id', as: 'blogs' })
-Blog.belongsTo(User, { foreignKey: 'author_id', as: 'author' })
+User.hasMany(Blog, { foreignKey: 'authorId', as: 'blogs' })
+Blog.belongsTo(User, { foreignKey: 'authorId', as: 'author' })
 
 // Blog - BlogComment (One-to-Many: Blog can have many comments)
-Blog.hasMany(BlogComment, { foreignKey: 'blog_id', as: 'comments' })
-BlogComment.belongsTo(Blog, { foreignKey: 'blog_id', as: 'blog' })
+Blog.hasMany(BlogComment, { foreignKey: 'blogId', as: 'comments' })
+BlogComment.belongsTo(Blog, { foreignKey: 'blogId', as: 'blog' })
 
 // User - BlogComment (One-to-Many: User can write many comments)
-User.hasMany(BlogComment, { foreignKey: 'user_id', as: 'comments' })
-BlogComment.belongsTo(User, { foreignKey: 'user_id', as: 'user' })
+User.hasMany(BlogComment, { foreignKey: 'userId', as: 'comments' })
+BlogComment.belongsTo(User, { foreignKey: 'userId', as: 'user' })
 
-User.hasMany(Progress, { foreignKey: 'user_id' })
-Lesson.hasMany(Progress, { foreignKey: 'lesson_id' })
+User.hasMany(Progress, { foreignKey: 'userId' })
+Lesson.hasMany(Progress, { foreignKey: 'lessonId' })
 
-Progress.belongsTo(User, { foreignKey: 'user_id' })
-Progress.belongsTo(Lesson, { foreignKey: 'lesson_id' })
+Progress.belongsTo(User, { foreignKey: 'userId' })
+Progress.belongsTo(Lesson, { foreignKey: 'lessonId' })
 
 export { User, Course, Section, Lesson, Quiz, Roadmap, RoadmapCourse, Enrollment, Blog, BlogComment }

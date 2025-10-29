@@ -28,7 +28,7 @@ const SidebarLesson = ({ params, setParams, handleDrawerToggle, courseData, less
     if (lessonData) {
       setOpenSections((prev) => {
         // Kiểm tra xem section của bài học hiện tại đã có trong danh sách mở chưa
-        const sectionIdStr = lessonData.section_id
+        const sectionIdStr = lessonData.sectionId
         if (!prev.includes(sectionIdStr)) {
           return [...prev, sectionIdStr]
         }
@@ -73,13 +73,13 @@ const SidebarLesson = ({ params, setParams, handleDrawerToggle, courseData, less
       <nav className='p-0'>
         {courseData?.sections &&
           courseData?.sections.map((section) => {
-            const isExpanded = openSections.includes(section.section_id)
+            const isExpanded = openSections.includes(section.sectionId)
 
             return (
-              <div key={section.section_id} className='border-b border-border'>
+              <div key={section.sectionId} className='border-b border-border'>
                 {/* Section Header */}
                 <button
-                  onClick={() => handleSectionClick(section.section_id)}
+                  onClick={() => handleSectionClick(section.sectionId)}
                   className={cn(
                     'w-full p-3 text-left transition-colors hover:bg-accent',
                     isExpanded ? 'bg-accent' : 'bg-background'
@@ -106,11 +106,11 @@ const SidebarLesson = ({ params, setParams, handleDrawerToggle, courseData, less
                   {section?.lessons &&
                     section.lessons.map((lesson) => (
                       <button
-                        key={lesson.lesson_id}
-                        onClick={() => handleLessonClick(lesson.lesson_id)}
+                        key={lesson.lessonId}
+                        onClick={() => handleLessonClick(lesson.lessonId)}
                         className={cn(
                           'flex w-full items-center py-2 pl-8 pr-4 text-left transition-colors hover:bg-accent',
-                          activeLessonId === lesson.lesson_id
+                          activeLessonId === lesson.lessonId
                             ? 'bg-accent font-semibold text-primary'
                             : 'text-foreground'
                         )}
@@ -118,7 +118,7 @@ const SidebarLesson = ({ params, setParams, handleDrawerToggle, courseData, less
                         <PlayCircle
                           className={cn(
                             'mr-2 h-4 w-4 flex-shrink-0',
-                            activeLessonId === lesson.lesson_id ? 'text-primary' : 'text-muted-foreground'
+                            activeLessonId === lesson.lessonId ? 'text-primary' : 'text-muted-foreground'
                           )}
                         />
                         <span className='line-clamp-2 text-sm'>{lesson.title}</span>

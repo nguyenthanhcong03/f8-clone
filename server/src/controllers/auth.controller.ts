@@ -27,7 +27,7 @@ const loginAccount = catchAsync(async (req: Request, res: Response) => {
     httpOnly: true,
     // secure: true,
     // sameSite: 'Strict',
-    maxAge: process.env.REFRESH_TOKEN_COOKIE_EXPIRES
+    maxAge: parseInt(process.env.REFRESH_TOKEN_COOKIE_EXPIRES || '7200000')
   })
 
   res.status(200).json({
@@ -42,7 +42,7 @@ const loginAccount = catchAsync(async (req: Request, res: Response) => {
 })
 
 const changePassword = catchAsync(async (req: Request, res: Response) => {
-  const userId = parseInt(req.params.id)
+  const userId = req.params.id
   const { currentPassword, newPassword } = req.body
 
   if (!currentPassword || !newPassword) {

@@ -4,37 +4,45 @@ import { v4 as uuidv4 } from 'uuid'
 
 // định nghĩa attributes
 interface ProgressAttributes {
-  progress_id: string
-  user_id: string
-  lesson_id: string
-  is_completed: boolean
+  progressId: string
+  userId: string
+  lessonId: string
+  isCompleted: boolean
 }
 
 // tạo type cho create
-type ProgressCreationAttributes = Optional<ProgressAttributes, 'progress_id' | 'is_completed'>
+type ProgressCreationAttributes = Optional<ProgressAttributes, 'progressId' | 'isCompleted'>
 
 class Progress extends Model<ProgressAttributes, ProgressCreationAttributes> implements ProgressAttributes {
-  public progress_id!: string
-  public user_id!: string
-  public lesson_id!: string
-  public is_completed!: boolean
+  public progressId!: string
+  public userId!: string
+  public lessonId!: string
+  public isCompleted!: boolean
 }
 
 Progress.init(
   {
-    progress_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), primaryKey: true },
-    user_id: {
+    progressId: {
       type: DataTypes.STRING,
-      allowNull: false
+      defaultValue: () => uuidv4(),
+      primaryKey: true,
+      field: 'progress_id'
     },
-    lesson_id: {
+    userId: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      field: 'user_id'
     },
-    is_completed: {
+    lessonId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      field: 'lesson_id'
+    },
+    isCompleted: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: false
+      defaultValue: false,
+      field: 'is_completed'
     }
   },
   {

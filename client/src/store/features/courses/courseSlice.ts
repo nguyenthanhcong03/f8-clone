@@ -30,13 +30,13 @@ export const fetchCourses = createAsyncThunk('courses/fetchCourses', async (_, {
 
 export const fetchCourseById = createAsyncThunk(
   'courses/fetchCourseById',
-  async (course_id: string, { rejectWithValue }) => {
+  async (courseId: string, { rejectWithValue }) => {
     try {
-      const response = await courseAPI.getCourseById(course_id)
+      const response = await courseAPI.getCourseById(courseId)
       console.log('response.data', response.data)
       return response.data
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : `Failed to fetch course with ID ${course_id}`
+      const message = error instanceof Error ? error.message : `Failed to fetch course with ID ${courseId}`
       return rejectWithValue(message)
     }
   }

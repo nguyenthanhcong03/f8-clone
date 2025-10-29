@@ -16,9 +16,9 @@ const initialState: EnrollmentState = {
 // Async thunks
 export const enrollCourse = createAsyncThunk(
   'enrollment/enrollCourse',
-  async (course_id: string, { rejectWithValue }) => {
+  async (courseId: string, { rejectWithValue }) => {
     try {
-      const response = await enrollmentAPI.enrollCourse(course_id)
+      const response = await enrollmentAPI.enrollCourse(courseId)
       return response.data
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Có lỗi xảy ra khi đăng ký khóa học'

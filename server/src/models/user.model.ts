@@ -3,33 +3,37 @@ import sequelize from '../config/database'
 import { v4 as uuidv4 } from 'uuid'
 
 interface UserAttributes {
-  user_id: string
+  userId: string
   name: string
   phone?: string
   email: string
   password: string
   avatar?: string
-  avatar_public_id?: string
+  avatarPublicId?: string
   role?: 'admin' | 'student'
 }
 
-type UserCreationAttributes = Optional<UserAttributes, 'user_id' | 'phone' | 'avatar' | 'avatar_public_id' | 'role'>
+type UserCreationAttributes = Optional<UserAttributes, 'userId' | 'phone' | 'avatar' | 'avatarPublicId' | 'role'>
 
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
-  declare user_id: string
+  declare userId: string
   declare name: string
   declare phone?: string
   declare email: string
   declare password: string
   declare avatar?: string
-  declare avatar_public_id?: string
+  declare avatarPublicId?: string
   declare role?: 'admin' | 'student'
 }
 
 User.init(
   {
-    user_id: { type: DataTypes.STRING, defaultValue: () => uuidv4(), primaryKey: true },
-
+    userId: {
+      type: DataTypes.STRING,
+      defaultValue: () => uuidv4(),
+      primaryKey: true,
+      field: 'user_id'
+    },
     name: {
       type: DataTypes.STRING(100),
       allowNull: false
@@ -50,8 +54,9 @@ User.init(
     avatar: {
       type: DataTypes.STRING(255)
     },
-    avatar_public_id: {
-      type: DataTypes.STRING(255)
+    avatarPublicId: {
+      type: DataTypes.STRING(255),
+      field: 'avatar_public_id'
     },
     role: {
       type: DataTypes.ENUM('admin', 'student'),

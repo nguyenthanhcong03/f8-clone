@@ -36,7 +36,7 @@ const LessonArea = ({ handleDrawerToggle }: LessonAreaProps) => {
   // Get section title
   const getSectionTitle = () => {
     if (!currentLesson) return ''
-    const section = currentCourse?.sections?.find((section: Section) => section.section_id === currentLesson.section_id)
+    const section = currentCourse?.sections?.find((section: Section) => section.sectionId === currentLesson.sectionId)
     return section?.title || ''
   }
 

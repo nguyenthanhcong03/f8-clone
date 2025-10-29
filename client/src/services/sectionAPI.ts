@@ -9,7 +9,7 @@ export const getCourseSections = async (courseId: string) => {
   return response
 }
 
-export const createSection = async (sectionData: { title: string; course_id: string }) => {
+export const createSection = async (sectionData: { title: string; courseId: string }) => {
   const response = await axiosInstance.post<ApiResponse<Section>>(API_ENDPOINT, sectionData)
   return response
 }
