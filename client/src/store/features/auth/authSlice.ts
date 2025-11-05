@@ -21,11 +21,12 @@ const authSlice = createSlice({
       state.isAuthenticated = true
       state.user = action.payload
     },
-    setToken: (state, action: PayloadAction<string | null>) => {
+    setToken: (state, action: PayloadAction<string>) => {
       state.accessToken = action.payload
-      localStorage.setItem('accessToken', action.payload || '')
+      localStorage.setItem('accessToken', action.payload)
     },
     logout: (state) => {
+      console.log('❤️đã vào')
       state.accessToken = null
       state.isAuthenticated = false
       state.user = null

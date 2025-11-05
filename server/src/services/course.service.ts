@@ -16,24 +16,27 @@ export const CourseService = {
   },
 
   async getAllPublished(where: any, options: any) {
-    console.log('👉check----: ', options)
     const { count, rows } = await Course.findAndCountAll({
-      // where,
-      // limit: Number(options.limit),
-      // offset: options.offset,
-      // order: options.order
+      where,
+      limit: options.limit,
+      offset: options.offset,
+      order: options.order
     })
     return { total: count, data: rows }
   },
 
-  async getAllCoursesAdmin() {
-    const courses = await Course.findAll({
-      order: [['createdAt', 'DESC']]
+  async getAllCoursesAdmin(where: any, options: any) {
+    const { count, rows } = await Course.findAndCountAll({
+      where,
+      limit: options.limit,
+      offset: options.offset,
+      order: options.order
     })
-    return courses
+    return { total: count, data: rows }
   },
 
   async getById(courseId: string) {
+    console.log('👉check: ', courseId)
     const course = await Course.findByPk(courseId, {
       include: [
         {

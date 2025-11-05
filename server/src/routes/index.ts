@@ -18,13 +18,4 @@ router.use('/lessons', lessonRoutes)
 router.use('/enrollments', enrollmentRoutes)
 router.use('/progress', progressRoutes)
 
-// Health check route
-router.get('/health', (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'API is running successfully',
-    timestamp: new Date().toISOString()
-  })
-})
-
 export default router

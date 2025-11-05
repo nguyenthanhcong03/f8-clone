@@ -4,10 +4,10 @@ import { baseApi } from './baseApi'
 
 export const sectionApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // Lấy các phần trong một khóa học
+    // Lấy các chương trong một khóa học
     getCourseSections: builder.query<Section[], string>({
       query: (courseId) => `/sections/${courseId}`,
-      transformResponse: (response: ApiResponse<Section[]>) => response.data,
+      transformResponse: (response: ApiResponse<Section[]>) => response.data!,
       providesTags: (result) =>
         result
           ? [
@@ -17,7 +17,7 @@ export const sectionApi = baseApi.injectEndpoints({
           : [{ type: 'Section', id: 'LIST' }]
     }),
 
-    // Tạo phần mới
+    // Tạo chương mới
     createSection: builder.mutation<ApiResponse<Section>, { title: string; courseId: string }>({
       query: (sectionData) => ({
         url: '/sections',
@@ -30,17 +30,21 @@ export const sectionApi = baseApi.injectEndpoints({
       ]
     }),
 
-    // Cập nhật phần
+    // Cập nhật chương
     updateSection: builder.mutation<ApiResponse<Section>, { sectionId: string; title: string }>({
       query: ({ sectionId, title }) => ({
         url: `/sections/${sectionId}`,
         method: 'PUT',
         body: { title }
       }),
-      invalidatesTags: (_result, _error, { sectionId }) => [{ type: 'Section', id: sectionId }]
+      invalidatesTags: (_result, _error, { sectionId }) => [
+        { type: 'Section', id: sectionId },
+        { type: 'Section', id: 'LIST' },
+        { type: 'Course', id: _result?.data?.courseId }
+      ]
     }),
 
-    // Xóa phần
+    // Xóa chương
     deleteSection: builder.mutation<ApiResponse<Section>, string>({
       query: (sectionId) => ({
         url: `/sections/${sectionId}`,
@@ -48,11 +52,12 @@ export const sectionApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: (_result, _error, sectionId) => [
         { type: 'Section', id: sectionId },
-        { type: 'Section', id: 'LIST' }
+        { type: 'Section', id: 'LIST' },
+        { type: 'Course', id: _result?.data?.courseId }
       ]
     }),
 
-    // Cập nhật thứ tự các phần
+    // Cập nhật thứ tự các chương
     updateSectionOrder: builder.mutation<ApiResponse<Section[]>, { courseId: string; sectionIds: string[] }>({
       query: ({ courseId, sectionIds }) => ({
         url: `/sections/${courseId}/reorder`,
@@ -67,7 +72,6 @@ export const sectionApi = baseApi.injectEndpoints({
   })
 })
 
-// Export hooks
 export const {
   useGetCourseSectionsQuery,
   useCreateSectionMutation,

@@ -1,6 +1,6 @@
-import { useAppDispatch, useAppSelector } from '@/store/hook'
-import { addSection, editSection } from '@/store/features/courses/sectionSlice'
-import { showSnackbar } from '@/store/snackbarSlice'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useGetCourseByIdQuery } from '@/store/api/courseApi'
 import type { Lesson, Section } from '@/types/course'
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core'
 import {
@@ -15,56 +15,66 @@ import {
 } from '@dnd-kit/core'
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { Plus } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useState } from 'react'
-import SortableLesson from './SortableLesson'
-import SortableSection from './SortableSection'
-import SectionForm from './SectionForm'
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import ConfirmDeleteLesson from './components/ConfirmDeleteLesson'
+import ConfirmDeleteSection from './components/ConfirmDeleteSection'
+import LessonForm from './components/LessonForm'
+import SectionForm from './components/SectionForm'
+import SortableLesson from './components/SortableLesson'
+import SortableSection from './components/SortableSection'
 
-interface CourseStructureProps {
-  courseId: string
-  isOpenFormSection: boolean
-  setIsOpenFormSection: (isOpen: boolean) => void
-  selectedSection: Section | null
-  onSaveSection?: (section: Section) => void
-  onAddSection: () => void
-  onEditSection: (section: Section) => void
-  onDeleteSection: (sectionId: string) => void
-  onAddLesson: (sectionId: string) => void
-  onDeleteLesson: (lessonId: string) => void
-  onReorderSections: (newSections: Section[]) => void
-  onReorderLessons: (sectionId: string, newLessons: Lesson[]) => void
-}
-
-const CourseStructure: React.FC<CourseStructureProps> = ({
-  courseId,
-  isOpenFormSection,
-  setIsOpenFormSection,
-  selectedSection,
-  onAddSection,
-  onEditSection,
-  onDeleteSection,
-  onAddLesson,
-  onDeleteLesson,
-  onReorderSections,
-  onReorderLessons
-}) => {
+const EditCourseStructurePage = () => {
+  const { courseId } = useParams<{ courseId: string }>()
+  const { data, isLoading, error } = useGetCourseByIdQuery(courseId!)
+  const currentCourse = data?.data
+  console.log('currentCourse: ', currentCourse)
+  const [isOpenSectionForm, setIsOpenSectionForm] = useState(false)
+  const [isOpenLessonForm, setIsOpenLessonForm] = useState(false)
+  const [isOpenConfirmDeleteSection, setIsOpenConfirmDeleteSection] = useState(false)
+  const [isOpenConfirmDeleteLesson, setIsOpenConfirmDeleteLesson] = useState(false)
+  const [selectedSection, setSelectedSection] = useState<Section | null>(null)
+  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null)
   const [activeSection, setActiveSection] = useState<Section | null>(null)
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null)
-  const [submitLoading, setSubmitLoading] = useState(false)
-  const dispatch = useAppDispatch()
+  const [items, setItems] = useState<Section[]>([])
 
-  const { currentCourse } = useAppSelector((state) => state.courses)
-
-  const initialItems = currentCourse?.sections?.map((section) => ({ ...section, isOpen: true })) || []
-  const [items, setItems] = useState(initialItems)
-
-  const toggleExpand = (sectionId: string) => {
-    setItems((prevItems) =>
-      prevItems.map((section) => (section.sectionId === sectionId ? { ...section, isOpen: !section.isOpen } : section))
-    )
+  const handleOpenEditSectionForm = (section: Section) => {
+    setSelectedSection(section)
+    setIsOpenSectionForm(true)
   }
+
+  const handleOpenConfirmDeleteSection = (section: Section) => {
+    setSelectedSection(section)
+    setIsOpenConfirmDeleteSection(true)
+  }
+  const handleOpenAddSectionForm = () => {
+    setSelectedSection(null)
+    setIsOpenSectionForm(true)
+  }
+
+  const handleOpenEditLessonForm = (lesson: Lesson) => {
+    setSelectedLesson(lesson)
+    setIsOpenLessonForm(true)
+  }
+
+  const handleOpenConfirmDeleteLesson = (lesson: Lesson) => {
+    setSelectedLesson(lesson)
+    setIsOpenConfirmDeleteLesson(true)
+  }
+
+  const handleOpenAddLessonForm = (section: Section) => {
+    setSelectedLesson(null)
+    setSelectedSection(section)
+    setIsOpenLessonForm(true)
+  }
+
+  useEffect(() => {
+    if (currentCourse) {
+      const initialItems = currentCourse.sections?.map((section) => ({ ...section, isOpen: true })) || []
+      setItems(initialItems)
+    }
+  }, [currentCourse])
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -130,46 +140,15 @@ const CourseStructure: React.FC<CourseStructureProps> = ({
     }
   }
 
-  const handleSaveSection = async (title: string) => {
-    setSubmitLoading(true)
-
-    try {
-      if (selectedSection) {
-        // Update existing section
-        await dispatch(
-          editSection({
-            sectionId: selectedSection.sectionId,
-            title
-          })
-        ).unwrap()
-        showSnackbar({ message: 'Cập nhật chương học thành công', severity: 'success' })
-      } else {
-        // Create new section
-        await dispatch(
-          addSection({
-            title,
-            courseId: courseId
-          })
-        ).unwrap()
-        showSnackbar({ message: 'Tạo chương học thành công', severity: 'success' })
-      }
-      setIsOpenFormSection(false)
-    } catch {
-      showSnackbar({ message: 'Có lỗi xảy ra. Vui lòng thử lại', severity: 'error' })
-    } finally {
-      setSubmitLoading(false)
-    }
-  }
-
   return (
-    <>
+    <div className='mx-auto w-full max-w-7xl p-6'>
       <Card className='border'>
         <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
           <div className='space-y-1'>
             <CardTitle className='text-xl font-semibold'>Nội dung khóa học</CardTitle>
             <p className='text-sm text-muted-foreground'>Các video bài giảng</p>
           </div>
-          <Button onClick={onAddSection} className='flex items-center gap-2'>
+          <Button onClick={handleOpenAddSectionForm} className='flex items-center gap-2'>
             <Plus className='h-4 w-4' />
             Tạo chương mới
           </Button>
@@ -187,10 +166,8 @@ const CourseStructure: React.FC<CourseStructureProps> = ({
                   <SortableSection
                     key={section.sectionId}
                     section={section}
-                    onEdit={onEditSection}
-                    onDelete={onDeleteSection}
-                    onAddLesson={onAddLesson}
-                    onToggleExpand={() => toggleExpand(section.sectionId)}
+                    onEdit={handleOpenEditSectionForm}
+                    onDelete={handleOpenConfirmDeleteSection}
                   >
                     {section.lessons && section.lessons.length > 0 ? (
                       <DndContext
@@ -208,8 +185,9 @@ const CourseStructure: React.FC<CourseStructureProps> = ({
                               key={lesson.lessonId}
                               lesson={lesson}
                               section={section}
-                              id={courseId}
-                              handleDeleteLesson={onDeleteLesson}
+                              courseId={courseId!}
+                              onEdit={handleOpenEditLessonForm}
+                              onDelete={handleOpenConfirmDeleteLesson}
                             />
                           ))}
                         </SortableContext>
@@ -218,15 +196,20 @@ const CourseStructure: React.FC<CourseStructureProps> = ({
                             <SortableLesson
                               lesson={activeLesson}
                               section={section}
-                              id={courseId}
-                              handleDeleteLesson={onDeleteLesson}
+                              courseId={courseId!}
+                              onEdit={handleOpenEditLessonForm}
+                              onDelete={handleOpenConfirmDeleteLesson}
                             />
                           )}
                         </DragOverlay>
                       </DndContext>
                     ) : (
-                      <p className='text-sm text-muted-foreground'>Chưa có bài học nào trong chương này.</p>
+                      <p className='py-2 text-sm text-muted-foreground'>Chưa có bài học nào trong chương này.</p>
                     )}
+                    <Button variant='outline' className='flex w-full' onClick={() => handleOpenAddLessonForm(section)}>
+                      <Plus className='h-4 w-4' />
+                      Thêm bài học
+                    </Button>
                   </SortableSection>
                 ))}
               </SortableContext>
@@ -234,9 +217,8 @@ const CourseStructure: React.FC<CourseStructureProps> = ({
                 {activeSection && (
                   <SortableSection
                     section={activeSection}
-                    onEdit={onEditSection}
-                    onDelete={onDeleteSection}
-                    onAddLesson={onAddLesson}
+                    onEdit={handleOpenEditSectionForm}
+                    onDelete={handleOpenConfirmDeleteSection}
                   >
                     {activeSection?.lessons && activeSection?.lessons.length > 0 ? (
                       activeSection.lessons.map((lesson) => (
@@ -244,8 +226,9 @@ const CourseStructure: React.FC<CourseStructureProps> = ({
                           key={lesson.lessonId}
                           lesson={lesson}
                           section={activeSection}
-                          id={courseId}
-                          handleDeleteLesson={onDeleteLesson}
+                          courseId={courseId!}
+                          onEdit={handleOpenEditLessonForm}
+                          onDelete={handleOpenConfirmDeleteLesson}
                         />
                       ))
                     ) : (
@@ -262,14 +245,33 @@ const CourseStructure: React.FC<CourseStructureProps> = ({
       </Card>
       {/* Section Form Modal */}
       <SectionForm
-        open={isOpenFormSection}
-        onClose={() => setIsOpenFormSection(false)}
-        onSave={handleSaveSection}
+        open={isOpenSectionForm}
+        onClose={() => setIsOpenSectionForm(false)}
         selectedSection={selectedSection}
-        isLoading={submitLoading}
+        courseId={courseId!}
       />
-    </>
+      {/* Lesson Form Modal */}
+      <LessonForm
+        open={isOpenLessonForm}
+        onClose={() => setIsOpenLessonForm(false)}
+        selectedLesson={selectedLesson}
+        courseId={courseId}
+        sectionId={selectedSection?.sectionId}
+      />
+      {/* Confirm Delete Section Modal */}
+      <ConfirmDeleteSection
+        open={isOpenConfirmDeleteSection}
+        onClose={() => setIsOpenConfirmDeleteSection(false)}
+        selectedSection={selectedSection!}
+      />
+      {/* Confirm Delete Lesson Modal */}
+      <ConfirmDeleteLesson
+        open={isOpenConfirmDeleteLesson}
+        onClose={() => setIsOpenConfirmDeleteLesson(false)}
+        selectedLesson={selectedLesson!}
+      />
+    </div>
   )
 }
 
-export default CourseStructure
+export default EditCourseStructurePage

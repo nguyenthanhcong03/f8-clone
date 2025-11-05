@@ -4,7 +4,7 @@ export type CourseStatus = 'draft' | 'published'
 export interface Lesson {
   lessonId: string
   sectionId: string
-  title?: string
+  title: string
   video_url?: string
   video_publicId?: string
   content?: string
@@ -30,13 +30,13 @@ export interface Course {
   slug: string
   description?: string
   thumbnail?: string
-  thumbnail_publicId?: string
-  level?: CourseLevel
-  is_paid?: boolean
+  thumbnailPublicId?: string
+  level?: 'beginner' | 'intermediate' | 'advanced'
+  isPaid?: boolean
   price?: number
-  enrollment_count?: number
-  status?: CourseStatus
-  created_by?: number
+  enrollmentCount?: number
+  isPublished?: boolean
+  createdBy?: number
   createdAt?: string
   updatedAt?: string
   sections?: Section[]

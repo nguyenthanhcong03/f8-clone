@@ -4,18 +4,22 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useState, useEffect } from 'react'
 import type { Section } from '@/types/course'
+import { toast } from 'react-toastify'
+import { useCreateSectionMutation, useUpdateSectionMutation } from '@/store/api/sectionApi'
 
 interface SectionFormProps {
   open: boolean
   onClose: () => void
-  onSave: (title: string) => void
   selectedSection: Section | null
-  isLoading: boolean
+  courseId: string
 }
 
-const SectionForm: React.FC<SectionFormProps> = ({ open, onClose, onSave, selectedSection, isLoading }) => {
+const SectionForm: React.FC<SectionFormProps> = ({ open, onClose, selectedSection, courseId }) => {
   const [title, setTitle] = useState('')
   const [error, setError] = useState('')
+
+  const [createSection, { isLoading: isCreating }] = useCreateSectionMutation()
+  const [updateSection, { isLoading: isUpdating }] = useUpdateSectionMutation()
 
   useEffect(() => {
     if (selectedSection) {
@@ -26,12 +30,32 @@ const SectionForm: React.FC<SectionFormProps> = ({ open, onClose, onSave, select
     setError('')
   }, [selectedSection])
 
-  const handleSave = () => {
+  const handleSaveSection = async () => {
     if (!title.trim()) {
       setError('Vui lòng nhập tên chương')
       return
     }
-    onSave(title)
+
+    try {
+      if (selectedSection) {
+        await updateSection({
+          sectionId: selectedSection.sectionId,
+          title
+        }).unwrap()
+        toast.success('Cập nhật chương học thành công')
+      } else {
+        // Create new section
+        await createSection({
+          title,
+          courseId
+        }).unwrap()
+        toast.success('Tạo chương học thành công')
+      }
+      onClose()
+    } catch {
+      toast.error('Đã có lỗi xảy ra. Vui lòng thử lại.')
+      onClose()
+    }
   }
 
   return (
@@ -60,10 +84,10 @@ const SectionForm: React.FC<SectionFormProps> = ({ open, onClose, onSave, select
           <Button variant='outline' onClick={onClose}>
             Hủy
           </Button>
-          <Button onClick={handleSave} disabled={isLoading}>
-            {isLoading ? (
+          <Button onClick={handleSaveSection} disabled={isCreating || isUpdating}>
+            {isCreating || isUpdating ? (
               <div className='flex items-center gap-2'>
-                <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-current'></div>
+                <div className='h-4 w-4 animate-spin rounded-full border-b-2 border-current'></div>
                 Đang xử lý...
               </div>
             ) : selectedSection ? (

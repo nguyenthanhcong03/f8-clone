@@ -6,11 +6,12 @@ import authMiddleware from '@/middleware/auth.middleware'
 const router = Router()
 
 router.get('/', courseController.getAllPublishedCourses)
+router.get('/admin', authMiddleware.authRequired, courseController.getAllCoursesAdmin)
 
 router.get('/slug/:slug', authMiddleware.authOptional, courseController.getCourseBySlug)
 
 router.get('/:id/sections', courseController.getCourseSections)
-router.get('/:course_id', courseController.getCourseById)
+router.get('/:courseId', courseController.getCourseByIdAdmin)
 
 router.post('/', upload.single('thumbnail'), courseController.createCourse)
 

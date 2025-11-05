@@ -1,12 +1,12 @@
-import { BookOpen, Menu, PlusCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { BookOpen, ChartNoAxesColumn, Menu } from 'lucide-react'
 import { useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 
 // Menu items
 const SIDEBAR_ITEMS = [
-  { name: 'Tổng quan', icon: BookOpen, href: '/admin' },
+  { name: 'Tổng quan', icon: ChartNoAxesColumn, href: '/admin/dashboard' },
   { name: 'Khóa học', icon: BookOpen, href: '/admin/courses' }
 ]
 
@@ -15,7 +15,7 @@ const AdminSidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false)
 
   const isActive = (path: string) => {
-    return location.pathname === path
+    return location.pathname.startsWith(path)
   }
 
   const handleToggle = () => {
@@ -23,16 +23,16 @@ const AdminSidebar = () => {
   }
 
   return (
-    <div
+    <aside
       className={cn(
-        'h-screen overflow-hidden border-r border-border bg-background transition-all duration-300 ease-in-out',
+        'border-r border-border bg-background transition-all duration-300 ease-in-out',
         isCollapsed ? 'w-20' : 'w-80'
       )}
     >
       {/* Header */}
       <div
         className={cn(
-          'flex items-center border-b border-border py-4',
+          'flex h-16 items-center border-b border-border',
           isCollapsed ? 'justify-center px-2' : 'justify-between px-6'
         )}
       >
@@ -75,7 +75,7 @@ const AdminSidebar = () => {
           })}
         </ul>
       </nav>
-    </div>
+    </aside>
   )
 }
 

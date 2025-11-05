@@ -9,23 +9,21 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
-import { useAppDispatch, useAppSelector } from '@/store/hook'
+import { useLogoutMutation } from '@/store/api/authApi'
+import { useAppSelector } from '@/store/hook'
 import { Bell, BookOpen, ChevronLeft, LogOut, Search, User } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import ModalAuth from '../AuthModal/AuthModal'
-import ThemeToggle from '../ThemeToggle/ThemeToggle'
-import { logout } from '@/store/features/auth/authSlice'
-import { useLogoutMutation } from '@/store/api/authApi'
 import { toast } from 'react-toastify'
+import ModalAuth from '../../auth/AuthModal/AuthModal'
+import ThemeToggle from '../../common/ThemeToggle/ThemeToggle'
 
-// Main component
 const Header = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const isProfilePage = location.pathname === '/profile'
   const { user, isAuthenticated } = useAppSelector((state) => state.auth)
-  const [logout, { data, isSuccess }] = useLogoutMutation()
+  const [logout] = useLogoutMutation()
 
   const [openModalAuth, setOpenModalAuth] = useState(false)
   const [typeModalAuth, setTypeModalAuth] = useState<'login' | 'register'>('login')
@@ -40,14 +38,14 @@ const Header = () => {
     try {
       await logout({}).unwrap()
       toast.success('Đăng xuất thành công')
+      navigate('/')
     } catch (error) {
       console.log('Failed to logout:', error)
     }
-    navigate('/')
   }
 
   return (
-    <header className='sticky top-0 z-50 h-[66px] border-b bg-background shadow-sm'>
+    <header className='fixed left-0 right-0 top-0 z-50 h-[66px] border-b bg-background shadow-sm'>
       <div className='mx-auto flex h-full items-center justify-between px-7'>
         {/* Logo */}
         <Link to='/' className='mr-2 flex items-center transition-opacity hover:opacity-80'>

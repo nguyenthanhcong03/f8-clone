@@ -28,7 +28,11 @@ const baseQuery = fetchBaseQuery({
 })
 
 // Custom baseQuery có retry refresh token
-const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, ApiError> = async (args, api, extraOptions) => {
+const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
+  args,
+  api,
+  extraOptions
+) => {
   // Gọi query gốc
   let result = await baseQuery(args, api, extraOptions)
   // Nếu lỗi 401 - thử refresh token
@@ -37,14 +41,14 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, ApiError> = 
     // Gọi API refresh token
     const refreshResult = await baseQuery(
       {
-        url: '/auth/refresh',
+        url: '/auth/refresh-token',
         method: 'POST'
       },
       api,
       extraOptions
     )
     if (refreshResult.data) {
-      const { accessToken } = refreshResult.data as { accessToken: string }
+      const { accessToken } = refreshResult.data.data as { accessToken: string }
       // Cập nhật token vào localStorage và Redux
       localStorage.setItem('accessToken', accessToken)
       api.dispatch(setToken(accessToken))
@@ -64,18 +68,19 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, ApiError> = 
   if (import.meta.env.NODE_ENV === 'development' && result.error) {
     console.error('❌ RTK Query error:', result.error)
   }
-  if (result.error) {
-    const err = result.error as FetchBaseQueryError
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const data = err.data as any
-    // Chuẩn hóa về dạng thống nhất
-    const normalizedError: ApiError = {
-      status: typeof err.status === 'number' ? err.status : 500,
-      message: data?.message || ('error' in err ? err.error : undefined) || 'Có lỗi xảy ra, vui lòng thử lại.',
-      errors: data?.errors || undefined
-    }
-    return { error: normalizedError }
-  }
+  // if (result.error) {
+  //   const err = result.error as FetchBaseQueryError
+  //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //   const data = err.data as any
+  //   // Chuẩn hóa về dạng thống nhất
+  //   const normalizedError: ApiError = {
+  //     status: typeof err.status === 'number' ? err.status : 500,
+  //     message: data?.message || ('error' in err ? err.error : undefined) || 'Có lỗi xảy ra, vui lòng thử lại.',
+  //     errors: data?.errors || undefined
+  //   }
+
+  //   return { error: normalizedError }
+  // }
 
   return result
 }

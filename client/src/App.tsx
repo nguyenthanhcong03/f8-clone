@@ -9,6 +9,7 @@ import AppLoader from './components/common/Loading/AppLoader'
 import { useGetCurrentUserQuery } from './store/api/authApi'
 import { useAppDispatch } from './store/hook'
 import { logout } from './store/features/auth/authSlice'
+import { TooltipProvider } from './components/ui/tooltip'
 
 function App() {
   const dispatch = useAppDispatch()
@@ -46,7 +47,9 @@ function App() {
         draggable
         pauseOnHover
       />
-      <RouterProvider router={router} />
+      <TooltipProvider>
+        <RouterProvider router={router} />
+      </TooltipProvider>
     </ThemeProvider>
   )
 }

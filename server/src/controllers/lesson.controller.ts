@@ -6,30 +6,28 @@ import { Request, Response } from 'express'
 
 const createLesson = catchAsync(async (req: Request, res: Response) => {
   console.log('jjj')
-  const { course_id, section_id, title, content, video_url } = req.body
+  const { sectionId, title, content, videoUrl } = req.body
 
   // Tạo object course data
   const lessonData: {
-    course_id: string
-    section_id: string
+    sectionId: string
     title: string
     content: string
-    video_url?: string
-    video_public_id?: string
+    videoUrl?: string
+    videoPublicId?: string
   } = {
-    course_id,
-    section_id,
+    sectionId,
     title,
     content,
-    video_url
+    videoUrl
   }
 
   // Nếu có file video được upload
   if (req.file) {
     try {
       const uploadResult = await uploadService.uploadVideo(req.file.buffer, 'lesson-videos')
-      lessonData.video_url = uploadResult.url
-      lessonData.video_public_id = uploadResult.public_id
+      lessonData.videoUrl = uploadResult.url
+      lessonData.videoPublicId = uploadResult.publicId
       console.log('Video uploaded successfully:', uploadResult)
     } catch (error) {
       throw new ApiError(400, 'Có lỗi khi upload video')

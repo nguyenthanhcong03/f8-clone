@@ -6,12 +6,42 @@ import { baseApi } from './baseApi'
 export const courseApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Lấy tất cả khóa học
-    getAllCourses: builder.query<
+    getAllPublishedCourses: builder.query<
       ApiResponse<PaginationResponse<Course>>,
       { page: number; limit: number; sort: string; order: string }
     >({
       query: (params: { page: number; limit: number; sort: string; order: string }) => {
         return { url: '/courses', method: 'GET', params: params }
+      }
+    }),
+
+    // Lấy khóa học theo slug
+    getCourseBySlug: builder.query<ApiResponse<Course>, string>({
+      query: (slug) => `/courses/slug/${slug}`,
+      // transformResponse: (response: ApiResponse<Course>) => response.data!,
+      providesTags: (result) => (result?.data ? [{ type: 'Course', id: result.data.courseId }] : [])
+    }),
+
+    // ADMIN
+
+    // Lấy tất cả khóa học
+    getAllCoursesAdmin: builder.query<
+      ApiResponse<PaginationResponse<Course>>,
+      {
+        page: number
+        limit: number
+        sort: string
+        order: string
+        search?: string
+        level?: string
+        isPaid?: string
+        isPublished?: string
+        minPrice?: number
+        maxPrice?: number
+      }
+    >({
+      query: (params) => {
+        return { url: '/courses/admin', method: 'GET', params: params }
       },
       // transformResponse: (response: ApiResponse<PaginationResponse<Course>>) => response.data?.data ?? [],
 
@@ -26,20 +56,13 @@ export const courseApi = baseApi.injectEndpoints({
     }),
 
     // Lấy khóa học theo ID
-    getCourseById: builder.query<{ course: Course }, string>({
+    getCourseById: builder.query<ApiResponse<Course>, string>({
       query: (courseId) => `/courses/${courseId}`,
-      providesTags: (_result, _error, courseId) => [{ type: 'Course', id: courseId }]
-    }),
-
-    // Lấy khóa học theo slug
-    getCourseBySlug: builder.query<ApiResponse<Course>, string>({
-      query: (slug) => `/courses/slug/${slug}`,
-      // transformResponse: (response: ApiResponse<Course>) => response.data!,
       providesTags: (result) => (result?.data ? [{ type: 'Course', id: result.data.courseId }] : [])
     }),
 
     // Tạo khóa học=> mới
-    createCourse: builder.mutation<ApiResponse<Course>, CreateCourseInput>({
+    createCourse: builder.mutation<ApiResponse<Course>, CreateCourseInput | FormData>({
       query: (courseData) => {
         return {
           url: '/courses',
@@ -54,21 +77,11 @@ export const courseApi = baseApi.injectEndpoints({
     // Cập nhật khóa học
     updateCourse: builder.mutation<ApiResponse<Course>, { id: string; data: UpdateCourseInput | FormData }>({
       query: ({ id, data }) => {
-        // Xử lý trường hợp data là FormData
-        if (data instanceof FormData) {
-          return {
-            url: `/courses/${id}`,
-            method: 'PUT',
-            body: data,
-            formData: true
-          }
-        }
-
-        // Xử lý trường hợp data là đối tượng thông thường
         return {
           url: `/courses/${id}`,
           method: 'PUT',
-          body: data
+          body: data,
+          formData: true
         }
       },
       invalidatesTags: (_result, _error, { id }) => [
@@ -103,7 +116,8 @@ export const courseApi = baseApi.injectEndpoints({
 
 // Export hooks
 export const {
-  useGetAllCoursesQuery,
+  useGetAllPublishedCoursesQuery,
+  useGetAllCoursesAdminQuery,
   useGetCourseByIdQuery,
   useGetCourseBySlugQuery,
   useCreateCourseMutation,

@@ -1,18 +1,19 @@
+import { Button } from '@/components/ui/button'
 import type { Lesson, Section } from '@/types/course'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { Trash2, GripVertical } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { EditIcon, GripVertical, Trash2Icon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 interface SortableLessonProps {
   lesson: Lesson
   section: Section
-  id?: string
-  handleDeleteLesson: (lessonId: string) => void
+  courseId: string
+  onEdit: (lesson: Lesson) => void
+  onDelete: (lesson: Lesson) => void
 }
 
-const SortableLesson: React.FC<SortableLessonProps> = ({ lesson, section, id, handleDeleteLesson }) => {
+const SortableLesson: React.FC<SortableLessonProps> = ({ lesson, section, courseId, onEdit, onDelete }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: lesson.lessonId
   })
@@ -29,26 +30,28 @@ const SortableLesson: React.FC<SortableLessonProps> = ({ lesson, section, id, ha
     <div
       ref={setNodeRef}
       style={style}
-      className='mb-4 flex cursor-pointer items-center justify-between rounded-lg border border-border bg-white p-3 transition-colors hover:bg-accent'
-      onClick={() => navigate(`/admin/courses/${id}/sections/${section.sectionId}/lessons/${lesson.lessonId}`)}
+      className='mb-4 flex cursor-pointer items-center justify-between rounded-lg border bg-white transition-colors hover:bg-accent'
     >
-      <div className='flex items-center gap-3'>
+      <div
+        className='flex flex-1 items-center gap-3 p-3'
+        onClick={() => navigate(`/admin/courses/${courseId}/sections/${section.sectionId}/lessons/${lesson.lessonId}`)}
+      >
         <div {...attributes} {...listeners} className='flex cursor-grab items-center hover:cursor-grabbing'>
           <GripVertical className='h-4 w-4 text-muted-foreground' />
         </div>
         <span className='text-sm font-medium'>{lesson.title}</span>
       </div>
       <div className='flex items-center'>
+        <Button variant='ghost' size='sm' onClick={() => onEdit(lesson)}>
+          <EditIcon className='h-4 w-4' />
+        </Button>
         <Button
           variant='ghost'
           size='sm'
-          onClick={(e) => {
-            e.stopPropagation()
-            handleDeleteLesson(lesson.lessonId)
-          }}
+          onClick={() => onDelete(lesson)}
           className='text-destructive hover:text-destructive'
         >
-          <Trash2 className='h-4 w-4' />
+          <Trash2Icon className='h-4 w-4' />
         </Button>
       </div>
     </div>

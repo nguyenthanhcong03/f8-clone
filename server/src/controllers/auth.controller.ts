@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import authService from '../services/auth.service'
 import catchAsync from '@/utils/catchAsync'
 import ApiError from '@/utils/ApiError'
+import { responseHandler } from '@/utils/responseHandler'
 
 const registerAccount = catchAsync(async (req: Request, res: Response) => {
   const user = await authService.register(req.body)
@@ -74,25 +75,12 @@ const logout = catchAsync(async (req: Request, res: Response) => {
 })
 
 const refreshToken = catchAsync(async (req: Request, res: Response) => {
-  console.log('Req.cookies:', req.cookies)
   const refreshToken = req.cookies.refreshToken
 
-  if (!refreshToken) {
-    return res.status(401).json({
-      success: false,
-      message: 'No refresh token provided'
-    })
-  }
-  const newTokens = await authService.refreshToken(refreshToken)
+  if (!refreshToken) throw new ApiError(401, 'Không có refresh token, vui lòng đăng nhập lại.')
+  const newAccessToken = await authService.refreshToken(refreshToken)
 
-  res.status(200).json({
-    success: true,
-    message: 'Refresh token thành công',
-    data: {
-      accessToken: newTokens.accessToken,
-      user: newTokens.user
-    }
-  })
+  responseHandler(res, 200, 'Làm mới access token thành công', { accessToken: newAccessToken })
 })
 
 const getCurrentUser = catchAsync(async (req: Request, res: Response) => {
@@ -107,7 +95,7 @@ const getCurrentUser = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getProfile = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user?.id
+  const userId = req.user?.userId
   if (!userId) {
     throw new ApiError(401, 'Unauthorized')
   }
@@ -119,7 +107,7 @@ const getProfile = catchAsync(async (req: Request, res: Response) => {
 })
 
 const updateProfile = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user?.id
+  const userId = req.user?.userId
   if (!userId) {
     throw new ApiError(401, 'Unauthorized')
   }

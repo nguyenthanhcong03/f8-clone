@@ -13,6 +13,34 @@ const createSection = async (sectionData: CreateSectionData) => {
   return section
 }
 
+const updateSection = async (sectionId: string, sectionData: Partial<CreateSectionData>) => {
+  const { title } = sectionData
+  const section = await Section.findByPk(sectionId)
+  if (!section) {
+    throw new ApiError(404, 'Chương học không tồn tại')
+  }
+  // Cập nhật thông tin
+  section.title = title ?? section.title
+  await section.save()
+  return section
+}
+
+const deleteSection = async (sectionId: string) => {
+  console.log('sectionId: ', sectionId)
+  const section = await Section.findByPk(sectionId)
+  if (!section) {
+    throw new ApiError(404, 'Chương học không tồn tại')
+  }
+  // Kiểm tra section có chứa lesson nào không
+  const lessonCount = await Lesson.count({ where: { sectionId } })
+  console.log('lessonCount: ', lessonCount)
+  if (lessonCount > 0) {
+    throw new ApiError(400, 'Không thể xóa chương học vì nó chứa bài học')
+  }
+  // await section.destroy()
+  return section
+}
+
 const getCourseSectionsById = async (id: string) => {
   const sections = await Section.findAll({
     where: { courseId: id },
@@ -52,6 +80,8 @@ const updateSectionOrder = async (courseId: string, sectionIds: string[]) => {
 
 export default {
   createSection,
+  updateSection,
+  deleteSection,
   getCourseSectionsById,
   updateSectionOrder
 }

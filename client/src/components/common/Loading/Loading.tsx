@@ -30,7 +30,7 @@ export const Loading: React.FC<LoadingProps> = ({ message = 'Đang tải...', si
   }
 
   return (
-    <div className='flex h-full flex-col items-center justify-center bg-red-50 py-6'>
+    <div className='flex flex-col items-center justify-center py-6'>
       {spinner}
       <p className='mt-2 text-sm text-muted-foreground'>{message}</p>
     </div>

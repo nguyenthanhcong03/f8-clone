@@ -40,6 +40,7 @@ const login = async (loginData: LoginAccountInput['body']) => {
   if (!user) {
     throw new ApiError(401, 'Thông tin đăng nhập không hợp lệ')
   }
+  console.log('👉check: ', loginData)
 
   const currentPassword = user.password
 
@@ -99,41 +100,21 @@ const changePassword = async (id: string, currentPassword: string, newPassword: 
 }
 
 const refreshToken = async (refreshToken: string) => {
-  if (!refreshToken) {
-    throw new ApiError(401, 'Không có refresh token')
+  const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET as string) as jwt.JwtPayload
+  const user = await User.findByPk(decoded.userId, {
+    attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
+  })
+
+  if (!user) {
+    throw new ApiError(401, 'Người dùng không tồn tại')
   }
-  try {
-    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET as string) as jwt.JwtPayload
-    const user = await User.findByPk(decoded.userId, {
-      attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
-    })
-    if (!user) {
-      throw new ApiError(401, 'Người dùng không tồn tại')
-    }
-    // Create new tokens
-    const newAccessToken = generateAccessToken({
-      userId: user.userId,
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-      avatar: user.avatar,
-      role: user.role
-    })
-    return {
-      accessToken: newAccessToken,
-      user: {
-        userId: user.userId,
-        name: user.name,
-        phone: user.phone,
-        email: user.email,
-        avatar: user.avatar,
-        role: user.role
-      }
-    }
-  } catch (error) {
-    console.log('Error refreshing token:', error)
-    throw new ApiError(401, 'Refresh token không hợp lệ hoặc đã hết hạn')
-  }
+
+  const newAccessToken = generateAccessToken({
+    userId: user.userId,
+    role: user.role
+  })
+
+  return newAccessToken
 }
 
 const getProfile = async (userId: string) => {

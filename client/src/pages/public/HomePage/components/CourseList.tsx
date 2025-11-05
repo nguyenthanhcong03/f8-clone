@@ -3,10 +3,10 @@ import { ErrorState } from '@/components/common/ErrorState/ErrorState'
 import { Loading } from '@/components/common/Loading/Loading'
 import { NoData } from '@/components/common/NoData/NoData'
 import { Button } from '@/components/ui/button'
-import { useGetAllCoursesQuery } from '@/store/api/courseApi'
+import { useGetAllPublishedCoursesQuery } from '@/store/api/courseApi'
 
 const CourseList = () => {
-  const { data, isLoading, isFetching, isError, refetch } = useGetAllCoursesQuery({
+  const { data, isLoading, isFetching, isError, refetch } = useGetAllPublishedCoursesQuery({
     page: 1,
     limit: 12,
     sort: 'createdAt',
@@ -31,11 +31,7 @@ const CourseList = () => {
           ))}
         </div>
       ) : (
-        <NoData
-          message='Chưa có sản phẩm nào'
-          subMessage='Bạn có thể thêm sản phẩm mới ngay bây giờ'
-          action={<Button onClick={refetch}>Làm mới</Button>}
-        />
+        <NoData message='Chưa có khóa học nào' action={<Button onClick={refetch}>Làm mới</Button>} />
       )}
     </>
   )

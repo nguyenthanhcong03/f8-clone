@@ -18,6 +18,7 @@ const authRequired = async (req: Request, res: Response, next: NextFunction) => 
     if (!token) {
       throw new ApiError(401, 'Không có token, truy cập bị từ chối')
     }
+
     // Giải mã và xác minh token
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as jwt.JwtPayload
     if (!decoded || !decoded.userId) {

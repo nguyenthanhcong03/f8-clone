@@ -3,7 +3,7 @@ import CourseList from './components/CourseList'
 
 const HomePage = () => {
   return (
-    <div className='w-full'>
+    <div>
       <AdSlider />
 
       <div className='mt-6'>

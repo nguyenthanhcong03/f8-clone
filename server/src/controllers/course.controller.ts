@@ -58,7 +58,7 @@ const getAllPublishedCourses = catchAsync(async (req: Request, res: Response) =>
   } = req.query
 
   // Điều kiện lọc
-  const where: any = {
+  const where: Record<string, unknown> = {
     is_published: true
   }
   // Tìm kiếm theo tên khóa học
@@ -83,6 +83,7 @@ const getAllPublishedCourses = catchAsync(async (req: Request, res: Response) =>
   }
   // Phân trang và sắp xếp
   const offset = (Number(page) - 1) * Number(limit)
+
   const response = await courseService.getAllPublished(where, {
     offset,
     limit: Number(limit),
@@ -96,17 +97,6 @@ const getAllPublishedCourses = catchAsync(async (req: Request, res: Response) =>
     data: response.data
   }
   responseHandler(res, 200, 'Lấy danh sách khóa học thành công', responseData)
-})
-
-const getAllCoursesAdmin = catchAsync(async (req: Request, res: Response) => {
-  const courses = await courseService.getAllCoursesAdmin()
-  responseHandler(res, 200, 'Lấy danh sách khóa học thành công', courses)
-})
-
-const getCourseById = catchAsync(async (req: Request, res: Response) => {
-  const courseId = req.params.courseId
-  const course = await courseService.getById(courseId)
-  responseHandler(res, 200, 'Lấy khóa học thành công', course)
 })
 
 const getCourseBySlug = catchAsync(async (req: Request, res: Response) => {
@@ -123,6 +113,70 @@ const getCourseBySlug = catchAsync(async (req: Request, res: Response) => {
 
   const response = { ...course.toJSON(), isEnrolled }
   responseHandler(res, 200, 'Lấy khóa học thành công', response)
+})
+
+const getAllCoursesAdmin = catchAsync(async (req: Request, res: Response) => {
+  const {
+    search,
+    level,
+    isPaid,
+    isPublished,
+    minPrice,
+    maxPrice,
+    page = 1,
+    limit = 10,
+    sort = 'createdAt',
+    order = 'DESC'
+  } = req.query
+
+  // Điều kiện lọc
+  const where: Record<string, unknown> = {}
+  // Tìm kiếm theo tên khóa học
+  if (search) {
+    where.title = { [Op.like]: `%${search}%` }
+  }
+  // Lọc theo level
+  if (level) {
+    where.level = level
+  }
+  // Lọc theo miễn phí / trả phí
+  if (isPaid !== undefined) {
+    where.is_paid = isPaid === 'true'
+  }
+  // Lọc theo trạng thái xuất bản
+  if (isPublished !== undefined) {
+    where.is_published = isPublished === 'true'
+  }
+  // Lọc theo khoảng giá
+  if (minPrice && maxPrice) {
+    where.price = { [Op.between]: [Number(minPrice), Number(maxPrice)] }
+  } else if (minPrice) {
+    where.price = { [Op.gte]: Number(minPrice) }
+  } else if (maxPrice) {
+    where.price = { [Op.lte]: Number(maxPrice) }
+  }
+  // Phân trang và sắp xếp
+  const offset = (Number(page) - 1) * Number(limit)
+
+  const response = await courseService.getAllCoursesAdmin(where, {
+    offset,
+    limit: Number(limit),
+    order: [[String(sort), String(order).toUpperCase()]]
+  })
+
+  const responseData = {
+    total: response.total,
+    page: Number(page),
+    limit: Number(limit),
+    data: response.data
+  }
+  responseHandler(res, 200, 'Lấy danh sách khóa học thành công', responseData)
+})
+
+const getCourseByIdAdmin = catchAsync(async (req: Request, res: Response) => {
+  const courseId = req.params.courseId
+  const course = await courseService.getById(courseId)
+  responseHandler(res, 200, 'Lấy khóa học thành công', course)
 })
 
 const updateCourse = catchAsync(async (req: Request, res: Response) => {
@@ -188,7 +242,7 @@ export default {
   createCourse,
   getAllPublishedCourses,
   getAllCoursesAdmin,
-  getCourseById,
+  getCourseByIdAdmin,
   getCourseBySlug,
   updateCourse,
   deleteCourse,

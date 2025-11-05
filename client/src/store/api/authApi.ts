@@ -1,5 +1,5 @@
 import { baseApi } from './baseApi'
-import { setCredentials, setToken } from '../features/auth/authSlice'
+import { logout, setCredentials, setToken } from '../features/auth/authSlice'
 import type { User } from '@/types/user'
 import type { ApiResponse } from '@/types/api'
 
@@ -21,7 +21,7 @@ export const authApi = baseApi.injectEndpoints({
             dispatch(setCredentials(result.data.user))
             dispatch(setToken(result.data.accessToken))
           } catch (error) {
-            console.log(error)
+            console.log('Đăng nhập thất bại:', error)
           }
         }
       }),
@@ -39,8 +39,7 @@ export const authApi = baseApi.injectEndpoints({
         }),
         async onQueryStarted(args, { queryFulfilled, dispatch }) {
           // Xoá thông tin user khỏi store
-          dispatch(setCredentials(null))
-          dispatch(setToken(null))
+          dispatch(logout())
         }
       }),
       getCurrentUser: builder.query<User, void>({

@@ -64,8 +64,7 @@ const ModalAuth = ({ open, onClose, type: initialType }: ModalAuthProps) => {
       await login(data).unwrap()
       toast.success('Đăng nhập thành công!')
       onClose()
-    } catch (err) {
-      console.log(err)
+    } catch {
       toast.error('Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.')
     }
   }
@@ -76,8 +75,7 @@ const ModalAuth = ({ open, onClose, type: initialType }: ModalAuthProps) => {
       toast.success('Đăng ký thành công! Vui lòng đăng nhập.')
       setType('login')
       loginForm.reset({ email: data.email, password: '' })
-    } catch (err) {
-      console.log(err)
+    } catch {
       toast.error('Đăng ký thất bại. Vui lòng kiểm tra lại thông tin.')
     }
   }

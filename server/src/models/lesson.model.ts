@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid'
 
 interface LessonAttributes {
   lessonId: string
-  courseId: string
   sectionId: string
   title?: string
   videoUrl?: string
@@ -21,7 +20,6 @@ type LessonCreationAttributes = Optional<
 
 class Lesson extends Model<LessonAttributes, LessonCreationAttributes> implements LessonAttributes {
   declare lessonId: string
-  declare courseId: string
   declare sectionId: string
   declare title?: string
   declare videoUrl?: string
@@ -38,15 +36,6 @@ Lesson.init(
       defaultValue: () => uuidv4(),
       primaryKey: true,
       field: 'lesson_id'
-    },
-    courseId: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      field: 'course_id',
-      references: {
-        model: 'courses',
-        key: 'course_id'
-      }
     },
     sectionId: {
       type: DataTypes.STRING,
