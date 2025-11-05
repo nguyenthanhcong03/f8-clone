@@ -53,11 +53,15 @@ const CourseDetail = () => {
   return (
     <>
       {courseData ? (
-        <div className='flex h-[3000px] flex-row items-start justify-between'>
+        <div className='flex flex-row items-start justify-between'>
           <div className='flex-[4]'>
             <div className='min-h-screen'>
               <h1 className='text-3xl font-bold'>{courseData?.title || 'Thông tin khóa học'}</h1>
-              <p className='mt-2 text-muted-foreground'>{courseData?.description || 'Không có mô tả.'}</p>
+              <div
+                className='prose max-w-none' // dùng tailwind-typography để format đẹp
+                dangerouslySetInnerHTML={{ __html: courseData.description! }}
+              />
+              {/* <p className='mt-2 text-muted-foreground'>{courseData?.description || 'Không có mô tả.'}</p> */}
               <CourseOutline courseData={courseData} totalSections={totalSections} totalLessons={totalLessons} />
             </div>
           </div>
@@ -77,17 +81,11 @@ const CourseDetail = () => {
             </h3>
 
             {courseData?.isEnrolled ? (
-              <Button
-                variant='secondary'
-                className='w-48'
-                disabled={isEnrolling}
-                onClick={() => slug && handleNavigateToStudy(slug)}
-              >
+              <Button className='w-48' disabled={isEnrolling} onClick={() => slug && handleNavigateToStudy(slug)}>
                 VÀO HỌC
               </Button>
             ) : (
               <Button
-                variant='secondary'
                 className='w-48'
                 disabled={isEnrolling}
                 isLoading={isEnrolling}

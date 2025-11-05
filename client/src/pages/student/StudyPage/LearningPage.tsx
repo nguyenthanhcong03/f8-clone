@@ -14,27 +14,24 @@ const LearningPage = () => {
   const [mobileOpen, setMobileOpen] = useState(false)
   const lessonId = params.get('lessonId')
 
-  // Sử dụng RTK Query để lấy thông tin khóa học theo slug
   const {
     data: courseData,
     isLoading: getCourseIsLoading,
     isError: getCourseIsError
   } = useGetCourseBySlugQuery(slug ?? skipToken)
-
-  // Lấy thông tin bài học hiện tại
   const { data: lessonData, isLoading: lessonIsLoading } = useGetLessonByIdQuery(lessonId ?? skipToken)
-
+  const currentCourse = courseData?.data
+  const currentLesson = lessonData?.data
   const isLoading = getCourseIsLoading || (lessonId && lessonIsLoading)
 
   // Tự động chọn bài học đầu tiên nếu chưa có bài học nào được chọn
   // và khóa học đã được tải
   useEffect(() => {
-    if (!params.get('lessonId') && courseData?.sections?.length && courseData?.sections[0].lessons?.length) {
-      setParams({ lessonId: String(courseData.sections[0].lessons[0].lessonId) })
+    if (!params.get('lessonId') && currentCourse?.sections?.length && currentCourse?.sections[0].lessons?.length) {
+      setParams({ lessonId: String(currentCourse.sections[0].lessons[0].lessonId) })
     }
-  }, [courseData, params, setParams])
+  }, [currentCourse, params, setParams])
 
-  // Hiển thị loading khi đang tải dữ liệu
   if (isLoading) {
     return <AppLoader />
   }
@@ -58,7 +55,7 @@ const LearningPage = () => {
   return (
     <div className='flex h-screen flex-col'>
       {/* Header */}
-      <LearningHeader title={courseData?.title} />
+      <LearningHeader title={currentCourse?.title} />
 
       {/* Main Content */}
       <div className='relative flex flex-1 overflow-hidden'>
@@ -70,8 +67,8 @@ const LearningPage = () => {
             params={params}
             setParams={setParams}
             handleDrawerToggle={handleDrawerToggle}
-            courseData={courseData}
-            lessonData={lessonData}
+            currentCourse={currentCourse}
+            currentLesson={currentLesson}
           />
         </nav>
 
@@ -80,7 +77,12 @@ const LearningPage = () => {
 
         {/* Lesson Content */}
         <main className='flex-1 overflow-auto'>
-          <LessonContent handleDrawerToggle={handleDrawerToggle} />
+          <LessonContent
+            handleDrawerToggle={handleDrawerToggle}
+            currentCourse={currentCourse!}
+            currentLesson={currentLesson!}
+            setParams={setParams}
+          />
         </main>
       </div>
     </div>

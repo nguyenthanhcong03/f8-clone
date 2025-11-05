@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useDeleteSectionMutation } from '@/store/api/sectionApi'
 import type { Section } from '@/types/course'
+import { getErrorMessage } from '@/utils/helpers'
 import React from 'react'
 import { toast } from 'react-toastify'
 
@@ -22,8 +23,8 @@ const ConfirmDeleteSection: React.FC<ConfirmDeleteSectionProps> = ({ open, onClo
         toast.success('Xóa chương học thành công')
       }
       onClose()
-    } catch {
-      toast.error('Đã có lỗi xảy ra. Vui lòng thử lại.')
+    } catch (error) {
+      toast.error(getErrorMessage(error) || 'Đã có lỗi xảy ra. Vui lòng thử lại.')
       onClose()
     }
   }

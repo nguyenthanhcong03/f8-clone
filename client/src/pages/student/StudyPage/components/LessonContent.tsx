@@ -1,38 +1,18 @@
-import { skipToken } from '@/store/hook'
-import { useGetLessonByIdQuery } from '@/store/api/lessonApi'
-import { Menu, ArrowLeft, ArrowRight, CheckCircle, PlayCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
-import ReactMarkdown from 'react-markdown'
+import type { Course, Lesson, Section } from '@/types/course'
+import { ArrowLeft, ArrowRight, CheckCircle, Menu, PlayCircle } from 'lucide-react'
 import ReactPlayer from 'react-player'
-import { useSearchParams } from 'react-router-dom'
-import { useGetCourseBySlugQuery } from '@/store/api/courseApi'
-import { useParams } from 'react-router-dom'
-import type { Course, Section } from '@/types/course'
 
-interface LessonAreaProps {
+interface LessonContentProps {
+  setParams: (params: URLSearchParams) => void
+  currentCourse: Course
+  currentLesson: Lesson
   handleDrawerToggle?: () => void
 }
 
-const LessonArea = ({ handleDrawerToggle }: LessonAreaProps) => {
-  const { slug } = useParams()
-  const [searchParams, setSearchParams] = useSearchParams()
-  const lessonId = searchParams.get('lessonId')
-
-  // Lấy dữ liệu bài học từ RTK Query
-  const { data: lessonData, isLoading: lessonLoading } = useGetLessonByIdQuery(lessonId ?? skipToken)
-
-  // Lấy thông tin khóa học từ RTK Query
-  const { data: courseData } = useGetCourseBySlugQuery(slug ?? skipToken)
-
-  const currentLesson = lessonData
-  const currentCourse = courseData?.course as Course | undefined
-
-  // TODO: Implement lesson navigation logic
-  const previousLessonId = null
-  const nextLessonId = null
-
+const LessonContent = ({ handleDrawerToggle, currentCourse, currentLesson, setParams }: LessonContentProps) => {
+  console.log('currentLesson', currentLesson)
   // Get section title
   const getSectionTitle = () => {
     if (!currentLesson) return ''
@@ -40,13 +20,13 @@ const LessonArea = ({ handleDrawerToggle }: LessonAreaProps) => {
     return section?.title || ''
   }
 
-  const navigateToLesson = (lessonId: string | null) => {
+  const navigateToLesson = (lessonId: string) => {
     if (lessonId) {
-      setSearchParams({ lessonId: lessonId })
+      setParams({ lessonId: lessonId })
     }
   }
 
-  if (!currentLesson && !lessonLoading) {
+  if (!currentLesson) {
     return (
       <div className='flex h-full w-full flex-col items-center justify-center p-6'>
         <h3 className='mb-4 text-lg font-medium text-muted-foreground'>Chọn bài học từ danh sách để bắt đầu</h3>
@@ -77,10 +57,10 @@ const LessonArea = ({ handleDrawerToggle }: LessonAreaProps) => {
 
       {/* Lesson content */}
       <div className='flex-1 overflow-auto bg-background p-6'>
-        {currentLesson?.video_url ? (
+        {currentLesson?.videoUrl ? (
           <div className='relative mb-6 w-full overflow-hidden rounded-lg pt-[56.25%]'>
             <ReactPlayer
-              src={currentLesson.video_url}
+              src={currentLesson.videoUrl}
               width='100%'
               height='100%'
               style={{
@@ -108,7 +88,7 @@ const LessonArea = ({ handleDrawerToggle }: LessonAreaProps) => {
         <Card className='mb-6'>
           <CardContent className='p-6'>
             {currentLesson?.content ? (
-              <ReactMarkdown>{currentLesson.content}</ReactMarkdown>
+              <div className='prose max-w-none' dangerouslySetInnerHTML={{ __html: currentLesson.content }} />
             ) : (
               <p>Không có nội dung cho bài học này.</p>
             )}
@@ -128,8 +108,8 @@ const LessonArea = ({ handleDrawerToggle }: LessonAreaProps) => {
 
         <div className='flex w-full justify-end gap-4 lg:justify-between'>
           <Button
-            disabled={!previousLessonId}
-            onClick={() => navigateToLesson(previousLessonId)}
+            disabled={!currentLesson?.prevLesson}
+            onClick={() => navigateToLesson(currentLesson.prevLesson?.id)}
             variant='outline'
             className='flex items-center gap-2'
           >
@@ -138,8 +118,8 @@ const LessonArea = ({ handleDrawerToggle }: LessonAreaProps) => {
           </Button>
 
           <Button
-            disabled={!nextLessonId}
-            onClick={() => navigateToLesson(nextLessonId)}
+            disabled={!currentLesson?.nextLesson}
+            onClick={() => navigateToLesson(currentLesson?.nextLesson.id)}
             className='flex items-center gap-2'
           >
             Bài tiếp theo
@@ -151,4 +131,4 @@ const LessonArea = ({ handleDrawerToggle }: LessonAreaProps) => {
   )
 }
 
-export default LessonArea
+export default LessonContent

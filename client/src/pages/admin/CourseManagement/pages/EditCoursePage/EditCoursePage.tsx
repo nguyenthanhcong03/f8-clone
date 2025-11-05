@@ -24,6 +24,7 @@ const EditCoursePage = () => {
 
   const { data, isLoading: isLoadingCourse, error: courseError } = useGetCourseByIdQuery(courseId!)
   const course = data?.data
+
   const [updateCourse, { isLoading: isUpdating }] = useUpdateCourseMutation()
 
   const {
@@ -82,6 +83,7 @@ const EditCoursePage = () => {
       if (data.isPublished !== undefined) formData.append('isPublished', data.isPublished.toString())
       if (data.isPaid && data.price !== undefined && data.price !== null)
         formData.append('price', data.price.toString())
+
       if (data.thumbnail instanceof File) formData.append('thumbnail', data.thumbnail)
 
       const dataObj = Object.fromEntries(formData.entries())
@@ -89,7 +91,7 @@ const EditCoursePage = () => {
 
       await updateCourse({ id: courseId, data: formData }).unwrap()
       toast.success('Cập nhật khóa học thành công')
-      navigate('/admin/courses')
+      // navigate('/admin/courses')
     } catch (error) {
       console.error('Update error:', error)
       toast.error(getErrorMessage(error) || 'Đã có lỗi xảy ra. Vui lòng thử lại.')
@@ -208,7 +210,7 @@ const EditCoursePage = () => {
           </CardHeader>
 
           <CardContent className='px-8 py-8'>
-            <form id='course-form' onSubmit={handleSubmit(onSubmit)} className='space-y-8'>
+            <form id='course-form' onSubmit={handleSubmit(onSubmit)} noValidate className='space-y-8'>
               {/* Thông tin cơ bản */}
               <div className='space-y-6'>
                 <div className='border-l-4 border-blue-500 pl-4'>
@@ -410,6 +412,15 @@ const EditCoursePage = () => {
                                   : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
                               }`}
                               value={field.value || ''}
+                              onChange={(e) => {
+                                const value = e.target.value
+                                field.onChange(value === '' ? undefined : Number(value))
+                              }}
+                              onKeyDown={(e) => {
+                                if (['-', '+', 'e', 'E'].includes(e.key)) {
+                                  e.preventDefault()
+                                }
+                              }}
                             />
                           </div>
                           {errors.price && (

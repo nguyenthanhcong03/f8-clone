@@ -7,11 +7,11 @@ interface Iprops {
   params: URLSearchParams
   setParams: (params: URLSearchParams) => void
   handleDrawerToggle?: () => void
-  courseData?: Course
-  lessonData?: Lesson
+  currentCourse?: Course
+  currentLesson?: Lesson
 }
 
-const SidebarLesson = ({ params, setParams, handleDrawerToggle, courseData, lessonData }: Iprops) => {
+const SidebarLesson = ({ params, setParams, handleDrawerToggle, currentCourse, currentLesson }: Iprops) => {
   const [openSections, setOpenSections] = useState<string[]>([])
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null)
 
@@ -25,17 +25,17 @@ const SidebarLesson = ({ params, setParams, handleDrawerToggle, courseData, less
 
   // Xử lý mở accordion section khi reload
   useEffect(() => {
-    if (lessonData) {
+    if (currentLesson) {
       setOpenSections((prev) => {
         // Kiểm tra xem section của bài học hiện tại đã có trong danh sách mở chưa
-        const sectionIdStr = lessonData.sectionId
+        const sectionIdStr = currentLesson.sectionId
         if (!prev.includes(sectionIdStr)) {
           return [...prev, sectionIdStr]
         }
         return prev
       })
     }
-  }, [lessonData])
+  }, [currentLesson])
 
   // Xử lý mở accordion section khi click vào section
   const handleSectionClick = (sectionId: string) => {
@@ -57,9 +57,9 @@ const SidebarLesson = ({ params, setParams, handleDrawerToggle, courseData, less
         <div>
           <h2 className='text-lg font-bold'>Nội dung bài học</h2>
           <p className='text-sm text-muted-foreground'>
-            {courseData?.sections && courseData?.sections.length} chương •{' '}
-            {courseData?.sections &&
-              courseData?.sections.reduce((sum, section) => {
+            {currentCourse?.sections && currentCourse?.sections.length} chương •{' '}
+            {currentCourse?.sections &&
+              currentCourse?.sections.reduce((sum, section) => {
                 return sum + (section.lessons?.length || 0)
               }, 0)}{' '}
             bài học
@@ -71,8 +71,8 @@ const SidebarLesson = ({ params, setParams, handleDrawerToggle, courseData, less
       </div>
 
       <nav className='p-0'>
-        {courseData?.sections &&
-          courseData?.sections.map((section) => {
+        {currentCourse?.sections &&
+          currentCourse?.sections.map((section) => {
             const isExpanded = openSections.includes(section.sectionId)
 
             return (

@@ -80,8 +80,8 @@ export const courseApi = baseApi.injectEndpoints({
         return {
           url: `/courses/${id}`,
           method: 'PUT',
-          body: data,
-          formData: true
+          body: data
+          // formData: true
         }
       },
       invalidatesTags: (_result, _error, { id }) => [
