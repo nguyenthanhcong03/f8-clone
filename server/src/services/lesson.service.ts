@@ -15,42 +15,54 @@ export class LessonService {
     return lessons
   }
 
-  async getLessonById(lesson_id: string) {
-    const lesson = await Lesson.findByPk(lesson_id)
+  async getLessonById(lessonId: string) {
+    // Tìm bài học hiện tại và lấy courseId của nó
+    const lesson = await Lesson.findByPk(lessonId, {
+      include: {
+        model: Section,
+        as: 'section',
+        attributes: ['sectionId', 'courseId']
+      }
+    })
 
-    if (!lesson) {
-      throw new ApiError(404, 'Bài học không tồn tại')
-    }
+    if (!lesson) throw new ApiError(404, 'Bài học không tồn tại')
+    const courseId = lesson.section.courseId
 
     // Lấy bài trước và sau trong cùng course
     const [prevLesson, nextLesson] = await Promise.all([
       Lesson.findOne({
+        include: {
+          model: Section,
+          as: 'section',
+          where: { courseId }
+        },
         where: {
-          course_id: lesson.course_id,
           order: { [Op.lt]: lesson.order }
         },
         order: [['order', 'DESC']]
       }),
       Lesson.findOne({
-        where: {
-          course_id: lesson.course_id,
-          order: { [Op.gt]: lesson.order }
+        include: {
+          model: Section,
+          as: 'section',
+          where: { courseId }
         },
+        where: { order: { [Op.gt]: lesson.order } },
         order: [['order', 'ASC']]
       })
     ])
 
     return {
       ...lesson.toJSON(),
-      prevLesson: prevLesson ? { id: prevLesson.lesson_id, title: prevLesson.title } : null,
-      nextLesson: nextLesson ? { id: nextLesson.lesson_id, title: nextLesson.title } : null
+      prevLesson: prevLesson ? { id: prevLesson.lessonId, title: prevLesson.title } : null,
+      nextLesson: nextLesson ? { id: nextLesson.lessonId, title: nextLesson.title } : null
     }
   }
 
-  async updateLesson(lesson_id: string, lessonData: any) {
-    const lesson = await Lesson.findByPk(lesson_id)
+  async updateLesson(lessonId: string, lessonData: any) {
+    const lesson = await Lesson.findByPk(lessonId)
     if (!lesson) {
-      throw new Error('Lesson not found')
+      throw new ApiError(404, 'Khóa học không tồn tại')
     }
     await lesson.update(lessonData)
     return lesson

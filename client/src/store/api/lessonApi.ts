@@ -21,12 +21,12 @@ interface UpdateLessonRequest {
 export const lessonApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Lấy bài học theo ID
-    getLessonById: builder.query<Lesson, string>({
+    getLessonById: builder.query<ApiResponse<Lesson>, string>({
       query: (lessonId) => `/lessons/${lessonId}`,
       providesTags: (_result, _error, lessonId) => [{ type: 'Lesson', id: lessonId }]
     }),
 
-    // Lấy tất cả bài học trong một phần
+    // Lấy tất cả bài học trong một chương
     getSectionLessons: builder.query<Lesson[], string>({
       query: (sectionId) => `/sections/${sectionId}/lessons`,
       providesTags: (result) =>
@@ -77,7 +77,7 @@ export const lessonApi = baseApi.injectEndpoints({
         }
 
         if (lessonData.video_url) {
-          formData.append('video_url', lessonData.video_url)
+          formData.append('videoUrl', lessonData.video_url)
         }
 
         if (lessonData.videoFile) {
@@ -91,7 +91,10 @@ export const lessonApi = baseApi.injectEndpoints({
           formData: true
         }
       },
-      invalidatesTags: (_result, _error, { courseId }) => [{ type: 'Course', id: courseId }]
+      invalidatesTags: (_result, _error, { courseId, lessonData }) => [
+        { type: 'Course', id: courseId },
+        { type: 'Lesson', id: lessonData.lessonId }
+      ]
     }),
 
     // Xóa bài học
@@ -118,7 +121,6 @@ export const lessonApi = baseApi.injectEndpoints({
   })
 })
 
-// Export hooks
 export const {
   useGetLessonByIdQuery,
   useGetSectionLessonsQuery,

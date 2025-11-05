@@ -43,30 +43,28 @@ const createLesson = catchAsync(async (req: Request, res: Response) => {
 })
 
 const updateLesson = catchAsync(async (req: Request, res: Response) => {
-  console.log('--------------------------------')
-
-  const lessonId = req.params.lesson_id
-  const { title, content, video_url } = req.body
+  const lessonId = req.params.id
+  const { title, content, videoUrl } = req.body
 
   // Tạo object course data
   const lessonData: {
     title: string
     content: string
-    video_url?: string
-    video_public_id?: string
+    videoUrl?: string
+    videoPublicId?: string
     duration?: number
   } = {
     title,
     content,
-    video_url
+    videoUrl
   }
 
   // Nếu có file thumbnail được upload
   if (req.file) {
     try {
       const uploadResult = await uploadService.uploadVideo(req.file.buffer, 'lesson-videos')
-      lessonData.video_url = uploadResult.url
-      lessonData.video_public_id = uploadResult.public_id
+      lessonData.videoUrl = uploadResult.url
+      lessonData.videoPublicId = uploadResult.publicId
       lessonData.duration = uploadResult.duration
     } catch (error) {
       return res.status(400).json({
@@ -78,6 +76,7 @@ const updateLesson = catchAsync(async (req: Request, res: Response) => {
   }
 
   const updatedLesson = await lessonService.updateLesson(lessonId, lessonData)
+
   res.status(201).json({
     success: true,
     message: 'Cập nhật bài học thành công',
@@ -86,8 +85,7 @@ const updateLesson = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getLessonById = catchAsync(async (req: Request, res: Response) => {
-  const lessonId = req.params.lesson_id
-
+  const lessonId = req.params.id
   const response = await lessonService.getLessonById(lessonId)
 
   res.status(200).json({

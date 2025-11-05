@@ -5,8 +5,8 @@ export interface Lesson {
   lessonId: string
   sectionId: string
   title: string
-  video_url?: string
-  video_publicId?: string
+  videoUrl?: string
+  videoPublicId?: string
   content?: string
   order?: number
   createdAt?: string

@@ -36,7 +36,7 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
   // Gọi query gốc
   let result = await baseQuery(args, api, extraOptions)
   // Nếu lỗi 401 - thử refresh token
-  if (result.error && 'status' in result.error && result.error.status === 401) {
+  if (result.error && 'status' in result.error && result.error.status === 401 && localStorage.getItem('accessToken')) {
     console.warn('🔄 Access token hết hạn, đang refresh...')
     // Gọi API refresh token
     const refreshResult = await baseQuery(

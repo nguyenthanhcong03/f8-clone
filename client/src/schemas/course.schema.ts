@@ -23,6 +23,7 @@ export const createCourseSchema = z.object({
   isPaid: z.boolean(),
 
   price: z.number().nonnegative('Giá tiền không được âm').optional(),
+  isPublished: z.boolean().default(false),
   thumbnail: z
     .file()
     .max(5 * 1024 * 1024, 'Kích thước ảnh không được vượt quá 5MB')

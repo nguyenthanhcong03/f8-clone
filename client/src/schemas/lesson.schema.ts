@@ -15,7 +15,7 @@ const ACCEPTED_VIDEO_TYPES = [
 export const lessonSchema = z.object({
   title: z.string().min(1, 'Vui lòng nhập tiêu đề bài học').max(255, 'Tiêu đề bài học không được vượt quá 255 ký tự'),
   content: z.string().optional(),
-  video_url: z.string().url('URL video không hợp lệ').optional().or(z.literal('')),
+  videoUrl: z.string().url('URL video không hợp lệ').optional().or(z.literal('')),
   videoFile: z
     .instanceof(File)
     .refine((file) => file.size <= MAX_FILE_SIZE, `Kích thước tập tin tối đa là ${MAX_FILE_SIZE / 1024 / 1024}MB`)
