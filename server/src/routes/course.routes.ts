@@ -15,7 +15,7 @@ router.get('/:courseId', courseController.getCourseByIdAdmin)
 
 router.post('/', upload.single('thumbnail'), courseController.createCourse)
 
-router.put('/:id', courseController.updateCourse)
+router.put('/:id', upload.single('thumbnail'), courseController.updateCourse)
 
 router.post('/:id/thumbnail', upload.single('thumbnail'), courseController.uploadThumbnail)
 

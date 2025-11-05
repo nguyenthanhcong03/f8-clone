@@ -19,7 +19,7 @@ const createCourse = catchAsync(async (req: Request, res: Response) => {
     description,
     level,
     isPaid: isPaid === 'true' || isPaid === true,
-    price: isPaid === 'true' || isPaid === true ? parseFloat(price) : null,
+    price: isPaid === 'true' || isPaid === true ? Number(price) : null,
     isPublished: isPublished === 'true' || isPublished === true,
     createdBy: req.user?.userId as string
   }
@@ -176,16 +176,19 @@ const getAllCoursesAdmin = catchAsync(async (req: Request, res: Response) => {
 const getCourseByIdAdmin = catchAsync(async (req: Request, res: Response) => {
   const courseId = req.params.courseId
   const course = await courseService.getById(courseId)
+  // console.log('🚀 ~ course.controller.ts:179 ~ course:', course)
+
   responseHandler(res, 200, 'Lấy khóa học thành công', course)
 })
 
 const updateCourse = catchAsync(async (req: Request, res: Response) => {
   const courseId = req.params.id
+  console.log('req.body', req.body)
   const course = await courseService.updateCourse(courseId, req.body)
   res.status(200).json({
     success: true,
     data: course,
-    message: 'Course updated successfully'
+    message: 'Cập nhật khóa học thành công'
   })
 })
 

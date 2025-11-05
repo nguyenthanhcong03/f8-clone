@@ -36,7 +36,6 @@ export const CourseService = {
   },
 
   async getById(courseId: string) {
-    console.log('👉check: ', courseId)
     const course = await Course.findByPk(courseId, {
       include: [
         {
@@ -77,7 +76,7 @@ export const CourseService = {
               as: 'lessons',
               // Sắp xếp bài học trong mỗi chương theo 'order'
               separate: true,
-              order: [['order', 'DESC']]
+              order: [['order', 'ASC']]
             }
           ],
           // Sắp xếp chương theo 'order'
@@ -99,7 +98,17 @@ export const CourseService = {
     if (!course) {
       throw new ApiError(404, 'Khóa học không tồn tại')
     }
-    await course.update(courseData)
+    const updateData: Partial<CreateCourseData> = {
+      title: courseData.title,
+      slug: courseData.slug,
+      description: courseData.description,
+      level: courseData.level,
+      isPaid: Boolean(courseData.isPaid),
+      price: Number(courseData.price),
+      isPublished: Boolean(courseData.isPublished)
+    }
+
+    await course.update(updateData)
     return course
   },
 

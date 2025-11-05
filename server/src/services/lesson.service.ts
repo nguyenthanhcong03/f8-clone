@@ -27,6 +27,7 @@ export class LessonService {
 
     if (!lesson) throw new ApiError(404, 'Bài học không tồn tại')
     const courseId = lesson.section.courseId
+    console.log('🚀 ~ lesson.service.ts:30 ~ LessonService ~ getLessonById ~ courseId:', courseId)
 
     // Lấy bài trước và sau trong cùng course
     const [prevLesson, nextLesson] = await Promise.all([
@@ -34,7 +35,7 @@ export class LessonService {
         include: {
           model: Section,
           as: 'section',
-          where: { courseId }
+          where: { course_id: courseId }
         },
         where: {
           order: { [Op.lt]: lesson.order }
@@ -45,7 +46,7 @@ export class LessonService {
         include: {
           model: Section,
           as: 'section',
-          where: { courseId }
+          where: { course_id: courseId }
         },
         where: { order: { [Op.gt]: lesson.order } },
         order: [['order', 'ASC']]

@@ -7,7 +7,7 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
-      user?: { userId: string; role: 'student' | 'admin' } | null // null nếu chưa login
+      user?: { userId: string; name: string; email: string; avatar: string; role: 'student' | 'admin' } | null // null nếu chưa login
     }
   }
 }
@@ -25,7 +25,13 @@ const authRequired = async (req: Request, res: Response, next: NextFunction) => 
       throw new ApiError(401, 'Token không hợp lệ')
     }
     // Gắn thông tin người dùng vào request để sử dụng trong các middleware hoặc route tiếp theo
-    req.user = { userId: decoded.userId, role: decoded.role }
+    req.user = {
+      userId: decoded.userId,
+      name: decoded.name,
+      email: decoded.email,
+      avatar: decoded.avatar,
+      role: decoded.role
+    }
     next()
   } catch {
     throw new ApiError(401, 'Token không hợp lệ hoặc đã hết hạn')

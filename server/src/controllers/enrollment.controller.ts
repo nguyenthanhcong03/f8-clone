@@ -3,8 +3,8 @@ import catchAsync from '@/utils/catchAsync'
 import enrollmentService from '@/services/enrollment.service'
 
 const enrollCourse = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user?.id
-  const courseId = req.body.course_id
+  const userId = req.user?.userId
+  const courseId = req.body.courseId
 
   const enrollment = await enrollmentService.enrollInCourse(userId!, courseId)
 
@@ -47,7 +47,7 @@ const getUserEnrollments = catchAsync(async (req: Request, res: Response) => {
 })
 
 const unenrollCourse = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user?.id
+  const userId = req.user?.userId
   const courseId = parseInt(req.params.courseId, 10)
 
   if (!userId) {

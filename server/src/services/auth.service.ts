@@ -40,7 +40,6 @@ const login = async (loginData: LoginAccountInput['body']) => {
   if (!user) {
     throw new ApiError(401, 'Thông tin đăng nhập không hợp lệ')
   }
-  console.log('👉check: ', loginData)
 
   const currentPassword = user.password
 
@@ -55,9 +54,7 @@ const login = async (loginData: LoginAccountInput['body']) => {
     userId: user.userId,
     name: user.name,
     email: user.email,
-    phone: user.phone,
     avatar: user.avatar,
-    avatarPublicId: user.avatarPublicId,
     role: user.role
   }
 
@@ -67,7 +64,7 @@ const login = async (loginData: LoginAccountInput['body']) => {
 
   return {
     user: {
-      id: user.userId,
+      userId: user.userId,
       name: user.name,
       phone: user.phone,
       email: user.email,

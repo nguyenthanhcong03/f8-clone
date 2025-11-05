@@ -56,7 +56,7 @@ Course.init(
       field: 'is_paid' // map to database column
     },
     price: {
-      type: DataTypes.DECIMAL(10, 2)
+      type: DataTypes.INTEGER
     },
     isPublished: {
       type: DataTypes.BOOLEAN,
