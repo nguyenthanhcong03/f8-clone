@@ -3,6 +3,7 @@ import GlobalLoading from '@/components/common/Loading/GlobalLoading2'
 import NavigationDesktop from '@/components/student/Navigation/NavigationDesktop'
 import NavigationMobile from '@/components/student/Navigation/NavigationMobile'
 import { Outlet } from 'react-router-dom'
+import Footer from '@/components/student/Footer/Footer'
 
 const MainLayout = () => {
   return (
@@ -12,11 +13,11 @@ const MainLayout = () => {
       <div className='min-h-screen'>
         <Header />
 
-        <div className='mt-[66px]'>
-          <div className='fixed left-0 top-[66px] hidden h-screen w-[96px] border-r bg-background md:block'>
+        <div className='relative mt-[66px]'>
+          <div className='fixed left-0 top-[66px] hidden w-[96px] bg-background md:block'>
             <NavigationDesktop />
           </div>
-          <div className='mb-14 h-screen overflow-auto p-10 scrollbar-none md:mb-0 md:ml-24'>
+          <div className='mb-14 overflow-auto scrollbar-none md:mb-0 md:ml-24'>
             <Outlet />
           </div>
 
@@ -24,6 +25,7 @@ const MainLayout = () => {
             <NavigationMobile />
           </div>
         </div>
+        <Footer />
       </div>
     </>
   )

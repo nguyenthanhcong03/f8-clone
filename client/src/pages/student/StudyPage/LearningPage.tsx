@@ -1,12 +1,12 @@
-import { useGetCourseBySlugQuery } from '@/store/api/courseApi'
-import { useGetLessonByIdQuery } from '@/store/api/lessonApi'
+import AppLoader from '@/components/common/Loading/AppLoader'
+import { useGetCourseBySlugQuery } from '@/services/api/courseApi'
+import { useGetLessonByIdQuery } from '@/services/api/lessonApi'
 import { skipToken } from '@/store/hook'
-import { useState, useEffect } from 'react'
-import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useParams, useSearchParams } from 'react-router-dom'
+import LearningHeader from './components/LearningHeader'
 import LessonContent from './components/LessonContent'
 import LessonSidebar from './components/LessonSidebar'
-import AppLoader from '@/components/common/Loading/AppLoader'
-import LearningHeader from './components/LearningHeader'
 
 const LearningPage = () => {
   const { slug } = useParams()

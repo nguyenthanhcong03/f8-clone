@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { useDeleteSectionMutation } from '@/store/api/sectionApi'
 import type { Section } from '@/types/course'
-import { getErrorMessage } from '@/utils/helpers'
+import { getErrorMessage } from '@/services/helpers'
 import React from 'react'
 import { toast } from 'react-toastify'
+import { useDeleteSectionMutation } from '@/services/api/sectionApi'
 
 interface ConfirmDeleteSectionProps {
   open: boolean

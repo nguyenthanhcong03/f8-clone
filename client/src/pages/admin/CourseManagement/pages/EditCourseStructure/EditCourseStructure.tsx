@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useGetCourseByIdQuery } from '@/store/api/courseApi'
 import type { Lesson, Section } from '@/types/course'
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core'
 import {
@@ -23,6 +22,7 @@ import LessonForm from './components/LessonForm'
 import SectionForm from './components/SectionForm'
 import SortableLesson from './components/SortableLesson'
 import SortableSection from './components/SortableSection'
+import { useGetCourseByIdQuery } from '@/services/api/courseApi'
 
 const EditCourseStructurePage = () => {
   const { courseId } = useParams<{ courseId: string }>()

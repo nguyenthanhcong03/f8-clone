@@ -3,9 +3,9 @@ import { ErrorState } from '@/components/common/ErrorState/ErrorState'
 import { Loading } from '@/components/common/Loading/Loading'
 import { NoData } from '@/components/common/NoData/NoData'
 import { Button } from '@/components/ui/button'
-import { useGetAllPublishedCoursesQuery } from '@/store/api/courseApi'
+import { useGetAllPublishedCoursesQuery } from '@/services/api/courseApi'
 
-const CourseList = () => {
+const PublishedCourseList = () => {
   const { data, isLoading, isFetching, isError, refetch } = useGetAllPublishedCoursesQuery({
     page: 1,
     limit: 12,
@@ -37,4 +37,4 @@ const CourseList = () => {
   )
 }
 
-export default CourseList
+export default PublishedCourseList

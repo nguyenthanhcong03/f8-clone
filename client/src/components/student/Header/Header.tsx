@@ -9,14 +9,14 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
-import { useLogoutMutation } from '@/store/api/authApi'
 import { useAppSelector } from '@/store/hook'
 import { Bell, BookOpen, ChevronLeft, LogOut, Search, User } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import ModalAuth from '../../auth/AuthModal/AuthModal'
 import ThemeToggle from '../../common/ThemeToggle/ThemeToggle'
+import { useLogoutMutation } from '@/services/api/authApi'
 
 const Header = () => {
   const navigate = useNavigate()
@@ -27,6 +27,13 @@ const Header = () => {
 
   const [openModalAuth, setOpenModalAuth] = useState(false)
   const [typeModalAuth, setTypeModalAuth] = useState<'login' | 'register'>('login')
+
+  // Ngăn giao diện bị nhảy khi dropdown mở
+  useEffect(() => {
+    // Tính toán và đặt scrollbar width để tránh layout shift
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+    document.documentElement.style.setProperty('--scrollbar-width', `${scrollbarWidth}px`)
+  }, [])
 
   const handleOpenModalAuth = (type: 'register' | 'login') => {
     setTypeModalAuth(type)
@@ -40,7 +47,7 @@ const Header = () => {
       toast.success('Đăng xuất thành công')
       navigate('/')
     } catch (error) {
-      console.log('Failed to logout:', error)
+      console.log('Lỗi khi đăng xuất:', error)
     }
   }
 
@@ -90,8 +97,8 @@ const Header = () => {
           </Button>
 
           {/* User section */}
-          {isAuthenticated ? (
-            <DropdownMenu>
+          {user ? (
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 {/* Ảnh và tên người dùng */}
                 <div className='flex cursor-pointer items-center gap-2'>

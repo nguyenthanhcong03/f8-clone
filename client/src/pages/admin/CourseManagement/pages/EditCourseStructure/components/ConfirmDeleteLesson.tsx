@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { useDeleteLessonMutation } from '@/store/api/lessonApi'
+import { useDeleteLessonMutation } from '@/services/api/lessonApi'
 import type { Lesson } from '@/types/course'
 import React from 'react'
 import { toast } from 'react-toastify'

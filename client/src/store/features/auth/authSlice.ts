@@ -7,8 +7,17 @@ interface AuthState {
   accessToken: string | null
 }
 
+const initialUser = (() => {
+  try {
+    const data = localStorage.getItem('user')
+    return data ? JSON.parse(data) : null
+  } catch {
+    return null
+  }
+})()
+
 const initialState: AuthState = {
-  user: null,
+  user: initialUser,
   isAuthenticated: false,
   accessToken: localStorage.getItem('accessToken')
 }
@@ -19,7 +28,9 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (state, action: PayloadAction<User | null>) => {
       state.isAuthenticated = true
-      state.user = action.payload
+      if (action.payload) localStorage.setItem('user', JSON.stringify(action.payload))
+      else localStorage.removeItem('user')
+      // state.user = action.payload
     },
     setToken: (state, action: PayloadAction<string>) => {
       state.accessToken = action.payload

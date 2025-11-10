@@ -1,3 +1,5 @@
+import { logout, setToken } from '@/store/features/auth/authSlice'
+import type { RootState } from '@/store/store'
 import {
   createApi,
   fetchBaseQuery,
@@ -5,8 +7,6 @@ import {
   type FetchArgs,
   type FetchBaseQueryError
 } from '@reduxjs/toolkit/query/react'
-import { logout, setToken } from '../features/auth/authSlice'
-import type { RootState } from '../store'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 

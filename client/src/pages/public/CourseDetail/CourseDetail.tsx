@@ -1,14 +1,14 @@
 import NotFound from '@/components/auth/NotFound/NotFound'
 import { Loading } from '@/components/common/Loading/Loading'
 import { Button } from '@/components/ui/button'
-import { useGetCourseBySlugQuery } from '@/store/api/courseApi'
-import { useEnrollCourseMutation } from '@/store/api/enrollmentApi'
+import { useGetCourseBySlugQuery } from '@/services/api/courseApi'
+import { useEnrollCourseMutation } from '@/services/api/enrollmentApi'
 import { skipToken, useAppSelector } from '@/store/hook'
+import { formatLevel } from '@/utils/format'
 import { BarChart3, GraduationCap, Monitor } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import CourseOutline from './components/CourseOutline'
-import { formatLevel } from '@/utils/format'
 
 const CourseDetail = () => {
   const { slug } = useParams()

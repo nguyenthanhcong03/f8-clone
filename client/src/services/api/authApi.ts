@@ -1,7 +1,7 @@
 import { baseApi } from './baseApi'
-import { logout, setCredentials, setToken } from '../features/auth/authSlice'
 import type { User } from '@/types/user'
 import type { ApiResponse } from '@/types/api'
+import { logout, setCredentials, setToken } from '@/store/features/auth/authSlice'
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => {

@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label'
 import { useState, useEffect } from 'react'
 import type { Section } from '@/types/course'
 import { toast } from 'react-toastify'
-import { useCreateSectionMutation, useUpdateSectionMutation } from '@/store/api/sectionApi'
+import { useCreateSectionMutation, useUpdateSectionMutation } from '@/services/api/sectionApi'
 
 interface SectionFormProps {
   open: boolean

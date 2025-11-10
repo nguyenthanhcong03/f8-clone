@@ -1,15 +1,15 @@
+import GlobalSnackbar from '@/components/common/GlobaSnackbar/GlobalSnackbar'
+import AppLoader from '@/components/common/Loading/AppLoader'
+import { TooltipProvider } from '@/components/ui/tooltip'
+import router from '@/routes/routes'
+import { useGetCurrentUserQuery } from '@/services/api/authApi'
+import { logout } from '@/store/features/auth/authSlice'
+import { useAppDispatch } from '@/store/hook'
+import ThemeProvider from '@/theme/ThemeProvider'
 import { useEffect } from 'react'
 import { RouterProvider } from 'react-router-dom'
-import GlobalSnackbar from './components/common/GlobaSnackbar/GlobalSnackbar'
-import router from './routes/routes'
-import ThemeProvider from './theme/ThemeProvider'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import AppLoader from './components/common/Loading/AppLoader'
-import { useGetCurrentUserQuery } from './store/api/authApi'
-import { useAppDispatch } from './store/hook'
-import { logout } from './store/features/auth/authSlice'
-import { TooltipProvider } from './components/ui/tooltip'
 
 function App() {
   const dispatch = useAppDispatch()
@@ -29,9 +29,9 @@ function App() {
     }
   }, [isError, dispatch])
 
-  if (isLoading) {
-    return <AppLoader />
-  }
+  // if (isLoading) {
+  //   return <AppLoader />
+  // }
 
   return (
     <ThemeProvider>

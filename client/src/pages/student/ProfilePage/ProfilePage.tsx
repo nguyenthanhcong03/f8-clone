@@ -1,5 +1,5 @@
 import AppLoader from '@/components/common/Loading/AppLoader'
-import { useGetProfileQuery, useUpdateUserMutation } from '@/store/api/authApi'
+import { useGetProfileQuery, useUpdateUserMutation } from '@/services/api/authApi'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 
@@ -7,8 +7,6 @@ const ProfilePage = () => {
   const [name, setName] = useState('')
   const [profilePicture, setProfilePicture] = useState<File | null>(null)
   const { data: user, isLoading, isError, error, refetch } = useGetProfileQuery()
-  console.log('user', user)
-
   const [updateUser, { data: updateUserData, isLoading: updateUserIsLoading }] = useUpdateUserMutation()
 
   const onChangeProfilePicture = (e: React.ChangeEvent<HTMLInputElement>) => {

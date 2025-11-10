@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useGetAllCoursesAdminQuery } from '@/store/api/courseApi'
+import { useGetAllCoursesAdminQuery } from '@/services/api/courseApi'
 import { formatCurrency } from '@/utils/format'
 import { BookOpen, Users, DollarSign, TrendingUp } from 'lucide-react'
 

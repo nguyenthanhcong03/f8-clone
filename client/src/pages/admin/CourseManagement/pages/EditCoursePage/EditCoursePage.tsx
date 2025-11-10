@@ -6,8 +6,8 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { updateCourseSchema, type UpdateCourseInput } from '@/schemas/course.schema'
-import { useGetCourseByIdQuery, useUpdateCourseMutation } from '@/store/api/courseApi'
-import { getErrorMessage } from '@/utils/helpers'
+import { useGetCourseByIdQuery, useUpdateCourseMutation } from '@/services/api/courseApi'
+import { getErrorMessage } from '@/services/helpers'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Editor } from '@tinymce/tinymce-react'
 import { AlertCircle, ArrowLeft, BookOpen, CheckCircle2, DollarSign, Image, Save } from 'lucide-react'
@@ -16,7 +16,6 @@ import { Controller, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import slugify from 'slugify'
-import CourseSummary from './components/CourseSummary'
 
 const EditCoursePage = () => {
   const navigate = useNavigate()
@@ -24,7 +23,6 @@ const EditCoursePage = () => {
 
   const { data, isLoading: isLoadingCourse, error: courseError } = useGetCourseByIdQuery(courseId!)
   const course = data?.data
-
   const [updateCourse, { isLoading: isUpdating }] = useUpdateCourseMutation()
 
   const {

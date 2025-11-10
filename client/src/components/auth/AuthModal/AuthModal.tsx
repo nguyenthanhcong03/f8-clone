@@ -19,8 +19,8 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import Logo from '@/assets/images/logo.png'
-import { useLoginMutation, useRegisterMutation } from '@/store/api/authApi'
 import { toast } from 'react-toastify'
+import { useLoginMutation, useRegisterMutation } from '@/services/api/authApi'
 
 interface ModalAuthProps {
   open: boolean

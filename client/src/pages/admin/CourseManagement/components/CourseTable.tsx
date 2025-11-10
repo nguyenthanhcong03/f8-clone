@@ -3,19 +3,23 @@ import { NoData } from '@/components/common/NoData/NoData'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { useGetAllCoursesAdminQuery, useDeleteCourseMutation } from '@/store/api/courseApi'
-import { EditIcon, Trash2Icon, PlusIcon, UsersIcon, BookOpenIcon } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import useDebounce from '@/hooks/useDebounce'
+import { formatLevel, formatPrice } from '@/utils/format'
+import { BookOpenIcon, EditIcon, PlusIcon, Trash2Icon, UsersIcon } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useState, useMemo, useEffect } from 'react'
 import { toast } from 'react-toastify'
 import CourseFilters from './CourseFilters'
+import CourseSummaryDialog from './CourseSummaryDialog'
 import CourseTableSkeleton from './CourseTableSkeleton'
-import { formatLevel, formatPrice } from '@/utils/format'
-import useDebounce from '@/hooks/useDebounce'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import type { Course } from '@/types/course'
+import { useDeleteCourseMutation, useGetAllCoursesAdminQuery } from '@/services/api/courseApi'
 
 const CourseTable = () => {
   const navigate = useNavigate()
+  const [isOpenCourseSummary, setIsOpenCourseSummary] = useState(false)
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [deletingCourseId, setDeletingCourseId] = useState<string | null>(null)
   const [filters, setFilters] = useState({
@@ -151,7 +155,13 @@ const CourseTable = () => {
                   courses.map((course) => (
                     <TableRow key={course.courseId}>
                       <TableCell>
-                        <div className='h-10 w-10 overflow-hidden rounded-md bg-gray-100'>
+                        <div
+                          onClick={() => {
+                            setSelectedCourse(course)
+                            setIsOpenCourseSummary(true)
+                          }}
+                          className='h-10 w-10 overflow-hidden rounded-md bg-gray-100'
+                        >
                           {course.thumbnail ? (
                             <img src={course.thumbnail} alt={course.title} className='h-full w-full object-cover' />
                           ) : (
@@ -164,7 +174,15 @@ const CourseTable = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className='font-medium'>{course.title}</div>
+                        <div
+                          onClick={() => {
+                            setSelectedCourse(course)
+                            setIsOpenCourseSummary(true)
+                          }}
+                          className='font-medium'
+                        >
+                          {course.title}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <Badge variant='outline'>{formatLevel(course.level)}</Badge>
@@ -294,6 +312,13 @@ const CourseTable = () => {
             </div>
           )}
         </>
+      )}
+      {isOpenCourseSummary && (
+        <CourseSummaryDialog
+          course={selectedCourse!}
+          open={isOpenCourseSummary}
+          onClose={() => setIsOpenCourseSummary(false)}
+        />
       )}
     </div>
   )

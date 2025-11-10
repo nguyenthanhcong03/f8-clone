@@ -1,4 +1,4 @@
-import { Enrollment, Lesson, Section } from '@/models'
+import { Enrollment, Lesson, Section, User } from '@/models'
 import Course from '../models/course.model'
 import uploadService from './upload.service'
 import ApiError from '@/utils/ApiError'
@@ -18,6 +18,10 @@ export const CourseService = {
   async getAllPublished(where: any, options: any) {
     const { count, rows } = await Course.findAndCountAll({
       where,
+      include: [
+        { model: Section, as: 'sections', include: [{ model: Lesson, as: 'lessons' }] },
+        { model: User, as: 'creator' }
+      ],
       limit: options.limit,
       offset: options.offset,
       order: options.order

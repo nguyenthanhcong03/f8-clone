@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 
 const NavigationDesktop = () => {
   return (
-    <div className='flex h-full w-[96px] flex-col items-center justify-start gap-2 py-4'>
+    <div className='flex h-auto w-[96px] flex-col items-center justify-start gap-2 py-4'>
       <NavLink
         to='/'
         className={({ isActive }) =>

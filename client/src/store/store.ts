@@ -1,5 +1,5 @@
+import { baseApi } from '@/services/api/baseApi'
 import { configureStore } from '@reduxjs/toolkit'
-import { baseApi } from './api/baseApi'
 import appReducer from './appSlice'
 import authReducer from './features/auth/authSlice'
 import themeReducer from './features/theme/themeSlice'

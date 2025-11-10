@@ -4,8 +4,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { lessonSchema, type LessonFormValues } from '@/schemas/lesson.schema'
-import { useGetCourseByIdQuery } from '@/store/api/courseApi'
-import { useGetLessonByIdQuery, useUpdateLessonMutation } from '@/store/api/lessonApi'
+import { useGetCourseByIdQuery } from '@/services/api/courseApi'
+import { useGetLessonByIdQuery, useUpdateLessonMutation } from '@/services/api/lessonApi'
 import { skipToken } from '@/store/hook'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Editor } from '@tinymce/tinymce-react'
@@ -14,7 +14,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { Control, FieldErrors, UseFormWatch } from 'react-hook-form'
 import { Controller, useForm } from 'react-hook-form'
 import ReactPlayer from 'react-player'
-import { useNavigate, useParams, useBlocker } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 type VideoPlayerProps = {
@@ -255,7 +255,6 @@ const EditLessonPage = () => {
   const [updateLesson, { isLoading: isUpdating }] = useUpdateLessonMutation()
   const currentCourse = courseData?.data
   const currentLesson = lessonData?.data
-  console.log('🚀 ~ EditLessonPage.tsx:260 ~ EditLessonPage ~ currentLesson:', currentLesson)
 
   const {
     control,
