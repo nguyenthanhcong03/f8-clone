@@ -17,7 +17,7 @@ const MainLayout = () => {
           <div className='fixed left-0 top-[66px] hidden w-[96px] bg-background md:block'>
             <NavigationDesktop />
           </div>
-          <div className='mb-14 overflow-auto scrollbar-none md:mb-0 md:ml-24'>
+          <div className='mb-14 min-h-screen overflow-auto scrollbar-none md:mb-0 md:ml-24'>
             <Outlet />
           </div>
 

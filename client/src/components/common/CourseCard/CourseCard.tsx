@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import type { Course } from '@/types/course'
-import { Clock, PlayCircle, Star, Users } from 'lucide-react'
+import { PlayCircle, Star, Users } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 interface CourseCardProps {
@@ -15,7 +15,6 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
   }
   const totalSections = course?.sections ? course.sections.length : 0
   const totalLessons = course?.sections && course?.sections.reduce((acc, section) => acc + section.lessons!.length, 0)
-  console.log(course)
 
   const levelColors = {
     beginner: 'bg-green-100 text-green-800',

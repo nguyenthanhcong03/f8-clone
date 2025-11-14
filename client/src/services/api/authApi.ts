@@ -48,6 +48,8 @@ export const authApi = baseApi.injectEndpoints({
         async onQueryStarted(args, { queryFulfilled, dispatch }) {
           try {
             const result = await queryFulfilled
+            console.log('🚀 ~ authApi.ts:8 ~ result:', result)
+
             dispatch(setCredentials(result.data))
           } catch (error) {
             console.log(error)

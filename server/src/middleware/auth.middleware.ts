@@ -53,7 +53,13 @@ const authOptional = (req: Request, res: Response, next: NextFunction) => {
       throw new ApiError(401, 'Token không hợp lệ')
     }
     // Gắn thông tin người dùng vào request để sử dụng trong các middleware hoặc route tiếp theo
-    req.user = { userId: decoded.userId, role: decoded.role }
+    req.user = {
+      userId: decoded.userId,
+      name: decoded.name,
+      email: decoded.email,
+      avatar: decoded.avatar,
+      role: decoded.role
+    }
   } catch {
     req.user = null // token hỏng thì coi như chưa login
   }

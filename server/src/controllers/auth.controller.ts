@@ -36,7 +36,6 @@ const loginAccount = catchAsync(async (req: Request, res: Response) => {
     message: 'Đăng nhập thành công',
     data: {
       accessToken: response.accessToken,
-      // refreshToken: response.refreshToken,
       user: response.user
     }
   })

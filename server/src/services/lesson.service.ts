@@ -27,7 +27,6 @@ export class LessonService {
 
     if (!lesson) throw new ApiError(404, 'Bài học không tồn tại')
     const courseId = lesson.section.courseId
-    console.log('🚀 ~ lesson.service.ts:30 ~ LessonService ~ getLessonById ~ courseId:', courseId)
 
     // Lấy bài trước và sau trong cùng course
     const [prevLesson, nextLesson] = await Promise.all([
