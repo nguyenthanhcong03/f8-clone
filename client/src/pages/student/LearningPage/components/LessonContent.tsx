@@ -1,8 +1,10 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { useUpdateProgressMutation } from '@/services/api/progressApi'
 import type { Course, Lesson, Section } from '@/types/course'
 import { ArrowLeft, ArrowRight, CheckCircle, Menu, PlayCircle } from 'lucide-react'
 import ReactPlayer from 'react-player'
+import { toast } from 'react-toastify'
 
 interface LessonContentProps {
   setParams: (params: URLSearchParams) => void
@@ -12,7 +14,17 @@ interface LessonContentProps {
 }
 
 const LessonContent = ({ handleDrawerToggle, currentCourse, currentLesson, setParams }: LessonContentProps) => {
-  console.log('currentLesson', currentLesson)
+  const [updateProgress, { isLoading }] = useUpdateProgressMutation()
+
+  const handleCompleteLesson = async (lessonId: string) => {
+    try {
+      await updateProgress({ lessonId }).unwrap()
+      toast.success('Đã đánh dấu bài học là đã học!')
+    } catch (error) {
+      toast.error('Có lỗi xảy ra khi cập nhật tiến độ học tập.')
+    }
+  }
+
   // Get section title
   const getSectionTitle = () => {
     if (!currentLesson) return ''
@@ -22,7 +34,9 @@ const LessonContent = ({ handleDrawerToggle, currentCourse, currentLesson, setPa
 
   const navigateToLesson = (lessonId: string) => {
     if (lessonId) {
-      setParams({ lessonId: lessonId })
+      const params = new URLSearchParams()
+      params.set('lessonId', lessonId)
+      setParams(params)
     }
   }
 
@@ -45,11 +59,7 @@ const LessonContent = ({ handleDrawerToggle, currentCourse, currentLesson, setPa
           <p className='text-sm text-muted-foreground'>{getSectionTitle()}</p>
           <h2 className='text-lg font-bold'>{currentLesson?.title}</h2>
         </div>
-        <Button
-          size='sm'
-          // disabled={progressLoading}
-          // className={cn('flex items-center gap-2', isCompleted && 'bg-green-600 hover:bg-green-700')}
-        >
+        <Button size='sm' disabled={isLoading} onClick={() => handleCompleteLesson(currentLesson.lessonId)}>
           <CheckCircle className='h-4 w-4' />
           Đánh dấu đã học
         </Button>

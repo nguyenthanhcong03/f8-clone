@@ -1,37 +1,63 @@
-import { Lesson } from '@/models'
+import { Lesson, Section } from '@/models'
 import Progress from '@/models/progress.model'
+import ApiError from '@/utils/ApiError'
 import catchAsync from '@/utils/catchAsync'
+import { responseHandler } from '@/utils/responseHandler'
 import { Request, Response } from 'express'
 
+const getProgressByCourse = catchAsync(async (req: Request, res: Response) => {
+  const { courseId } = req.params
+  const userId = req.user?.userId
+
+  if (!userId) throw new ApiError(401, 'Unauthorized')
+
+  // Lấy tất cả progress của user cho course này
+  const progress = await Progress.findAll({
+    include: [
+      {
+        model: Lesson,
+        as: 'lesson',
+        required: true,
+        include: [
+          {
+            model: Section,
+            as: 'section',
+            where: { courseId },
+            required: true
+          }
+        ]
+      }
+    ],
+    where: { userId }
+  })
+
+  responseHandler(res, 200, 'Lấy danh sách tiến độ thành công', progress)
+})
+
 const updateProgress = catchAsync(async (req: Request, res: Response) => {
-  const { lessonId, watchedSeconds } = req.body
-  console.log('req.body', req.body)
-  // const userId = req.user.id
+  const { lessonId } = req.body
+  const userId = req.user?.userId
 
-  // const lesson = await Lesson.findByPk(lessonId)
-  // if (!lesson) return res.status(404).json({ message: 'Lesson not found' })
+  if (!userId) throw new ApiError(401, 'Unauthorized')
 
-  // const isCompleted = watchedSeconds >= lesson.duration * 0.9
+  const lesson = await Lesson.findByPk(lessonId)
+  if (!lesson) throw new ApiError(404, 'Khóa học không tồn tại')
 
-  // const [progress, created] = await Progress.findOrCreate({
-  //   where: { user_id: userId, lesson_id: lessonId },
-  //   defaults: { user_id: userId, lesson_id: lessonId, watched_seconds: watchedSeconds, is_completed: isCompleted }
-  // })
+  const [progress, created] = await Progress.findOrCreate({
+    where: { userId, lessonId },
+    defaults: { userId, lessonId, isCompleted: true }
+  })
 
-  // if (!created) {
-  //   await progress.update({
-  //     watched_seconds: watchedSeconds,
-  //     is_completed: isCompleted
-  //   })
-  // }
+  if (!created) {
+    await progress.update({
+      isCompleted: true
+    })
+  }
 
-  // return res.status(200).json({
-  //   success: true,
-  //   data: progress,
-  //   message: 'Cập nhật tiến độ thành công'
-  // })
+  responseHandler(res, 200, 'Cập nhật tiến độ bài học thành công', { progress })
 })
 
 export default {
+  getProgressByCourse,
   updateProgress
 }

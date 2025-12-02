@@ -20,6 +20,8 @@ export const authApi = baseApi.injectEndpoints({
 
             dispatch(setCredentials(result.data.user))
             dispatch(setToken(result.data.accessToken))
+
+            dispatch(baseApi.util.invalidateTags(['Course']))
           } catch (error) {
             console.log('Đăng nhập thất bại:', error)
           }
@@ -48,7 +50,6 @@ export const authApi = baseApi.injectEndpoints({
         async onQueryStarted(args, { queryFulfilled, dispatch }) {
           try {
             const result = await queryFulfilled
-            console.log('🚀 ~ authApi.ts:8 ~ result:', result)
 
             dispatch(setCredentials(result.data))
           } catch (error) {

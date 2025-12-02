@@ -1,7 +1,9 @@
-import { X, ChevronDown, PlayCircle } from 'lucide-react'
+import { X, ChevronDown, PlayCircle, CheckCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useEffect, useState } from 'react'
 import type { Course, Lesson } from '@/types/course'
+import { useGetProgressByCourseQuery } from '@/services/api/progressApi'
+import { skipToken } from '@/store/hook'
 
 interface Iprops {
   params: URLSearchParams
@@ -14,6 +16,15 @@ interface Iprops {
 const SidebarLesson = ({ params, setParams, handleDrawerToggle, currentCourse, currentLesson }: Iprops) => {
   const [openSections, setOpenSections] = useState<string[]>([])
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null)
+
+  // Lấy danh sách progress của course
+  const { data: progressData } = useGetProgressByCourseQuery(currentCourse?.courseId ?? skipToken)
+  const progressList = progressData?.data || []
+
+  // Helper function để check lesson đã hoàn thành chưa
+  const isLessonCompleted = (lessonId: string) => {
+    return progressList.some((progress) => progress.lessonId === lessonId && progress.isCompleted)
+  }
 
   // Set active lesson đang được chọn từ URL
   useEffect(() => {
@@ -115,12 +126,16 @@ const SidebarLesson = ({ params, setParams, handleDrawerToggle, currentCourse, c
                             : 'text-foreground'
                         )}
                       >
-                        <PlayCircle
-                          className={cn(
-                            'mr-2 h-4 w-4 flex-shrink-0',
-                            activeLessonId === lesson.lessonId ? 'text-primary' : 'text-muted-foreground'
-                          )}
-                        />
+                        {isLessonCompleted(lesson.lessonId) ? (
+                          <CheckCircle className='mr-2 h-4 w-4 flex-shrink-0 text-green-500' />
+                        ) : (
+                          <PlayCircle
+                            className={cn(
+                              'mr-2 h-4 w-4 flex-shrink-0',
+                              activeLessonId === lesson.lessonId ? 'text-primary' : 'text-muted-foreground'
+                            )}
+                          />
+                        )}
                         <span className='line-clamp-2 text-sm'>{lesson.title}</span>
                       </button>
                     ))}

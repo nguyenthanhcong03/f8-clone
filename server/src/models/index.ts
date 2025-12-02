@@ -71,6 +71,6 @@ User.hasMany(Progress, { foreignKey: 'userId' })
 Lesson.hasMany(Progress, { foreignKey: 'lessonId' })
 
 Progress.belongsTo(User, { foreignKey: 'userId' })
-Progress.belongsTo(Lesson, { foreignKey: 'lessonId' })
+Progress.belongsTo(Lesson, { foreignKey: 'lessonId', as: 'lesson' })
 
 export { User, Course, Section, Lesson, Quiz, Roadmap, RoadmapCourse, Enrollment, Blog, BlogComment }

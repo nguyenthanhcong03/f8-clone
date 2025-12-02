@@ -45,7 +45,6 @@ const Header = () => {
     try {
       await logout({}).unwrap()
       toast.success('Đăng xuất thành công')
-      navigate('/')
     } catch (error) {
       console.log('Lỗi khi đăng xuất:', error)
     }
