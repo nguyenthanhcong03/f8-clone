@@ -255,7 +255,7 @@ const EditCourseStructurePage = () => {
         open={isOpenLessonForm}
         onClose={() => setIsOpenLessonForm(false)}
         selectedLesson={selectedLesson}
-        courseId={courseId}
+        courseId={courseId!}
         sectionId={selectedSection?.sectionId}
       />
       {/* Confirm Delete Section Modal */}

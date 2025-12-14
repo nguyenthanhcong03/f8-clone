@@ -1,10 +1,10 @@
 import lessonService from '@/services/lesson.service'
 import uploadService from '@/services/upload.service'
 import ApiError from '@/utils/ApiError'
-import catchAsync from '@/utils/catchAsync'
+import asyncHandler from '@/utils/asyncHandler'
 import { Request, Response } from 'express'
 
-const createLesson = catchAsync(async (req: Request, res: Response) => {
+const createLesson = asyncHandler(async (req: Request, res: Response) => {
   console.log('jjj')
   const { sectionId, title, content, videoUrl } = req.body
 
@@ -42,7 +42,7 @@ const createLesson = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
-const updateLesson = catchAsync(async (req: Request, res: Response) => {
+const updateLesson = asyncHandler(async (req: Request, res: Response) => {
   const lessonId = req.params.id
   const { title, content, videoUrl } = req.body
 
@@ -84,7 +84,7 @@ const updateLesson = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
-const getLessonById = catchAsync(async (req: Request, res: Response) => {
+const getLessonById = asyncHandler(async (req: Request, res: Response) => {
   const lessonId = req.params.id
   const response = await lessonService.getLessonById(lessonId)
 

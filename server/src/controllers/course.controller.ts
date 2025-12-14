@@ -1,6 +1,6 @@
 import { CreateCourseData } from '@/types/course.types'
 import ApiError from '@/utils/ApiError'
-import catchAsync from '@/utils/catchAsync'
+import asyncHandler from '@/utils/asyncHandler'
 import { responseHandler } from '@/utils/responseHandler'
 import { Request, Response } from 'express'
 import courseService from '../services/course.service'
@@ -9,7 +9,7 @@ import uploadService from '../services/upload.service'
 import enrollmentService from '@/services/enrollment.service'
 import { Op } from 'sequelize'
 
-const createCourse = catchAsync(async (req: Request, res: Response) => {
+const createCourse = asyncHandler(async (req: Request, res: Response) => {
   const { title, slug, description, level, isPaid, price, isPublished } = req.body
 
   // Tạo object course data
@@ -44,7 +44,7 @@ const createCourse = catchAsync(async (req: Request, res: Response) => {
   responseHandler(res, 201, 'Tạo khóa học thành công', newCourse)
 })
 
-const getAllPublishedCourses = catchAsync(async (req: Request, res: Response) => {
+const getAllPublishedCourses = asyncHandler(async (req: Request, res: Response) => {
   const {
     search,
     level,
@@ -99,7 +99,7 @@ const getAllPublishedCourses = catchAsync(async (req: Request, res: Response) =>
   responseHandler(res, 200, 'Lấy danh sách khóa học thành công', responseData)
 })
 
-const getCourseBySlug = catchAsync(async (req: Request, res: Response) => {
+const getCourseBySlug = asyncHandler(async (req: Request, res: Response) => {
   const slug = req.params.slug
   const course = await courseService.getBySlug(slug)
   if (!course) {
@@ -115,7 +115,7 @@ const getCourseBySlug = catchAsync(async (req: Request, res: Response) => {
   responseHandler(res, 200, 'Lấy khóa học thành công', response)
 })
 
-const getAllCoursesAdmin = catchAsync(async (req: Request, res: Response) => {
+const getAllCoursesAdmin = asyncHandler(async (req: Request, res: Response) => {
   const {
     search,
     level,
@@ -173,7 +173,7 @@ const getAllCoursesAdmin = catchAsync(async (req: Request, res: Response) => {
   responseHandler(res, 200, 'Lấy danh sách khóa học thành công', responseData)
 })
 
-const getCourseByIdAdmin = catchAsync(async (req: Request, res: Response) => {
+const getCourseByIdAdmin = asyncHandler(async (req: Request, res: Response) => {
   const courseId = req.params.courseId
   const course = await courseService.getById(courseId)
   // console.log('🚀 ~ course.controller.ts:179 ~ course:', course)
@@ -181,7 +181,7 @@ const getCourseByIdAdmin = catchAsync(async (req: Request, res: Response) => {
   responseHandler(res, 200, 'Lấy khóa học thành công', course)
 })
 
-const updateCourse = catchAsync(async (req: Request, res: Response) => {
+const updateCourse = asyncHandler(async (req: Request, res: Response) => {
   const courseId = req.params.id
   console.log('req.body', req.body)
   const course = await courseService.updateCourse(courseId, req.body)
@@ -192,7 +192,7 @@ const updateCourse = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
-const deleteCourse = catchAsync(async (req: Request, res: Response) => {
+const deleteCourse = asyncHandler(async (req: Request, res: Response) => {
   const courseId = req.params.id
   const result = await courseService.deleteCourse(courseId)
   res.status(200).json({
@@ -201,7 +201,7 @@ const deleteCourse = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
-const uploadThumbnail = catchAsync(async (req: Request, res: Response) => {
+const uploadThumbnail = asyncHandler(async (req: Request, res: Response) => {
   const courseId = req.params.id
 
   if (!req.file) {
@@ -219,7 +219,7 @@ const uploadThumbnail = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
-const deleteThumbnail = catchAsync(async (req: Request, res: Response) => {
+const deleteThumbnail = asyncHandler(async (req: Request, res: Response) => {
   const courseId = req.params.id
   const course = await courseService.deleteThumbnail(courseId)
   res.status(200).json({
@@ -229,7 +229,7 @@ const deleteThumbnail = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
-const getCourseSections = catchAsync(async (req: Request, res: Response) => {
+const getCourseSections = asyncHandler(async (req: Request, res: Response) => {
   const courseId = req.params.id
 
   const sections = await sectionService.getCourseSectionsById(courseId)

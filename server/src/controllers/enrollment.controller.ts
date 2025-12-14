@@ -1,10 +1,10 @@
 import { Request, Response } from 'express'
-import catchAsync from '@/utils/catchAsync'
+import asyncHandler from '@/utils/asyncHandler'
 import enrollmentService from '@/services/enrollment.service'
 import { responseHandler } from '@/utils/responseHandler'
 import ApiError from '@/utils/ApiError'
 
-const enrollCourse = catchAsync(async (req: Request, res: Response) => {
+const enrollCourse = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.user?.userId
   const courseId = req.body.courseId
 
@@ -17,7 +17,7 @@ const enrollCourse = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
-const checkEnrollment = catchAsync(async (req: Request, res: Response) => {
+const checkEnrollment = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.user?.userId
   const courseId = req.params.courseId
 
@@ -28,7 +28,7 @@ const checkEnrollment = catchAsync(async (req: Request, res: Response) => {
   responseHandler(res, 200, 'Kiểm tra đăng ký thành công', { enrolled })
 })
 
-const getUserEnrollments = catchAsync(async (req: Request, res: Response) => {
+const getUserEnrollments = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.user?.userId
 
   if (!userId) throw new ApiError(401, 'Unauthorized')
@@ -38,7 +38,7 @@ const getUserEnrollments = catchAsync(async (req: Request, res: Response) => {
   responseHandler(res, 200, 'Lấy danh sách đăng ký thành công', { enrollments })
 })
 
-const unenrollCourse = catchAsync(async (req: Request, res: Response) => {
+const unenrollCourse = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.user?.userId
   const courseId = parseInt(req.params.courseId, 10)
 

@@ -27,8 +27,6 @@ export const errorConverter = (err: CustomError, req: Request, res: Response, ne
 }
 
 export const errorHandler = (err: CustomError, req: Request, res: Response, next: NextFunction) => {
-  // console.error(err.stack)
-
   console.log('ERROR LOG ', new Date().toLocaleString())
   console.log('Request:', req.method, req.originalUrl)
   console.log('Params:', req.params)

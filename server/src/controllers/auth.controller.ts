@@ -1,19 +1,15 @@
 import { Request, Response } from 'express'
 import authService from '../services/auth.service'
-import catchAsync from '@/utils/catchAsync'
+import asyncHandler from '@/utils/asyncHandler'
 import ApiError from '@/utils/ApiError'
 import { responseHandler } from '@/utils/responseHandler'
 
-const registerAccount = catchAsync(async (req: Request, res: Response) => {
+const registerAccount = asyncHandler(async (req: Request, res: Response) => {
   const user = await authService.register(req.body)
-  res.status(201).json({
-    success: true,
-    data: user,
-    message: 'Tạo tài khoản thành công'
-  })
+  responseHandler(res, 201, 'Đăng ký tài khoản thành công', user)
 })
 
-const loginAccount = catchAsync(async (req: Request, res: Response) => {
+const loginAccount = asyncHandler(async (req: Request, res: Response) => {
   const response = await authService.login(req.body)
   // // Lưu accessToken vào cookie
   // res.cookie('accessToken', response.accessToken, {
@@ -31,17 +27,10 @@ const loginAccount = catchAsync(async (req: Request, res: Response) => {
     maxAge: parseInt(process.env.REFRESH_TOKEN_COOKIE_EXPIRES || '7200000')
   })
 
-  res.status(200).json({
-    success: true,
-    message: 'Đăng nhập thành công',
-    data: {
-      accessToken: response.accessToken,
-      user: response.user
-    }
-  })
+  responseHandler(res, 200, 'Đăng nhập thành công', { user: response.user, accessToken: response.accessToken })
 })
 
-const changePassword = catchAsync(async (req: Request, res: Response) => {
+const changePassword = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.params.id
   const { currentPassword, newPassword } = req.body
 
@@ -59,7 +48,7 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
-const logout = catchAsync(async (req: Request, res: Response) => {
+const logout = asyncHandler(async (req: Request, res: Response) => {
   // Xoá cookie refreshToken
   res.clearCookie('refreshToken', {
     httpOnly: true
@@ -73,7 +62,7 @@ const logout = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
-const refreshToken = catchAsync(async (req: Request, res: Response) => {
+const refreshToken = asyncHandler(async (req: Request, res: Response) => {
   const refreshToken = req.cookies.refreshToken
 
   if (!refreshToken) throw new ApiError(401, 'Không có refresh token, vui lòng đăng nhập lại.')
@@ -82,7 +71,7 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
   responseHandler(res, 200, 'Làm mới access token thành công', { accessToken: newAccessToken })
 })
 
-const getCurrentUser = catchAsync(async (req: Request, res: Response) => {
+const getCurrentUser = asyncHandler(async (req: Request, res: Response) => {
   const user = req.user
   if (!user) {
     throw new ApiError(401, 'Unauthorized')
@@ -93,7 +82,7 @@ const getCurrentUser = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
-const getProfile = catchAsync(async (req: Request, res: Response) => {
+const getProfile = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.user?.userId
   if (!userId) {
     throw new ApiError(401, 'Unauthorized')
@@ -105,7 +94,7 @@ const getProfile = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
-const updateProfile = catchAsync(async (req: Request, res: Response) => {
+const updateProfile = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.user?.userId
   if (!userId) {
     throw new ApiError(401, 'Unauthorized')

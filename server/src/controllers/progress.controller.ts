@@ -1,11 +1,11 @@
 import { Lesson, Section } from '@/models'
 import Progress from '@/models/progress.model'
 import ApiError from '@/utils/ApiError'
-import catchAsync from '@/utils/catchAsync'
+import asyncHandler from '@/utils/asyncHandler'
 import { responseHandler } from '@/utils/responseHandler'
 import { Request, Response } from 'express'
 
-const getProgressByCourse = catchAsync(async (req: Request, res: Response) => {
+const getProgressByCourse = asyncHandler(async (req: Request, res: Response) => {
   const { courseId } = req.params
   const userId = req.user?.userId
 
@@ -34,7 +34,7 @@ const getProgressByCourse = catchAsync(async (req: Request, res: Response) => {
   responseHandler(res, 200, 'Lấy danh sách tiến độ thành công', progress)
 })
 
-const updateProgress = catchAsync(async (req: Request, res: Response) => {
+const updateProgress = asyncHandler(async (req: Request, res: Response) => {
   const { lessonId } = req.body
   const userId = req.user?.userId
 
