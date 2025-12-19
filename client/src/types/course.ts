@@ -48,7 +48,7 @@ export interface CourseCreateInput {
   slug?: string
   description?: string
   level?: CourseLevel
-  is_paid?: boolean
+  isPaid?: boolean
   price?: number
 }
 
@@ -57,6 +57,6 @@ export interface CourseUpdateInput {
   slug?: string
   description?: string
   level?: CourseLevel
-  is_paid?: boolean
+  isPaid?: boolean
   price?: number
 }

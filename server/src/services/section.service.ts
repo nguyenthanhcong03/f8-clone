@@ -32,11 +32,10 @@ const deleteSection = async (sectionId: string) => {
   }
   // Kiểm tra section có chứa lesson nào không
   const lessonCount = await Lesson.count({ where: { sectionId } })
-  console.log('lessonCount: ', lessonCount)
   if (lessonCount > 0) {
     throw new ApiError(400, 'Không thể xóa chương chứa bài học')
   }
-  // await section.destroy()
+  await section.destroy()
   return section
 }
 

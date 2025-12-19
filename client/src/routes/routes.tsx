@@ -1,4 +1,4 @@
-import NotFound from '@/components/auth/NotFound/NotFound'
+import NotFound from '@/components/auth/not-found/NotFound'
 import BlogCategoryIndex from '@/pages/admin/BlogCategoryManagement/BlogCategoryIndex'
 import { CreateCategoryPage, EditCategoryPage } from '@/pages/admin/BlogCategoryManagement/pages'
 import BlogIndex from '@/pages/admin/BlogManagement/BlogIndex'
@@ -10,6 +10,7 @@ import EditCourseStructurePage from '@/pages/admin/CourseManagement/pages/EditCo
 import EditLessonPage from '@/pages/admin/CourseManagement/pages/EditLessonPage/EditLessonPage'
 import DashboardPage from '@/pages/admin/DashboardPage/DashboardPage'
 import BlogPage from '@/pages/public/BlogPage/BlogPage'
+import BlogDetailPage from '@/pages/public/BlogPage/BlogDetailPage'
 import CourseDetail from '@/pages/public/CourseDetail/CourseDetail'
 import HomePage from '@/pages/public/HomePage/HomePage'
 import RoadMapPage from '@/pages/public/RoadMapPage/RoadMapPage'
@@ -19,12 +20,15 @@ import { createBrowserRouter, type RouteObject } from 'react-router-dom'
 import ProtectedRoute from './guards/ProtectedRoute'
 import AdminLayout from './layouts/AdminLayout'
 import MainLayout from './layouts/MainLayout'
+import PortfolioPage from '@/pages/public/PortfolioPage/PortfolioPage'
 
 const publicRoutes: RouteObject[] = [
   { index: true, element: <HomePage /> },
-  { path: ':slug', element: <CourseDetail /> },
+  { path: 'courses/:slug', element: <CourseDetail /> },
   { path: 'roadmap', element: <RoadMapPage /> },
-  { path: 'blog', element: <BlogPage /> }
+  { path: 'blogs', element: <BlogPage /> },
+  { path: 'blogs/:slug', element: <BlogDetailPage /> },
+  { path: 'portfolio', element: <PortfolioPage /> }
 ]
 
 // Khách hàng đã đăng nhập
@@ -75,15 +79,11 @@ const routes: RouteObject[] = [
     children: publicRoutes
   },
   {
-    path: '/learning/:slug',
-    element: <LearningPage />
-  },
-  {
     path: '',
     element: (
-      // <ProtectedRoute roles={['student', 'admin']}>
-      <MainLayout />
-      // </ProtectedRoute>
+      <ProtectedRoute roles={['student', 'admin']}>
+        <MainLayout />
+      </ProtectedRoute>
     ),
     children: studentRoutes
   },

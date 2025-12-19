@@ -1,4 +1,4 @@
-import AppLoader from '@/components/common/Loading/AppLoader'
+import AppLoader from '@/components/common/loading/AppLoader'
 import { useGetProfileQuery, useUpdateUserMutation } from '@/services/api/authApi'
 import { useState } from 'react'
 import { toast } from 'react-toastify'

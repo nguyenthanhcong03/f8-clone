@@ -2,7 +2,10 @@ export const ROUTES = {
   PUBLIC: {
     HOME: '/',
     ROADMAP: '/roadmap',
-    BLOG: '/blog',
+    BLOGS: {
+      LIST: '/blogs',
+      DETAIL: (slug: string = ':slug') => `/blogs/${slug}`
+    },
     COURSE_DETAIL: (slug: string = ':slug') => `/${slug}`
   },
 

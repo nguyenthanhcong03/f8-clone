@@ -1,3 +1,6 @@
+import { vi } from 'date-fns/locale'
+import { formatDistanceToNow } from 'date-fns'
+
 // Hàm format giá tiền
 export const formatPrice = (price: number | null | undefined, isPaid: boolean | undefined) => {
   if (!isPaid) return 'Miễn phí'
@@ -35,5 +38,13 @@ export const formatDate = (date?: Date) => {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
+  })
+}
+
+export const formatTimeAgo = (date?: Date | string) => {
+  if (!date) return ''
+  return formatDistanceToNow(new Date(date), {
+    addSuffix: true,
+    locale: vi
   })
 }

@@ -1,4 +1,4 @@
-import AppLoader from '@/components/common/Loading/AppLoader'
+import AppLoader from '@/components/common/loading/AppLoader'
 import { useGetCourseBySlugQuery } from '@/services/api/courseApi'
 import { useGetLessonByIdQuery } from '@/services/api/lessonApi'
 import { skipToken } from '@/store/hook'

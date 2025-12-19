@@ -59,7 +59,7 @@ const getAllPublishedCourses = asyncHandler(async (req: Request, res: Response) 
 
   // Điều kiện lọc
   const where: Record<string, unknown> = {
-    is_published: true
+    isPublished: true
   }
   // Tìm kiếm theo tên khóa học
   if (search) {
@@ -71,7 +71,7 @@ const getAllPublishedCourses = asyncHandler(async (req: Request, res: Response) 
   }
   // Lọc theo miễn phí / trả phí
   if (isPaid !== undefined) {
-    where.is_paid = isPaid === 'true'
+    where.isPaid = isPaid === 'true'
   }
   // Lọc theo khoảng giá
   if (minPrice && maxPrice) {
@@ -141,11 +141,11 @@ const getAllCoursesAdmin = asyncHandler(async (req: Request, res: Response) => {
   }
   // Lọc theo miễn phí / trả phí
   if (isPaid !== undefined) {
-    where.is_paid = isPaid === 'true'
+    where.isPaid = isPaid === 'true'
   }
   // Lọc theo trạng thái xuất bản
   if (isPublished !== undefined) {
-    where.is_published = isPublished === 'true'
+    where.isPublished = isPublished === 'true'
   }
   // Lọc theo khoảng giá
   if (minPrice && maxPrice) {
@@ -176,7 +176,6 @@ const getAllCoursesAdmin = asyncHandler(async (req: Request, res: Response) => {
 const getCourseByIdAdmin = asyncHandler(async (req: Request, res: Response) => {
   const courseId = req.params.courseId
   const course = await courseService.getById(courseId)
-  // console.log('🚀 ~ course.controller.ts:179 ~ course:', course)
 
   responseHandler(res, 200, 'Lấy khóa học thành công', course)
 })

@@ -10,18 +10,17 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { useAppSelector } from '@/store/hook'
-import { Bell, BookOpen, ChevronLeft, LogOut, Search, User } from 'lucide-react'
+import { Bell, BookOpen, Briefcase, FileText, Home, LogOut, Search, User } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import ModalAuth from '../../auth/AuthModal/AuthModal'
-import ThemeToggle from '../../common/ThemeToggle/ThemeToggle'
 import { useLogoutMutation } from '@/services/api/authApi'
+import ThemeToggle from '@/components/common/theme-toggle/ThemeToggle'
+import ModalAuth from '@/components/auth/auth-modal/AuthModal'
 
 const Header = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const isProfilePage = location.pathname === '/profile'
   const { user, isAuthenticated } = useAppSelector((state) => state.auth)
   const [logout] = useLogoutMutation()
 
@@ -50,34 +49,72 @@ const Header = () => {
     }
   }
 
-  return (
-    <header className='fixed left-0 right-0 top-0 z-50 h-[66px] border-b bg-background shadow-sm'>
-      <div className='mx-auto flex h-full items-center justify-between px-7'>
-        {/* Logo */}
-        <Link to='/' className='mr-2 flex items-center transition-opacity hover:opacity-80'>
-          <div className='flex items-center'>
-            <div className='h-[38px] w-[38px] overflow-hidden rounded-lg'>
-              <img src={Logo} alt='Logo' width={38} height={38} />
-            </div>
+  // Navigation items
+  const navItems = [
+    { label: 'Trang chủ', path: '/', icon: Home },
+    { label: 'Khóa học', path: '/courses', icon: BookOpen },
+    { label: 'Bài viết', path: '/blogs', icon: FileText },
+    { label: 'Portfolio', path: '/portfolio', icon: Briefcase }
+  ]
 
-            {!isProfilePage ? (
-              <span className='ml-4 hidden whitespace-nowrap text-sm font-bold sm:block md:block'>
-                Học lập trình để đi làm
-              </span>
-            ) : (
-              <div className='flex items-center text-[#808990]' onClick={() => navigate(-1)}>
-                <ChevronLeft className='ml-2 h-4 w-4' />
-                <p className='text-xs uppercase'>Quay lại</p>
-              </div>
-            )}
+  const isActiveLink = (path: string) => {
+    if (path === '/') return location.pathname === '/'
+    return location.pathname.startsWith(path)
+  }
+
+  return (
+    <header className='fixed left-0 right-0 top-0 z-50 border-b bg-background shadow-sm'>
+      <div className='mx-auto flex h-16 items-center justify-between px-6'>
+        {/* Logo & Brand */}
+        <Link to='/' className='flex items-center gap-3 transition-opacity hover:opacity-80'>
+          <div className='h-10 w-10 overflow-hidden rounded-lg'>
+            <img src={Logo} alt='Logo' width={40} height={40} />
+          </div>
+          <div className='hidden flex-col sm:flex'>
+            <span className='text-lg font-bold leading-tight'>F8 Learning</span>
+            <span className='text-xs text-muted-foreground'>Code • Learn • Grow</span>
           </div>
         </Link>
 
+        {/* Navigation Menu - Desktop */}
+        <nav className='hidden flex-1 items-center justify-center gap-2 lg:flex'>
+          {navItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`group relative flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-all duration-200 ${
+                isActiveLink(item.path) ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <item.icon
+                className={`h-4 w-4 transition-transform duration-200 ${
+                  isActiveLink(item.path) ? 'scale-110' : 'group-hover:scale-110'
+                }`}
+              />
+              <span>{item.label}</span>
+
+              {/* Active indicator - bottom border */}
+              <span
+                className={`absolute bottom-0 left-1/2 h-0.5 -translate-x-1/2 rounded-full bg-primary transition-all duration-300 ${
+                  isActiveLink(item.path) ? 'w-full' : 'w-0 group-hover:w-full'
+                }`}
+              />
+
+              {/* Hover background */}
+              <span
+                className={`absolute inset-0 -z-10 rounded-lg bg-primary/5 opacity-0 transition-opacity duration-200 ${
+                  isActiveLink(item.path) ? 'opacity-100' : 'group-hover:opacity-100'
+                }`}
+              />
+            </Link>
+          ))}
+        </nav>
+
         {/* Search bar */}
-        <div className='mx-4 flex h-10 max-w-md flex-1 items-center overflow-hidden rounded-full border-2 border-[#e8e8e8] px-3 py-1'>
-          <Search />
+        <div className='mx-4 hidden h-10 max-w-xs flex-1 items-center overflow-hidden rounded-full border bg-muted/50 px-4 lg:flex'>
+          <Search className='h-4 w-4 text-muted-foreground' />
           <Input
-            className='border-0 focus-visible:ring-0 focus-visible:ring-offset-0'
+            className='border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0'
             placeholder='Tìm kiếm khóa học, bài viết...'
             aria-label='search'
           />
@@ -102,29 +139,21 @@ const Header = () => {
                 {/* Ảnh và tên người dùng */}
                 <div className='flex cursor-pointer items-center gap-2'>
                   <Button variant='ghost' size='icon' className='rounded-full'>
-                    {user?.avatar ? (
-                      <Avatar className='h-8 w-8'>
-                        <AvatarImage src={user.avatar} alt={user.name} />
-                        <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                    ) : (
-                      <User className='h-5 w-5' />
-                    )}
+                    <Avatar className='h-8 w-8'>
+                      <AvatarImage src={user.avatar} alt={user.name} />
+                      <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
+                    </Avatar>
                   </Button>
-                  {user?.name}
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end' className='w-56'>
                 <div className='px-2 py-1.5'>
                   <div className='flex items-center gap-2'>
-                    {user?.avatar ? (
-                      <Avatar className='h-8 w-8'>
-                        <AvatarImage src={user.avatar} alt={user.name} />
-                        <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                    ) : (
-                      <User className='h-5 w-5' />
-                    )}
+                    <Avatar className='h-8 w-8'>
+                      <AvatarImage src={user.avatar} alt={user.name} />
+                      <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
+                    </Avatar>
+
                     <div className='flex flex-col'>
                       <span className='text-sm font-medium'>{user?.name}</span>
                       <span className='text-xs text-muted-foreground'>{user?.email}</span>

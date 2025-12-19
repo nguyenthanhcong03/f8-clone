@@ -1,7 +1,7 @@
-import CourseCard from '@/components/common/CourseCard/CourseCard'
-import { ErrorState } from '@/components/common/ErrorState/ErrorState'
-import { Loading } from '@/components/common/Loading/Loading'
-import { NoData } from '@/components/common/NoData/NoData'
+import CourseCard from '@/components/common/course-card/CourseCard'
+import { ErrorState } from '@/components/common/error-state/ErrorState'
+import { Loading } from '@/components/common/loading/Loading'
+import { NoData } from '@/components/common/no-data/NoData'
 import { Button } from '@/components/ui/button'
 import { useGetAllPublishedCoursesQuery } from '@/services/api/courseApi'
 

@@ -1,5 +1,5 @@
-import { ErrorState } from '@/components/common/ErrorState/ErrorState'
-import { NoData } from '@/components/common/NoData/NoData'
+import { ErrorState } from '@/components/common/error-state/ErrorState'
+import { NoData } from '@/components/common/no-data/NoData'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
