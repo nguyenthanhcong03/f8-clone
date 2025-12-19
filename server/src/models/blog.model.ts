@@ -1,30 +1,38 @@
 import { DataTypes, Model, Optional } from 'sequelize'
 import sequelize from '../config/database'
 import { v4 as uuidv4 } from 'uuid'
-
-interface BlogAttributes {
+export type BlogStatus = 'draft' | 'published'
+type BlogAttributes = {
   blogId: string
-  title?: string
-  slug?: string
-  content?: string
-  authorId?: string
-  thumbnail?: string
-  thumbnailPublicId?: string
+  title: string
+  slug: string
+  content: string
+  categoryId: string
+  authorId: string
+  thumbnail: string
+  status: BlogStatus
+  likes: number
+  thumbnailPublicId: string
+  publishedAt?: Date
 }
 
 type BlogCreationAttributes = Optional<
   BlogAttributes,
-  'blogId' | 'title' | 'slug' | 'content' | 'authorId' | 'thumbnail' | 'thumbnailPublicId'
+  'blogId' | 'thumbnail' | 'thumbnailPublicId' | 'likes' | 'publishedAt'
 >
 
 class Blog extends Model<BlogAttributes, BlogCreationAttributes> implements BlogAttributes {
-  public blogId!: string
-  public title?: string
-  public slug?: string
-  public content?: string
-  public authorId?: string
-  public thumbnail?: string
-  public thumbnailPublicId?: string
+  declare blogId: string
+  declare title: string
+  declare slug: string
+  declare content: string
+  declare categoryId: string
+  declare authorId: string
+  declare thumbnail: string
+  declare status: BlogStatus
+  declare likes: number
+  declare thumbnailPublicId: string
+  declare publishedAt?: Date
 }
 
 Blog.init(
@@ -32,32 +40,58 @@ Blog.init(
     blogId: {
       type: DataTypes.STRING,
       defaultValue: () => uuidv4(),
-      primaryKey: true,
-      field: 'blog_id'
+      primaryKey: true
     },
     title: {
-      type: DataTypes.STRING(255)
+      type: DataTypes.STRING(255),
+      allowNull: false
     },
     slug: {
-      type: DataTypes.STRING(255)
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      unique: true
     },
     content: {
-      type: DataTypes.TEXT
+      type: DataTypes.TEXT,
+      allowNull: false
+    },
+    categoryId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      references: {
+        model: 'blog_categories',
+        key: 'categoryId'
+      }
     },
     authorId: {
       type: DataTypes.STRING,
-      field: 'author_id',
+      allowNull: false,
       references: {
         model: 'users',
-        key: 'user_id'
+        key: 'userId'
       }
     },
     thumbnail: {
-      type: DataTypes.STRING(255)
+      type: DataTypes.STRING(255),
+      allowNull: true
     },
     thumbnailPublicId: {
       type: DataTypes.STRING(255),
-      field: 'thumbnail_public_id'
+      allowNull: true
+    },
+    status: {
+      type: DataTypes.ENUM('draft', 'published'),
+      allowNull: false,
+      defaultValue: 'draft'
+    },
+    likes: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
+    },
+    publishedAt: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
   },
   {

@@ -23,8 +23,7 @@ Section.init(
     sectionId: {
       type: DataTypes.STRING,
       defaultValue: () => uuidv4(),
-      primaryKey: true,
-      field: 'section_id'
+      primaryKey: true
     },
     title: {
       type: DataTypes.STRING(255),
@@ -33,14 +32,14 @@ Section.init(
     courseId: {
       type: DataTypes.STRING,
       allowNull: false,
-      field: 'course_id',
       references: {
         model: 'courses',
-        key: 'course_id'
+        key: 'courseId'
       }
     },
     order: {
-      type: DataTypes.INTEGER
+      type: DataTypes.INTEGER,
+      allowNull: true
     }
   },
   {

@@ -2,7 +2,7 @@ import { DataTypes, Model, Optional } from 'sequelize'
 import sequelize from '../config/database'
 import { v4 as uuidv4 } from 'uuid'
 
-interface RoadmapCourseAttributes {
+type RoadmapCourseAttributes = {
   roadmapCourseId: string
   roadmapId: string
   courseId: string
@@ -15,10 +15,10 @@ class RoadmapCourse
   extends Model<RoadmapCourseAttributes, RoadmapCourseCreationAttributes>
   implements RoadmapCourseAttributes
 {
-  public roadmapCourseId!: string
-  public roadmapId!: string
-  public courseId!: string
-  public order?: number
+  declare roadmapCourseId: string
+  declare roadmapId: string
+  declare courseId: string
+  declare order?: number
 }
 
 RoadmapCourse.init(
@@ -26,29 +26,27 @@ RoadmapCourse.init(
     roadmapCourseId: {
       type: DataTypes.STRING,
       defaultValue: () => uuidv4(),
-      primaryKey: true,
-      field: 'roadmap_course_id'
+      primaryKey: true
     },
     roadmapId: {
       type: DataTypes.STRING,
       allowNull: false,
-      field: 'roadmap_id',
       references: {
         model: 'roadmaps',
-        key: 'roadmap_id'
+        key: 'roadmapId'
       }
     },
     courseId: {
       type: DataTypes.STRING,
       allowNull: false,
-      field: 'course_id',
       references: {
         model: 'courses',
-        key: 'course_id'
+        key: 'courseId'
       }
     },
     order: {
-      type: DataTypes.INTEGER
+      type: DataTypes.INTEGER,
+      allowNull: true
     }
   },
   {

@@ -23,31 +23,27 @@ Enrollment.init(
     enrollmentId: {
       type: DataTypes.STRING,
       defaultValue: () => uuidv4(),
-      primaryKey: true,
-      field: 'enrollment_id'
+      primaryKey: true
     },
     userId: {
       type: DataTypes.STRING,
       allowNull: false,
-      field: 'user_id',
       references: {
         model: 'users',
-        key: 'user_id'
+        key: 'userId'
       }
     },
     courseId: {
       type: DataTypes.STRING,
       allowNull: false,
-      field: 'course_id',
       references: {
         model: 'courses',
-        key: 'course_id'
+        key: 'courseId'
       }
     },
     enrolledAt: {
       type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-      field: 'enrolled_at'
+      defaultValue: DataTypes.NOW
     }
   },
   {

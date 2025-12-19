@@ -1,7 +1,9 @@
 import { Button } from '@/components/ui/button'
+import { useAppSelector } from '@/store/hook'
 import { Bell, Search, Settings, User } from 'lucide-react'
 
 const AdminHeader = () => {
+  const { user, isAuthenticated } = useAppSelector((state) => state.auth)
   return (
     <header className='flex h-16 items-center justify-between border-b border-border bg-background px-6'>
       {/* Left side - Search */}
@@ -34,11 +36,15 @@ const AdminHeader = () => {
         {/* Profile */}
         <Button variant='ghost' size='sm' className='flex items-center gap-2 px-3'>
           <div className='flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground'>
-            <User className='h-4 w-4' />
+            {user?.avatar ? (
+              <img src={user.avatar} alt={user.name} className='h-8 w-8 rounded-full object-cover' />
+            ) : (
+              <User className='h-5 w-5' />
+            )}
           </div>
           <div className='hidden text-left md:block'>
-            <div className='text-sm font-medium'>Admin User</div>
-            <div className='text-xs text-muted-foreground'>admin@example.com</div>
+            <div className='text-sm font-medium'>{user?.name}</div>
+            <div className='text-xs text-muted-foreground'>{user?.email}</div>
           </div>
         </Button>
       </div>

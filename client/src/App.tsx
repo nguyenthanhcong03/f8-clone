@@ -1,5 +1,3 @@
-import GlobalSnackbar from '@/components/common/GlobaSnackbar/GlobalSnackbar'
-import AppLoader from '@/components/common/Loading/AppLoader'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import router from '@/routes/routes'
 import { useGetCurrentUserQuery } from '@/services/api/authApi'
@@ -35,7 +33,6 @@ function App() {
 
   return (
     <ThemeProvider>
-      <GlobalSnackbar />
       <ToastContainer
         position='bottom-right'
         autoClose={3000}

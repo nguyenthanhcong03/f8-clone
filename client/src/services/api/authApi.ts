@@ -1,7 +1,7 @@
 import { baseApi } from './baseApi'
 import type { User } from '@/types/user'
 import type { ApiResponse } from '@/types/api'
-import { logout, setCredentials, setToken } from '@/store/features/auth/authSlice'
+import { logout, setCredentials, setIsAuthLoading, setToken } from '@/store/features/auth/authSlice'
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => {
@@ -50,7 +50,7 @@ export const authApi = baseApi.injectEndpoints({
         async onQueryStarted(args, { queryFulfilled, dispatch }) {
           try {
             const result = await queryFulfilled
-
+            dispatch(setIsAuthLoading(false))
             dispatch(setCredentials(result.data))
           } catch (error) {
             console.log(error)

@@ -31,8 +31,7 @@ User.init(
     userId: {
       type: DataTypes.STRING,
       defaultValue: () => uuidv4(),
-      primaryKey: true,
-      field: 'user_id'
+      primaryKey: true
     },
     name: {
       type: DataTypes.STRING(100),
@@ -52,14 +51,16 @@ User.init(
       allowNull: false
     },
     avatar: {
-      type: DataTypes.STRING(255)
+      type: DataTypes.STRING(255),
+      allowNull: true
     },
     avatarPublicId: {
       type: DataTypes.STRING(255),
-      field: 'avatar_public_id'
+      allowNull: true
     },
     role: {
       type: DataTypes.ENUM('admin', 'student'),
+      allowNull: false,
       defaultValue: 'student'
     }
   },

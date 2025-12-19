@@ -3,7 +3,6 @@ import { configureStore } from '@reduxjs/toolkit'
 import appReducer from './appSlice'
 import authReducer from './features/auth/authSlice'
 import themeReducer from './features/theme/themeSlice'
-import snackbarReducer from './snackbarSlice'
 
 export const store = configureStore({
   reducer: {
@@ -13,7 +12,6 @@ export const store = configureStore({
     // Application state
     theme: themeReducer,
     app: appReducer,
-    snackbar: snackbarReducer,
 
     // Authentication
     auth: authReducer

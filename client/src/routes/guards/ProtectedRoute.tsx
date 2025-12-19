@@ -33,7 +33,8 @@ const ProtectedRoute = ({
 
   // Chuyển hướng người dùng không được xác thực đến trang đăng nhập với đường dẫn trở về
   // Chỉ khi đã hoàn thành việc kiểm tra xác thực (isLoading = false) và user thực sự chưa đăng nhập
-  if (requireAuth && !isAuthenticated && !isLoading) {
+  // if (requireAuth && !isAuthenticated && !isLoading) {
+  if (requireAuth && !isAuthenticated) {
     return <Navigate to={'/'} state={{ from: location.pathname }} replace />
   }
   // Kiểm tra quyền truy cập dựa trên vai trò người dùng

@@ -7,6 +7,7 @@ import Roadmap from './roadmap.model'
 import RoadmapCourse from './roadmapCourse.model'
 import Enrollment from './enrollment.model'
 import Blog from './blog.model'
+import BlogCategory from './blogCategory.model'
 import BlogComment from './blogComment.model'
 import Progress from './progress.model'
 
@@ -59,6 +60,10 @@ Course.belongsToMany(User, {
 User.hasMany(Blog, { foreignKey: 'authorId', as: 'blogs' })
 Blog.belongsTo(User, { foreignKey: 'authorId', as: 'author' })
 
+// BlogCategory - Blog (One-to-Many: Category can have many blogs)
+BlogCategory.hasMany(Blog, { foreignKey: 'categoryId', as: 'blogs' })
+Blog.belongsTo(BlogCategory, { foreignKey: 'categoryId', as: 'category' })
+
 // Blog - BlogComment (One-to-Many: Blog can have many comments)
 Blog.hasMany(BlogComment, { foreignKey: 'blogId', as: 'comments' })
 BlogComment.belongsTo(Blog, { foreignKey: 'blogId', as: 'blog' })
@@ -73,4 +78,4 @@ Lesson.hasMany(Progress, { foreignKey: 'lessonId' })
 Progress.belongsTo(User, { foreignKey: 'userId' })
 Progress.belongsTo(Lesson, { foreignKey: 'lessonId', as: 'lesson' })
 
-export { User, Course, Section, Lesson, Quiz, Roadmap, RoadmapCourse, Enrollment, Blog, BlogComment }
+export { User, Course, Section, Lesson, Quiz, Roadmap, RoadmapCourse, Enrollment, Blog, BlogCategory, BlogComment }

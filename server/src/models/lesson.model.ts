@@ -2,28 +2,25 @@ import { DataTypes, Model, Optional } from 'sequelize'
 import sequelize from '../config/database'
 import { v4 as uuidv4 } from 'uuid'
 
-interface LessonAttributes {
+type LessonAttributes = {
   lessonId: string
   sectionId: string
-  title?: string
-  videoUrl?: string
-  videoPublicId?: string
+  title: string
+  videoUrl: string
+  videoPublicId: string
   duration?: number
   content?: string
   order?: number
 }
 
-type LessonCreationAttributes = Optional<
-  LessonAttributes,
-  'lessonId' | 'title' | 'videoUrl' | 'videoPublicId' | 'duration' | 'content' | 'order'
->
+type LessonCreationAttributes = Optional<LessonAttributes, 'lessonId' | 'duration' | 'content' | 'order'>
 
 class Lesson extends Model<LessonAttributes, LessonCreationAttributes> implements LessonAttributes {
   declare lessonId: string
   declare sectionId: string
-  declare title?: string
-  declare videoUrl?: string
-  declare videoPublicId?: string
+  declare title: string
+  declare videoUrl: string
+  declare videoPublicId: string
   declare duration?: number
   declare content?: string
   declare order?: number
@@ -34,37 +31,39 @@ Lesson.init(
     lessonId: {
       type: DataTypes.STRING,
       defaultValue: () => uuidv4(),
-      primaryKey: true,
-      field: 'lesson_id'
+      primaryKey: true
     },
     sectionId: {
       type: DataTypes.STRING,
       allowNull: false,
-      field: 'section_id',
       references: {
         model: 'sections',
-        key: 'section_id'
+        key: 'sectionId'
       }
     },
     title: {
-      type: DataTypes.STRING(255)
+      type: DataTypes.STRING(255),
+      allowNull: false
     },
     videoUrl: {
       type: DataTypes.STRING(255),
-      field: 'video_url'
+      allowNull: false
     },
     videoPublicId: {
       type: DataTypes.STRING(255),
-      field: 'video_public_id'
+      allowNull: false
     },
     duration: {
-      type: DataTypes.INTEGER
+      type: DataTypes.INTEGER,
+      allowNull: true
     },
     content: {
-      type: DataTypes.TEXT
+      type: DataTypes.TEXT,
+      allowNull: true
     },
     order: {
-      type: DataTypes.INTEGER
+      type: DataTypes.INTEGER,
+      allowNull: true
     }
   },
   {

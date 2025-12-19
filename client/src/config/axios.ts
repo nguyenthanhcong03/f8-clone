@@ -1,8 +1,8 @@
 import axios from 'axios'
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_URL = import.meta.env.VITE_API_URL
 
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: `${API_URL}/api/v1`,
   withCredentials: true // để gửi cookie refresh token
 })
 
@@ -53,7 +53,7 @@ api.interceptors.response.use(
 
       try {
         // const res: any = await store.dispatch(refreshToken())
-        const res = await axios.post(`${API_URL}/api/auth/refresh-token`, {}, { withCredentials: true })
+        const res = await axios.post(`${API_URL}/api/v1/auth/refresh-token`, {}, { withCredentials: true })
         // const newAccessToken = res.payload.accessToken
         const newAccessToken = res.data.accessToken
 

@@ -3,6 +3,7 @@ import authService from '../services/auth.service'
 import asyncHandler from '@/utils/asyncHandler'
 import ApiError from '@/utils/ApiError'
 import { responseHandler } from '@/utils/responseHandler'
+import { User } from '@/models'
 
 const registerAccount = asyncHandler(async (req: Request, res: Response) => {
   const user = await authService.register(req.body)
@@ -72,10 +73,15 @@ const refreshToken = asyncHandler(async (req: Request, res: Response) => {
 })
 
 const getCurrentUser = asyncHandler(async (req: Request, res: Response) => {
-  const user = req.user
-  if (!user) {
+  const userId = req.user?.userId
+  if (!userId) {
     throw new ApiError(401, 'Unauthorized')
   }
+
+  const user = await User.findByPk(userId, {
+    attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
+  })
+
   res.status(200).json({
     success: true,
     data: user

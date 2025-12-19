@@ -28,3 +28,12 @@ export const formatLevel = (level?: 'beginner' | 'intermediate' | 'advanced') =>
       return 'Không xác định'
   }
 }
+
+export const formatDate = (date?: Date) => {
+  if (!date) return ''
+  return new Date(date).toLocaleDateString('vi-VN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+}

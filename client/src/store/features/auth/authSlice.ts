@@ -1,9 +1,11 @@
+import { isLoading } from './../../hook'
 import type { User } from '@/types/user'
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 
 interface AuthState {
   user: User | null
   isAuthenticated: boolean
+  isLoading: boolean
   accessToken: string | null
 }
 
@@ -19,6 +21,7 @@ const initialUser = (() => {
 const initialState: AuthState = {
   user: initialUser,
   isAuthenticated: false,
+  isLoading: true,
   accessToken: localStorage.getItem('accessToken')
 }
 
@@ -36,6 +39,9 @@ const authSlice = createSlice({
       state.accessToken = action.payload
       localStorage.setItem('accessToken', action.payload)
     },
+    setIsAuthLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload
+    },
     logout: (state) => {
       state.accessToken = null
       state.isAuthenticated = false
@@ -46,5 +52,5 @@ const authSlice = createSlice({
   }
 })
 
-export const { setCredentials, setToken, logout } = authSlice.actions
+export const { setCredentials, setToken, logout, setIsAuthLoading } = authSlice.actions
 export default authSlice.reducer

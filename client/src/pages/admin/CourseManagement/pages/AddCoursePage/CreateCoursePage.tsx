@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import slugify from 'slugify'
 
-const AddCoursePage = () => {
+const CreateCoursePage = () => {
   const navigate = useNavigate()
 
   const [createCourse, { isLoading: isCreating }] = useCreateCourseMutation()
@@ -454,4 +454,4 @@ const AddCoursePage = () => {
   )
 }
 
-export default AddCoursePage
+export default CreateCoursePage

@@ -25,8 +25,7 @@ Course.init(
     courseId: {
       type: DataTypes.STRING,
       defaultValue: () => uuidv4(),
-      primaryKey: true,
-      field: 'course_id' // map to database column
+      primaryKey: true
     },
     title: {
       type: DataTypes.STRING(255),
@@ -34,46 +33,51 @@ Course.init(
     },
     slug: {
       type: DataTypes.STRING(255),
+      allowNull: false,
       unique: true
     },
     description: {
-      type: DataTypes.TEXT
+      type: DataTypes.TEXT,
+      allowNull: true
     },
     thumbnail: {
-      type: DataTypes.STRING(255)
+      type: DataTypes.STRING(255),
+      allowNull: true
     },
     thumbnailPublicId: {
       type: DataTypes.STRING(255),
-      field: 'thumbnail_public_id' // map to database column
+      allowNull: true
     },
     level: {
       type: DataTypes.ENUM('beginner', 'intermediate', 'advanced'),
+      allowNull: false,
       defaultValue: 'beginner'
     },
     isPaid: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false,
-      field: 'is_paid' // map to database column
+      allowNull: false,
+      defaultValue: false
     },
     price: {
-      type: DataTypes.INTEGER
+      type: DataTypes.INTEGER,
+      allowNull: true
     },
     isPublished: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false,
-      field: 'is_published' // map to database column
+      allowNull: false,
+      defaultValue: false
     },
     enrollmentCount: {
-      type: DataTypes.STRING,
-      defaultValue: 0,
-      field: 'enrollment_count' // map to database column
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
     },
     createdBy: {
       type: DataTypes.STRING,
-      field: 'created_by', // map to database column
+      allowNull: false,
       references: {
         model: 'users',
-        key: 'user_id'
+        key: 'userId'
       }
     }
   },

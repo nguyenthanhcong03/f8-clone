@@ -8,7 +8,7 @@ import {
   type FetchBaseQueryError
 } from '@reduxjs/toolkit/query/react'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_URL = import.meta.env.VITE_API_URL
 
 export interface ApiError {
   status: number
@@ -18,7 +18,7 @@ export interface ApiError {
 
 // Base query với token từ localStorage
 const baseQuery = fetchBaseQuery({
-  baseUrl: API_URL,
+  baseUrl: `${API_URL}/api/v1`,
   prepareHeaders: (headers, { getState }) => {
     const token = (getState() as RootState).auth.accessToken || localStorage.getItem('accessToken')
     if (token) headers.set('authorization', `Bearer ${token}`)
@@ -36,7 +36,7 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
   // Gọi query gốc
   let result = await baseQuery(args, api, extraOptions)
   // Nếu lỗi 401 - thử refresh token
-  if (result.error && 'status' in result.error && result.error.status === 401 && localStorage.getItem('accessToken')) {
+  if (result.error && 'status' in result.error && result.error.status === 401) {
     console.warn('🔄 Access token hết hạn, đang refresh...')
     // Gọi API refresh token
     const refreshResult = await baseQuery(
@@ -89,7 +89,7 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
 export const baseApi = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
-  tagTypes: ['Course', 'User', 'Section', 'Lesson', 'Enrollment', 'Progress'],
+  tagTypes: ['Course', 'User', 'Section', 'Lesson', 'Enrollment', 'Progress', 'Blog', 'BlogCategory'],
   // Cấu hình caching
   keepUnusedDataFor: 300, // giữ cache trong 5 phút
   refetchOnMountOrArgChange: 30, // refetch nếu đã cache quá 30 giây

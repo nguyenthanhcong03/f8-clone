@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom'
 
 const AdminLayout = () => {
   return (
-    <div className='flex h-screen overflow-hidden bg-background'>
+    <div className='flex h-screen bg-background'>
       {/* Sidebar */}
       <AdminSidebar />
 
@@ -14,7 +14,7 @@ const AdminLayout = () => {
         <AdminHeader />
 
         {/* Page content */}
-        <main className='flex-1 overflow-hidden overflow-y-auto bg-gray-50 bg-muted/20'>
+        <main className='min-h-0 flex-1 overflow-y-auto bg-gray-50 bg-muted/20'>
           <Outlet />
         </main>
       </div>
