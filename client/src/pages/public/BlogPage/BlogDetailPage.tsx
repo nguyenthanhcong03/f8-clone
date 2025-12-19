@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ROUTES } from '@/lib/constants'
 import { useGetAllBlogsQuery, useGetBlogBySlugQuery } from '@/services/api/blogApi'
 import { formatTimeAgo } from '@/utils/format'
 import { ArrowLeft, Calendar, Clock, Share2, ThumbsUp } from 'lucide-react'
@@ -58,7 +59,7 @@ const BlogDetailPage = () => {
     return (
       <div className='container mx-auto px-4 py-16 text-center'>
         <h1 className='mb-4 text-2xl font-bold'>Không tìm thấy bài viết</h1>
-        <Button onClick={() => navigate('/blog')}>
+        <Button onClick={() => navigate(ROUTES.PUBLIC.BLOGS.LIST)}>
           <ArrowLeft className='mr-2 h-4 w-4' />
           Quay lại danh sách
         </Button>
@@ -71,7 +72,7 @@ const BlogDetailPage = () => {
       {/* Header */}
       <div className='border-b bg-muted/30'>
         <div className='container mx-auto px-4 py-4'>
-          <Button variant='ghost' onClick={() => navigate('/blog')} className='gap-2'>
+          <Button variant='ghost' onClick={() => navigate(ROUTES.PUBLIC.BLOGS.LIST)} className='gap-2'>
             <ArrowLeft className='h-4 w-4' />
             Quay lại
           </Button>

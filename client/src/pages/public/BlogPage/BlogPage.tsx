@@ -1,8 +1,10 @@
 import BlogCard from '@/components/common/blog-card/BlogCard'
+import TablePagination from '@/components/common/pagination/TablePagination'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
+import useDebounce from '@/hooks/useDebounce'
 import { useGetAllBlogsQuery, useGetAllCategoriesQuery } from '@/services/api/blogApi'
 import { Search, TrendingUp } from 'lucide-react'
 import { useState } from 'react'
@@ -11,20 +13,21 @@ const BlogPage = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('')
+  const debouncedSearchQuery = useDebounce(searchQuery, 500)
 
   const { data: blogsData, isLoading: isLoadingBlogs } = useGetAllBlogsQuery({
     page: currentPage,
     limit: 9,
     sort: 'createdAt',
     order: 'desc',
-    search: searchQuery,
+    search: debouncedSearchQuery,
     categoryId: selectedCategory || undefined
   })
 
   const { data: categoriesData } = useGetAllCategoriesQuery({ limit: 50 })
   const blogs = blogsData?.data?.data || []
   const categories = categoriesData?.data?.data || []
-  const totalPages = blogsData?.data ? Math.ceil(blogsData.data.total / blogsData.data.limit) : 1
+  const pagination = blogsData?.data
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -34,23 +37,23 @@ const BlogPage = () => {
   return (
     <div className='min-h-screen bg-gradient-to-b from-background to-muted/20'>
       {/* Hero Section */}
-      <section className='bg-gradient-to-r from-blue-600 to-purple-600 py-16 text-white'>
+      <section className={`bg-[url('@/assets/images/blog-banner.jpg')] bg-cover bg-center py-16 text-white`}>
         <div className='container mx-auto px-4'>
           <div className='mx-auto max-w-3xl text-center'>
-            <h1 className='mb-4 text-4xl font-bold md:text-5xl'>Blog & Bài viết</h1>
+            <h1 className='mb-4 text-4xl font-bold md:text-5xl'>Bài viết</h1>
             <p className='mb-8 text-lg opacity-90'>
               Khám phá kiến thức lập trình, kinh nghiệm thực tế và xu hướng công nghệ mới nhất
             </p>
 
             {/* Search Bar */}
             <form onSubmit={handleSearch} className='mx-auto max-w-2xl'>
-              <div className='flex gap-2 rounded-lg bg-white p-2 shadow-lg'>
+              <div className='flex gap-2 rounded-lg bg-white p-2 shadow-lg dark:bg-black'>
                 <Input
                   type='text'
                   placeholder='Tìm kiếm bài viết...'
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className='border-0 text-gray-900 focus-visible:ring-0'
+                  className='border-0 text-gray-900 focus-visible:ring-0 dark:text-white'
                 />
                 <Button type='submit' className='bg-blue-600 hover:bg-blue-700'>
                   <Search className='h-4 w-4' />
@@ -134,33 +137,12 @@ const BlogPage = () => {
                 </div>
 
                 {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className='mt-8 flex justify-center gap-2'>
-                    <Button
-                      variant='outline'
-                      disabled={currentPage === 1}
-                      onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                    >
-                      Trước
-                    </Button>
-                    {[...Array(totalPages)].map((_, i) => (
-                      <Button
-                        key={i}
-                        variant={currentPage === i + 1 ? 'default' : 'outline'}
-                        onClick={() => setCurrentPage(i + 1)}
-                      >
-                        {i + 1}
-                      </Button>
-                    ))}
-                    <Button
-                      variant='outline'
-                      disabled={currentPage === totalPages}
-                      onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                    >
-                      Sau
-                    </Button>
-                  </div>
-                )}
+                <TablePagination
+                  onPageChange={(newPage) => setCurrentPage(newPage)}
+                  page={currentPage}
+                  totalItems={pagination?.total || 0}
+                  pageSize={pagination?.limit || 6}
+                />
               </>
             )}
           </main>

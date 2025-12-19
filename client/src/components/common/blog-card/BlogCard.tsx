@@ -45,7 +45,7 @@ const BlogCard: React.FC<IBlogCardProps> = ({ blog }) => {
           />
 
           {/* Meta */}
-          <div className='flex items-center gap-4 text-xs text-muted-foreground'>
+          <div className='flex items-center justify-between gap-4 text-xs text-muted-foreground'>
             {blog.author && (
               <div className='flex items-center gap-1'>
                 <Avatar className='h-3 w-3'>

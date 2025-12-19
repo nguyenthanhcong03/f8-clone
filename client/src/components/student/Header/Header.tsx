@@ -65,7 +65,7 @@ const Header = () => {
   return (
     <header className='fixed left-0 right-0 top-0 z-50 border-b bg-background shadow-sm'>
       <div className='mx-auto flex h-16 items-center justify-between px-6'>
-        {/* Logo & Brand */}
+        {/* Logo */}
         <Link to='/' className='flex items-center gap-3 transition-opacity hover:opacity-80'>
           <div className='h-10 w-10 overflow-hidden rounded-lg'>
             <img src={Logo} alt='Logo' width={40} height={40} />
@@ -93,25 +93,21 @@ const Header = () => {
               />
               <span>{item.label}</span>
 
-              {/* Active indicator - bottom border */}
+              {/* Active - border-b */}
               <span
                 className={`absolute bottom-0 left-1/2 h-0.5 -translate-x-1/2 rounded-full bg-primary transition-all duration-300 ${
                   isActiveLink(item.path) ? 'w-full' : 'w-0 group-hover:w-full'
-                }`}
-              />
-
-              {/* Hover background */}
-              <span
-                className={`absolute inset-0 -z-10 rounded-lg bg-primary/5 opacity-0 transition-opacity duration-200 ${
-                  isActiveLink(item.path) ? 'opacity-100' : 'group-hover:opacity-100'
                 }`}
               />
             </Link>
           ))}
         </nav>
 
-        {/* Search bar */}
-        <div className='mx-4 hidden h-10 max-w-xs flex-1 items-center overflow-hidden rounded-full border bg-muted/50 px-4 lg:flex'>
+        {/* Search */}
+        <div className='hidden h-10 w-10 items-center justify-center overflow-hidden rounded-full border bg-muted/50 lg:flex'>
+          <Search className='h-4 w-4 text-muted-foreground' />
+        </div>
+        <div className='mx-4 hidden h-10 max-w-xs flex-1 items-center overflow-hidden rounded-full border bg-muted/50 px-4 xl:flex'>
           <Search className='h-4 w-4 text-muted-foreground' />
           <Input
             className='border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0'

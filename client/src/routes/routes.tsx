@@ -24,6 +24,7 @@ import PortfolioPage from '@/pages/public/PortfolioPage/PortfolioPage'
 
 const publicRoutes: RouteObject[] = [
   { index: true, element: <HomePage /> },
+  { path: 'courses', element: <HomePage /> },
   { path: 'courses/:slug', element: <CourseDetail /> },
   { path: 'roadmap', element: <RoadMapPage /> },
   { path: 'blogs', element: <BlogPage /> },
