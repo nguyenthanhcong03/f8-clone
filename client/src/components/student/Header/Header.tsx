@@ -1,4 +1,6 @@
 import Logo from '@/assets/images/logo.png'
+import ModalAuth from '@/components/auth/auth-modal/AuthModal'
+import ThemeToggle from '@/components/common/theme-toggle/ThemeToggle'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -9,17 +11,14 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import { useLogoutMutation } from '@/services/api/authApi'
 import { useAppSelector } from '@/store/hook'
 import { Bell, BookOpen, Briefcase, FileText, Home, LogOut, Search, User } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { useLogoutMutation } from '@/services/api/authApi'
-import ThemeToggle from '@/components/common/theme-toggle/ThemeToggle'
-import ModalAuth from '@/components/auth/auth-modal/AuthModal'
 
 const Header = () => {
-  const navigate = useNavigate()
   const location = useLocation()
   const { user, isAuthenticated } = useAppSelector((state) => state.auth)
   const [logout] = useLogoutMutation()
@@ -129,7 +128,7 @@ const Header = () => {
           </Button>
 
           {/* User section */}
-          {user ? (
+          {isAuthenticated && user ? (
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 {/* Ảnh và tên người dùng */}
@@ -169,6 +168,12 @@ const Header = () => {
                     Khóa học của tôi
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to='/liked-blogs' className='flex items-center gap-2'>
+                    <BookOpen className='h-4 w-4' />
+                    Bài viết đã thích
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className='text-red-600 focus:text-red-600'>
                   <LogOut className='mr-2 h-4 w-4' />
@@ -190,7 +195,9 @@ const Header = () => {
       </div>
 
       {/* Modal Auth */}
-      <ModalAuth open={openModalAuth} onClose={handleCloseModalAuth} type={typeModalAuth} />
+      {openModalAuth && typeModalAuth && (
+        <ModalAuth open={openModalAuth} onClose={handleCloseModalAuth} type={typeModalAuth} />
+      )}
     </header>
   )
 }

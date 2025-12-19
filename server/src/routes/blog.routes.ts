@@ -7,7 +7,7 @@ import authMiddleware from '@/middleware/auth.middleware'
 
 const router = Router()
 
-// ===== BLOG CATEGORY ROUTES =====
+// Tạo mới thể loại blog
 router.post(
   '/categories',
   authMiddleware.authRequired,
@@ -16,10 +16,13 @@ router.post(
   blogController.createCategory
 )
 
+// Lấy tất cả thể loại blog
 router.get('/categories', blogController.getAllCategories)
 
+// Lấy thể loại blog theo ID
 router.get('/categories/:categoryId', blogController.getCategoryById)
 
+// Chỉnh sửa thể loại blog
 router.put(
   '/categories/:categoryId',
   authMiddleware.authRequired,
@@ -28,6 +31,7 @@ router.put(
   blogController.updateCategory
 )
 
+// Xóa thể loại blog
 router.delete(
   '/categories/:categoryId',
   authMiddleware.authRequired,
@@ -35,7 +39,7 @@ router.delete(
   blogController.deleteCategory
 )
 
-// ===== BLOG ROUTES =====
+// Tạo mới blog
 router.post(
   '/',
   authMiddleware.authRequired,
@@ -45,12 +49,19 @@ router.post(
   blogController.createBlog
 )
 
+// Lấy tất cả blog mà user đã like (đặt trước các routes động)
+router.get('/liked/me', authMiddleware.authRequired, blogController.getLikedBlogs)
+
+// Lấy tất cả blog
 router.get('/', blogController.getAllBlogs)
 
-router.get('/:blogId', blogController.getBlogById)
-
+// Lấy blog theo slug (đặt trước :blogId để tránh conflict)
 router.get('/slug/:slug', blogController.getBlogBySlug)
 
+// Lấy blog theo ID
+router.get('/:blogId', blogController.getBlogById)
+
+// Cập nhật blog
 router.put(
   '/:blogId',
   authMiddleware.authRequired,
@@ -60,6 +71,16 @@ router.put(
   blogController.updateBlog
 )
 
+// Xóa blog
 router.delete('/:blogId', authMiddleware.authRequired, authMiddleware.checkRole('admin'), blogController.deleteBlog)
+
+// Like blog
+router.post('/:blogId/like', authMiddleware.authRequired, blogController.likeBlog)
+
+// Unlike blog
+router.delete('/:blogId/like', authMiddleware.authRequired, blogController.unlikeBlog)
+
+// Kiểm tra người dùng đã like blog chưa
+router.get('/:blogId/like-status', authMiddleware.authRequired, blogController.checkLikeStatus)
 
 export default router

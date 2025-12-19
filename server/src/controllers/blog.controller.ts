@@ -208,6 +208,54 @@ const deleteBlog = asyncHandler(async (req: Request, res: Response) => {
   responseHandler(res, 200, 'Xóa bài viết thành công', null)
 })
 
+// ===== BLOG LIKE CONTROLLERS =====
+
+const likeBlog = asyncHandler(async (req: Request, res: Response) => {
+  const { blogId } = req.params
+  const userId = req.user?.userId as string
+
+  const like = await blogService.likeBlog(userId, blogId)
+  responseHandler(res, 201, 'Đã like bài viết', like)
+})
+
+const unlikeBlog = asyncHandler(async (req: Request, res: Response) => {
+  const { blogId } = req.params
+  const userId = req.user?.userId as string
+
+  await blogService.unlikeBlog(userId, blogId)
+  responseHandler(res, 200, 'Đã bỏ like bài viết', null)
+})
+
+const checkLikeStatus = asyncHandler(async (req: Request, res: Response) => {
+  const { blogId } = req.params
+  const userId = req.user?.userId as string
+
+  const status = await blogService.checkLikeStatus(userId, blogId)
+  responseHandler(res, 200, 'Kiểm tra trạng thái like thành công', status)
+})
+
+const getLikedBlogs = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.user?.userId as string
+  const { page = 1, limit = 10, sort = 'createdAt', order = 'DESC' } = req.query
+
+  const offset = (Number(page) - 1) * Number(limit)
+  const response = await blogService.getLikedBlogs(userId, {
+    offset,
+    limit: Number(limit),
+    order: [[String(sort), String(order).toUpperCase()]]
+  })
+
+  const responseData = {
+    total: response.total,
+    page: Number(page),
+    limit: Number(limit),
+    totalPages: Math.ceil(response.total / Number(limit)),
+    data: response.data
+  }
+
+  responseHandler(res, 200, 'Lấy danh sách bài viết đã like thành công', responseData)
+})
+
 export default {
   // Category controllers
   createCategory,
@@ -221,5 +269,10 @@ export default {
   getBlogById,
   getBlogBySlug,
   updateBlog,
-  deleteBlog
+  deleteBlog,
+  // Like controllers
+  likeBlog,
+  unlikeBlog,
+  checkLikeStatus,
+  getLikedBlogs
 }

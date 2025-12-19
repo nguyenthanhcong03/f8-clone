@@ -142,6 +142,62 @@ export const blogApi = baseApi.injectEndpoints({
         method: 'DELETE'
       }),
       invalidatesTags: [{ type: 'Blog', id: 'LIST' }]
+    }),
+
+    // ===== BLOG LIKE ENDPOINTS =====
+
+    // Like blog
+    likeBlog: builder.mutation<ApiResponse<any>, string>({
+      query: (blogId) => ({
+        url: `/blogs/${blogId}/like`,
+        method: 'POST'
+      }),
+      invalidatesTags: (_result, _error, blogId) => [
+        { type: 'Blog', id: blogId },
+        { type: 'Blog', id: 'LIKED_LIST' }
+      ]
+    }),
+
+    // Unlike blog
+    unlikeBlog: builder.mutation<ApiResponse<null>, string>({
+      query: (blogId) => ({
+        url: `/blogs/${blogId}/like`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: (_result, _error, blogId) => [
+        { type: 'Blog', id: blogId },
+        { type: 'Blog', id: 'LIKED_LIST' }
+      ]
+    }),
+
+    // Kiểm tra trạng thái like
+    checkLikeStatus: builder.query<ApiResponse<{ isLiked: boolean }>, string>({
+      query: (blogId) => `/blogs/${blogId}/like-status`,
+      providesTags: (_result, _error, blogId) => [{ type: 'Blog', id: `LIKE_${blogId}` }]
+    }),
+
+    // Lấy danh sách blog đã like
+    getLikedBlogs: builder.query<
+      ApiResponse<PaginationResponse<Blog>>,
+      { page?: number; limit?: number; sort?: string; order?: string }
+    >({
+      query: (params) => ({
+        url: '/blogs/liked/me',
+        method: 'GET',
+        params: {
+          page: params.page || 1,
+          limit: params.limit || 10,
+          sort: params.sort || 'createdAt',
+          order: params.order || 'DESC'
+        }
+      }),
+      providesTags: (result) =>
+        result?.data?.data
+          ? [
+              ...result.data.data.map(({ blogId }) => ({ type: 'Blog' as const, id: blogId })),
+              { type: 'Blog', id: 'LIKED_LIST' }
+            ]
+          : [{ type: 'Blog', id: 'LIKED_LIST' }]
     })
   })
 })
@@ -160,5 +216,10 @@ export const {
   useGetBlogBySlugQuery,
   useCreateBlogMutation,
   useUpdateBlogMutation,
-  useDeleteBlogMutation
+  useDeleteBlogMutation,
+  // Blog Like hooks
+  useLikeBlogMutation,
+  useUnlikeBlogMutation,
+  useCheckLikeStatusQuery,
+  useGetLikedBlogsQuery
 } = blogApi

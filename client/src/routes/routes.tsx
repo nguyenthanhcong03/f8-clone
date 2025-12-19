@@ -4,23 +4,24 @@ import { CreateCategoryPage, EditCategoryPage } from '@/pages/admin/BlogCategory
 import BlogIndex from '@/pages/admin/BlogManagement/BlogIndex'
 import { CreateBlogPage, EditBlogPage, ViewBlogPage } from '@/pages/admin/BlogManagement/pages'
 import CourseIndex from '@/pages/admin/CourseManagement/CourseIndex'
-import AddCoursePage from '@/pages/admin/CourseManagement/pages/AddCoursePage/CreateCoursePage'
+import CreateCoursePage from '@/pages/admin/CourseManagement/pages/AddCoursePage/CreateCoursePage'
 import EditCoursePage from '@/pages/admin/CourseManagement/pages/EditCoursePage/EditCoursePage'
 import EditCourseStructurePage from '@/pages/admin/CourseManagement/pages/EditCourseStructure/EditCourseStructure'
 import EditLessonPage from '@/pages/admin/CourseManagement/pages/EditLessonPage/EditLessonPage'
 import DashboardPage from '@/pages/admin/DashboardPage/DashboardPage'
-import BlogPage from '@/pages/public/BlogPage/BlogPage'
 import BlogDetailPage from '@/pages/public/BlogPage/BlogDetailPage'
+import BlogPage from '@/pages/public/BlogPage/BlogPage'
 import CourseDetail from '@/pages/public/CourseDetail/CourseDetail'
 import HomePage from '@/pages/public/HomePage/HomePage'
 import RoadMapPage from '@/pages/public/RoadMapPage/RoadMapPage'
 import LearningPage from '@/pages/student/LearningPage/LearningPage'
+import LikedBlogsPage from '@/pages/student/LikedBlogsPage/LikedBlogsPage'
+import MyCoursesPage from '@/pages/student/MyCoursesPage/MyCoursesPage'
 import ProfilePage from '@/pages/student/ProfilePage/ProfilePage'
 import { createBrowserRouter, type RouteObject } from 'react-router-dom'
-import ProtectedRoute from './guards/ProtectedRoute'
-import AdminLayout from './layouts/AdminLayout'
-import MainLayout from './layouts/MainLayout'
-import PortfolioPage from '@/pages/public/PortfolioPage/PortfolioPage'
+import ProtectedRoute from '../components/auth/protected-route/ProtectedRoute'
+import AdminLayout from '../layouts/AdminLayout'
+import MainLayout from '../layouts/MainLayout'
 
 const publicRoutes: RouteObject[] = [
   { index: true, element: <HomePage /> },
@@ -28,14 +29,15 @@ const publicRoutes: RouteObject[] = [
   { path: 'courses/:slug', element: <CourseDetail /> },
   { path: 'roadmap', element: <RoadMapPage /> },
   { path: 'blogs', element: <BlogPage /> },
-  { path: 'blogs/:slug', element: <BlogDetailPage /> },
-  { path: 'portfolio', element: <PortfolioPage /> }
+  { path: 'blogs/:slug', element: <BlogDetailPage /> }
 ]
 
 // Khách hàng đã đăng nhập
 const studentRoutes: RouteObject[] = [
   { path: 'learning/:slug', element: <LearningPage /> },
-  { path: 'profile', element: <ProfilePage /> }
+  { path: 'profile', element: <ProfilePage /> },
+  { path: 'liked-blogs', element: <LikedBlogsPage /> },
+  { path: 'my-courses', element: <MyCoursesPage /> }
 ]
 
 // Admin
@@ -45,7 +47,7 @@ const adminRoutes: RouteObject[] = [
     path: 'courses',
     children: [
       { index: true, element: <CourseIndex /> },
-      { path: 'create', element: <AddCoursePage /> },
+      { path: 'create', element: <CreateCoursePage /> },
       { path: ':courseId', element: <EditCoursePage /> },
       { path: 'edit-structure/:courseId', element: <EditCourseStructurePage /> },
       { path: ':courseId/sections/:sectionId/lessons/:lessonId', element: <EditLessonPage /> }

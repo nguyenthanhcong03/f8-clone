@@ -59,10 +59,10 @@ const BlogTable = () => {
 
   // Hook API để lấy danh sách blog
   const { data, isFetching, isError, refetch } = useGetAllBlogsQuery(apiParams)
-  console.log('data :>> ', data)
   const [deleteBlog, { isLoading: isDeleting }] = useDeleteBlogMutation()
 
   const blogs = data?.data?.data || []
+  console.log('blogs :>> ', blogs)
   const pagination = data?.data
     ? {
         total: data.data.total,
@@ -173,7 +173,7 @@ const BlogTable = () => {
                         <span className='line-clamp-1 text-sm text-muted-foreground'>{formatDate(blog.createdAt)}</span>
                       </TableCell>
                       <TableCell>
-                        <div className='text-center text-sm text-muted-foreground'>{blog.likes}</div>
+                        <div className='text-center text-sm text-muted-foreground'>{blog.likesCount}</div>
                       </TableCell>
                       <TableCell>
                         <div className='flex items-center justify-center gap-2'>
@@ -243,31 +243,6 @@ const BlogTable = () => {
             totalItems={pagination?.total || 0}
             pageSize={pagination?.limit || 5}
           />
-          {/* {pagination && pagination.totalPages > 1 && (
-            <div className='flex items-center justify-between'>
-              <div className='text-sm text-muted-foreground'>
-                Trang {pagination.currentPage} trong {pagination.totalPages} ({pagination.total} bài viết)
-              </div>
-              <div className='flex items-center gap-2'>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  onClick={() => setCurrentPage(currentPage - 1)}
-                  disabled={currentPage <= 1}
-                >
-                  Trước
-                </Button>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                  disabled={currentPage >= pagination.totalPages}
-                >
-                  Sau
-                </Button>
-              </div>
-            </div>
-          )} */}
         </>
       )}
     </div>

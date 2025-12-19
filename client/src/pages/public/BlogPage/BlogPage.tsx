@@ -27,7 +27,12 @@ const BlogPage = () => {
   const { data: categoriesData } = useGetAllCategoriesQuery({ limit: 50 })
   const blogs = blogsData?.data?.data || []
   const categories = categoriesData?.data?.data || []
-  const pagination = blogsData?.data
+  const pagination = {
+    total: blogsData?.data?.total || 0,
+    limit: blogsData?.data?.limit || 9,
+    page: blogsData?.data?.page || 1,
+    totalPages: blogsData?.data?.totalPages || 0
+  }
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -53,7 +58,7 @@ const BlogPage = () => {
                   placeholder='Tìm kiếm bài viết...'
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className='border-0 text-gray-900 focus-visible:ring-0 dark:text-white'
+                  className='border-0 text-gray-900 focus-visible:ring-1 dark:text-white'
                 />
                 <Button type='submit' className='bg-blue-600 hover:bg-blue-700'>
                   <Search className='h-4 w-4' />

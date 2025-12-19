@@ -1,6 +1,7 @@
-import { Blog, BlogCategory, User } from '@/models'
+import { Blog, BlogCategory, User, BlogLike } from '@/models'
 import ApiError from '@/utils/ApiError'
 import uploadService from './upload.service'
+import sequelize from '@/config/database'
 
 export const BlogService = {
   // ===== CATEGORY SERVICES =====
@@ -134,6 +135,77 @@ export const BlogService = {
 
     await blog.destroy()
     return { message: 'Xóa bài viết thành công' }
+  },
+
+  // Like bài viết
+  async likeBlog(userId: string, blogId: string) {
+    // Kiểm tra blog có tồn tại không
+    const blog = await Blog.findByPk(blogId)
+    if (!blog) {
+      throw new ApiError(404, 'Bài viết không tồn tại')
+    }
+
+    // Kiểm tra đã like chưa
+    const existingLike = await BlogLike.findOne({ where: { userId, blogId } })
+    if (existingLike) {
+      throw new ApiError(400, 'Bạn đã like bài viết này rồi')
+    }
+
+    // Tạo like mới
+    const like = await BlogLike.create({ userId, blogId })
+    await blog.increment('likesCount', { by: 1 })
+    return like
+  },
+
+  // Unlike bài viết
+  async unlikeBlog(userId: string, blogId: string) {
+    // Kiểm tra blog có tồn tại không
+    const blog = await Blog.findByPk(blogId)
+    if (!blog) {
+      throw new ApiError(404, 'Bài viết không tồn tại')
+    }
+
+    // Tìm like
+    const like = await BlogLike.findOne({ where: { userId, blogId } })
+    if (!like) {
+      throw new ApiError(400, 'Bạn chưa like bài viết này')
+    }
+
+    // Xóa like
+    await like.destroy()
+    await blog.decrement('likesCount', { by: 1 })
+    return { message: 'Đã bỏ like bài viết' }
+  },
+
+  async checkLikeStatus(userId: string, blogId: string) {
+    const like = await BlogLike.findOne({ where: { userId, blogId } })
+    return { isLiked: !!like }
+  },
+
+  async getLikedBlogs(userId: string, options: any) {
+    const { count, rows } = await Blog.findAndCountAll({
+      include: [
+        {
+          model: User,
+          as: 'likedByUsers',
+          where: { userId },
+          attributes: [], // Không cần lấy thuộc tính của User
+          through: { attributes: [] } // Không lấy thuộc tính từ bảng trung gian (blogLike)
+        },
+        { model: User, as: 'author', attributes: ['userId', 'name', 'avatar'] },
+        { model: BlogCategory, as: 'category', attributes: ['categoryId', 'name', 'slug'] }
+      ],
+      limit: options.limit,
+      offset: options.offset,
+      order: options.order,
+      distinct: true
+    })
+    return { total: count, data: rows }
+  },
+
+  async getBlogLikeCount(blogId: string) {
+    const count = await BlogLike.count({ where: { blogId } })
+    return count
   }
 }
 

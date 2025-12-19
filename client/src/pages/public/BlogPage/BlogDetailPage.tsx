@@ -5,15 +5,23 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ROUTES } from '@/lib/constants'
-import { useGetAllBlogsQuery, useGetBlogBySlugQuery } from '@/services/api/blogApi'
+import {
+  useCheckLikeStatusQuery,
+  useGetAllBlogsQuery,
+  useGetBlogBySlugQuery,
+  useLikeBlogMutation,
+  useUnlikeBlogMutation
+} from '@/services/api/blogApi'
 import { formatTimeAgo } from '@/utils/format'
 import { ArrowLeft, Calendar, Clock, Share2, ThumbsUp } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 const BlogDetailPage = () => {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
+  const [isLiked, setIsLiked] = useState(false)
 
   const { data: blogData, isLoading, error } = useGetBlogBySlugQuery(slug!)
   const { data: relatedBlogsData } = useGetAllBlogsQuery({
@@ -25,7 +33,42 @@ const BlogDetailPage = () => {
   })
 
   const blog = blogData?.data
+  const blogId = blog?.blogId
+
+  // Check like status
+  const { data: likeStatusData } = useCheckLikeStatusQuery(blogId!, {
+    skip: !blogId
+  })
+
+  const [likeBlog, { isLoading: isLiking }] = useLikeBlogMutation()
+  const [unlikeBlog, { isLoading: isUnliking }] = useUnlikeBlogMutation()
+
   const relatedBlogs = relatedBlogsData?.data?.data?.filter((b) => b.blogId !== blog?.blogId) || []
+
+  // Update like status when data changes
+  useEffect(() => {
+    if (likeStatusData?.data) {
+      setIsLiked(likeStatusData.data.isLiked)
+    }
+  }, [likeStatusData])
+
+  const handleLike = async () => {
+    if (!blogId) return
+
+    try {
+      if (isLiked) {
+        await unlikeBlog(blogId).unwrap()
+        setIsLiked(false)
+        toast.success('Đã bỏ thích bài viết')
+      } else {
+        await likeBlog(blogId).unwrap()
+        setIsLiked(true)
+        toast.success('Đã thích bài viết')
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Có lỗi xảy ra')
+    }
+  }
 
   const handleShare = async () => {
     try {
@@ -126,9 +169,15 @@ const BlogDetailPage = () => {
 
           {/* Action Buttons */}
           <div className='mb-8 flex flex-wrap gap-2'>
-            <Button variant='outline' size='sm' className='gap-2'>
-              <ThumbsUp className='h-4 w-4' />
-              <span>Thích ({blog.likes || 0})</span>
+            <Button
+              variant={isLiked ? 'default' : 'outline'}
+              size='sm'
+              className='gap-2'
+              onClick={handleLike}
+              disabled={isLiking || isUnliking}
+            >
+              <ThumbsUp className={`h-4 w-4 ${isLiked ? 'fill-current' : ''}`} />
+              <span>{isLiked ? 'Đã thích' : 'Thích'}</span>
             </Button>
             <Button variant='outline' size='sm' className='gap-2' onClick={handleShare}>
               <Share2 className='h-4 w-4' />

@@ -1,5 +1,6 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { cn } from '@/lib/utils'
 import { BookOpen, FolderTree, LayoutDashboard, ListChecks, Menu, Newspaper, Settings, Users } from 'lucide-react'
 import { useState } from 'react'
@@ -48,6 +49,7 @@ const SIDEBAR_ITEMS: MenuItem[] = [
 const AdminSidebar = () => {
   const location = useLocation()
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const isMobile = useMediaQuery('(max-width: 1024px)')
 
   const isActive = (path: string) => {
     return location.pathname.startsWith(path)

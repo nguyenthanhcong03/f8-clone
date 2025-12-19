@@ -10,5 +10,6 @@ export interface PaginationResponse<T> {
   total: number // Tổng số mục
   page: number // Trang hiện tại
   limit: number // Số mục trên mỗi trang
+  totalPages: number // Tổng số trang
   data: T[] // Mảng dữ liệu của trang hiện tại
 }

@@ -11,15 +11,12 @@ type BlogAttributes = {
   authorId: string
   thumbnail: string
   status: BlogStatus
-  likes: number
   thumbnailPublicId: string
   publishedAt?: Date
+  likesCount: number
 }
 
-type BlogCreationAttributes = Optional<
-  BlogAttributes,
-  'blogId' | 'thumbnail' | 'thumbnailPublicId' | 'likes' | 'publishedAt'
->
+type BlogCreationAttributes = Optional<BlogAttributes, 'blogId' | 'thumbnail' | 'thumbnailPublicId' | 'publishedAt'>
 
 class Blog extends Model<BlogAttributes, BlogCreationAttributes> implements BlogAttributes {
   declare blogId: string
@@ -33,6 +30,7 @@ class Blog extends Model<BlogAttributes, BlogCreationAttributes> implements Blog
   declare likes: number
   declare thumbnailPublicId: string
   declare publishedAt?: Date
+  declare likesCount: number
 }
 
 Blog.init(
@@ -84,14 +82,14 @@ Blog.init(
       allowNull: false,
       defaultValue: 'draft'
     },
-    likes: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0
-    },
     publishedAt: {
       type: DataTypes.DATE,
       allowNull: true
+    },
+    likesCount: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
     }
   },
   {

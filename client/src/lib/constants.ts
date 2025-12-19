@@ -11,7 +11,8 @@ export const ROUTES = {
 
   STUDENT: {
     LEARNING: (slug: string = ':slug') => `/learning/${slug}`,
-    PROFILE: '/profile'
+    PROFILE: '/profile',
+    LIKED_BLOGS: '/liked-blogs'
   },
 
   ADMIN: {

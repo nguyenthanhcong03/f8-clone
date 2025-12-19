@@ -30,14 +30,14 @@ interface ModalAuthProps {
 
 // schema
 const loginSchema = z.object({
-  email: z.string().min(1, 'Email không được để trống').email('Email không hợp lệ'),
-  password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
+  loginEmail: z.string().min(1, 'Email không được để trống').email('Email không hợp lệ'),
+  loginPassword: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
 })
 
 const registerSchema = z.object({
-  name: z.string().min(1, 'Tên không được để trống'),
-  email: z.string().min(1, 'Email không được để trống').email('Email không hợp lệ'),
-  password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
+  registerName: z.string().min(1, 'Tên không được để trống'),
+  registerEmail: z.string().min(1, 'Email không được để trống').email('Email không hợp lệ'),
+  registerPassword: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
 })
 
 type LoginFormValues = z.infer<typeof loginSchema>
@@ -51,17 +51,17 @@ const ModalAuth = ({ open, onClose, type: initialType }: ModalAuthProps) => {
 
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '' }
+    defaultValues: { loginEmail: '', loginPassword: '' }
   })
 
   const registerForm = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { name: '', email: '', password: '' }
+    defaultValues: { registerName: '', registerEmail: '', registerPassword: '' }
   })
 
   const onLoginSubmit = async (data: LoginFormValues) => {
     try {
-      await login(data).unwrap()
+      await login({ email: data.loginEmail, password: data.loginPassword }).unwrap()
       toast.success('Đăng nhập thành công!')
       onClose()
     } catch {
@@ -71,10 +71,10 @@ const ModalAuth = ({ open, onClose, type: initialType }: ModalAuthProps) => {
 
   const onRegisterSubmit = async (data: RegisterFormValues) => {
     try {
-      await register(data).unwrap()
+      await register({ name: data.registerName, email: data.registerEmail, password: data.registerPassword }).unwrap()
       toast.success('Đăng ký thành công! Vui lòng đăng nhập.')
       setType('login')
-      loginForm.reset({ email: data.email, password: '' })
+      loginForm.reset({ loginEmail: data.registerEmail, loginPassword: '' })
     } catch {
       toast.error('Đăng ký thất bại. Vui lòng kiểm tra lại thông tin.')
     }
@@ -84,7 +84,7 @@ const ModalAuth = ({ open, onClose, type: initialType }: ModalAuthProps) => {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className='max-w-md rounded-2xl p-6'>
         <div className='flex justify-between'>
-          <DialogClose className='absolute right-4 top-4 rounded-full bg-[#E9F1F8] p-2'>
+          <DialogClose className='absolute right-4 top-4 rounded-full bg-[#E9F1F8] p-2 dark:bg-slate-600'>
             <X className='h-5 w-5' />
           </DialogClose>
         </div>
@@ -104,7 +104,7 @@ const ModalAuth = ({ open, onClose, type: initialType }: ModalAuthProps) => {
             <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className='mt-4 flex flex-col gap-4'>
               <FormField
                 control={loginForm.control}
-                name='email'
+                name='loginEmail'
                 render={({ field }) => (
                   <FormItem>
                     <Label>Email</Label>
@@ -115,7 +115,7 @@ const ModalAuth = ({ open, onClose, type: initialType }: ModalAuthProps) => {
               />
               <FormField
                 control={loginForm.control}
-                name='password'
+                name='loginPassword'
                 render={({ field }) => (
                   <FormItem>
                     <Label>Mật khẩu</Label>
@@ -143,7 +143,7 @@ const ModalAuth = ({ open, onClose, type: initialType }: ModalAuthProps) => {
             <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className='mt-4 flex flex-col gap-4'>
               <FormField
                 control={registerForm.control}
-                name='name'
+                name='registerName'
                 render={({ field }) => (
                   <FormItem>
                     <Label>Họ và tên</Label>
@@ -154,7 +154,7 @@ const ModalAuth = ({ open, onClose, type: initialType }: ModalAuthProps) => {
               />
               <FormField
                 control={registerForm.control}
-                name='email'
+                name='registerEmail'
                 render={({ field }) => (
                   <FormItem>
                     <Label>Email</Label>
@@ -165,7 +165,7 @@ const ModalAuth = ({ open, onClose, type: initialType }: ModalAuthProps) => {
               />
               <FormField
                 control={registerForm.control}
-                name='password'
+                name='registerPassword'
                 render={({ field }) => (
                   <FormItem>
                     <Label>Mật khẩu</Label>
