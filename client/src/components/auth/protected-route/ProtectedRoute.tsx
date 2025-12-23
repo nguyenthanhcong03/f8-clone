@@ -1,3 +1,4 @@
+import AppLoader from '@/components/common/loading/AppLoader'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 
@@ -22,13 +23,7 @@ const ProtectedRoute = ({
   const { user, isAuthenticated, isLoading } = useAppSelector((state) => state.auth)
 
   if (isLoading) {
-    return (
-      fallbackComponent || (
-        <div className='absolute inset-0 flex h-screen w-screen items-center justify-center bg-black/50'>
-          <div className='h-12 w-12 animate-spin rounded-full border-t-4 border-solid border-white'></div>
-        </div>
-      )
-    )
+    return fallbackComponent || <AppLoader />
   }
 
   // Chuyển hướng người dùng không được xác thực đến trang đăng nhập với đường dẫn trở về

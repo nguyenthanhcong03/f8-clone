@@ -13,7 +13,7 @@ import { toast } from 'react-toastify'
 import CourseCheckoutModal from './components/CourseCheckoutModal'
 import CourseOutline from './components/CourseOutline'
 
-const CourseDetail = () => {
+const CourseDetailPage = () => {
   const { slug } = useParams()
   const navigate = useNavigate()
   const { isAuthenticated } = useAppSelector((state) => state.auth)
@@ -158,4 +158,4 @@ const CourseDetail = () => {
   )
 }
 
-export default CourseDetail
+export default CourseDetailPage

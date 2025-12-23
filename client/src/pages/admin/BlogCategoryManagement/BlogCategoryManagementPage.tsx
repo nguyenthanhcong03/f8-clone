@@ -1,7 +1,7 @@
 import BlogCategoryStats from './components/BlogCategoryStats'
 import BlogCategoryTable from './components/BlogCategoryTable'
 
-const BlogCategoryIndex = () => {
+const BlogCategoryManagementPage = () => {
   return (
     <div className='space-y-8 p-6'>
       {/* Thống kê tổng quan */}
@@ -13,4 +13,4 @@ const BlogCategoryIndex = () => {
   )
 }
 
-export default BlogCategoryIndex
+export default BlogCategoryManagementPage

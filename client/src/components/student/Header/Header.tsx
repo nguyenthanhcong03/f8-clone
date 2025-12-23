@@ -52,8 +52,7 @@ const Header = () => {
   const navItems = [
     { label: 'Trang chủ', path: '/', icon: Home },
     { label: 'Khóa học', path: '/courses', icon: BookOpen },
-    { label: 'Bài viết', path: '/blogs', icon: FileText },
-    { label: 'Portfolio', path: '/portfolio', icon: Briefcase }
+    { label: 'Bài viết', path: '/blogs', icon: FileText }
   ]
 
   const isActiveLink = (path: string) => {

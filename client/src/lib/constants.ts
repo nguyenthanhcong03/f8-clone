@@ -4,7 +4,8 @@ export const ROUTES = {
     ROADMAP: '/roadmap',
     BLOGS: {
       LIST: '/blogs',
-      DETAIL: (slug: string = ':slug') => `/blogs/${slug}`
+      DETAIL: (slug: string = ':slug') => `/blogs/${slug}`,
+      BY_TOPIC: (topicSlug: string = ':topicSlug') => `/blogs/topic/${topicSlug}`
     },
     COURSE_DETAIL: (slug: string = ':slug') => `/${slug}`
   },

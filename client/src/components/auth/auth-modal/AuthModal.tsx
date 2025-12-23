@@ -96,7 +96,7 @@ const ModalAuth = ({ open, onClose, type: initialType }: ModalAuthProps) => {
             </div>
           </DialogTitle>
           <DialogDescription className='text-center text-sm text-muted-foreground'>
-            Mỗi người nên sử dụng riêng một tài khoản, tài khoản dùng chung sẽ bị khóa.
+            Chào mừng bạn trở lại với F8.
           </DialogDescription>
         </DialogHeader>
         {type === 'login' ? (

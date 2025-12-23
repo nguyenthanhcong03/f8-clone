@@ -1,6 +1,6 @@
 import { CourseStats, CourseTable } from './components'
 
-const CourseIndex = () => {
+const CourseManagementPage = () => {
   return (
     <div className='space-y-8 p-6'>
       {/* Thống kê tổng quan */}
@@ -12,4 +12,4 @@ const CourseIndex = () => {
   )
 }
 
-export default CourseIndex
+export default CourseManagementPage
