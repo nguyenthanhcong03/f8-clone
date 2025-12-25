@@ -1,8 +1,6 @@
 import { Request, Response } from 'express'
-import userService from '../services/user.service'
 import { CreateUserInput, GetUserInput, UpdateUserInput } from '../schemas/user.schema'
-import asyncHandler from '@/utils/asyncHandler'
-import { responseHandler } from '@/utils/responseHandler'
+import userService from '../services/user.service'
 
 const createUser = async (req: Request<object, object, CreateUserInput['body']>, res: Response) => {
   try {
@@ -135,56 +133,6 @@ const getUsersByRole = async (req: Request, res: Response) => {
   }
 }
 
-const uploadAvatar = async (req: Request<GetUserInput['params']>, res: Response) => {
-  try {
-    const userId = parseInt(req.params.id)
-
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        error: 'No file uploaded'
-      })
-    }
-
-    const user = await userService.uploadAvatar(userId, req.file.buffer)
-    res.status(200).json({
-      success: true,
-      data: user,
-      message: 'Avatar uploaded successfully'
-    })
-  } catch (error) {
-    const statusCode = error instanceof Error && error.message === 'User not found' ? 404 : 500
-    res.status(statusCode).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'An error occurred'
-    })
-  }
-}
-
-const deleteAvatar = async (req: Request<GetUserInput['params']>, res: Response) => {
-  try {
-    const userId = parseInt(req.params.id)
-    const user = await userService.deleteAvatar(userId)
-    res.status(200).json({
-      success: true,
-      data: user,
-      message: 'Avatar deleted successfully'
-    })
-  } catch (error) {
-    const statusCode = error instanceof Error && error.message === 'User not found' ? 404 : 500
-    res.status(statusCode).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'An error occurred'
-    })
-  }
-}
-
-const getPublicProfileByUsername = asyncHandler(async (req: Request, res: Response) => {
-  const { username } = req.params
-  const user = await userService.getPublicProfileByUsername(username)
-  responseHandler(res, 200, 'Lấy thông tin người dùng thành công', user)
-})
-
 export default {
   createUser,
   getAllUsers,
@@ -192,8 +140,5 @@ export default {
   updateUser,
   deleteUser,
   getUserByEmail,
-  getUsersByRole,
-  uploadAvatar,
-  deleteAvatar,
-  getPublicProfileByUsername
+  getUsersByRole
 }

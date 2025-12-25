@@ -20,6 +20,7 @@ import HomePage from '@/pages/public/HomePage/HomePage'
 import PublicProfilePage from '@/pages/public/PublicProfilePage/PublicProfilePage'
 import CreateBlogPage from '@/pages/student/CreateBlogPage/CreateBlogPage'
 import EditBlogPage from '@/pages/student/EditBlogPage/EditBlogPage'
+import EditProfilePage from '@/pages/student/EditProfilePage/EditProfilePage'
 import LearningPage from '@/pages/student/LearningPage/LearningPage'
 import LikedBlogsPage from '@/pages/student/LikedBlogsPage/LikedBlogsPage'
 import MyCoursesPage from '@/pages/student/MyCoursesPage/MyCoursesPage'
@@ -43,7 +44,8 @@ const studentRoutes: RouteObject[] = [
   { path: 'my-courses', element: <MyCoursesPage /> },
   { path: 'my-posts', element: <MyPostsPage /> },
   { path: 'blog/create', element: <CreateBlogPage /> },
-  { path: 'blog/:slug/edit', element: <EditBlogPage /> }
+  { path: 'blog/:slug/edit', element: <EditBlogPage /> },
+  { path: 'profile/edit', element: <EditProfilePage /> }
 ]
 
 // Admin

@@ -1,10 +1,12 @@
+import BlogCard from '@/components/common/blog-card/BlogCard'
 import { Loading } from '@/components/common/loading/Loading'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { ROUTES } from '@/lib/constants'
 import { cn } from '@/lib/utils'
-import { useGetPublicProfileByUsernameQuery } from '@/services/api/userApi'
+import { useGetPublicProfileByUsernameQuery } from '@/services/api/authApi'
 import { useAppSelector } from '@/store/hook'
 import { BookOpen, CalendarDays, GraduationCap, PlayCircle, Star, Users } from 'lucide-react'
 import React, { useState } from 'react'
@@ -15,7 +17,7 @@ type TabType = 'blogs' | 'courses'
 const PublicProfilePage: React.FC = () => {
   const { username } = useParams<{ username: string }>()
   const { user: currentUser } = useAppSelector((state) => state.auth)
-  const isMe = currentUser?.username === username
+  const isMe: boolean = currentUser?.username === username
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<TabType>('blogs')
 
@@ -91,7 +93,11 @@ const PublicProfilePage: React.FC = () => {
 
                     {/* Edit Profile Button - Only show if viewing own profile */}
                     {isMe && (
-                      <Button variant='default' className='w-full' onClick={() => navigate('/settings/profile')}>
+                      <Button
+                        variant='default'
+                        className='w-full'
+                        onClick={() => navigate(ROUTES.STUDENT.PROFILE.EDIT)}
+                      >
                         Chỉnh sửa hồ sơ
                       </Button>
                     )}
@@ -169,50 +175,7 @@ const PublicProfilePage: React.FC = () => {
                     {/* Blog Grid */}
                     <div className='grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3'>
                       {user.blogs.map((blog) => (
-                        <Card
-                          key={blog.blogId}
-                          className='group cursor-pointer overflow-hidden border-0 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md'
-                          onClick={() => handleNavigateToBlog(blog.slug)}
-                        >
-                          {/* Thumbnail */}
-                          <div className='relative overflow-hidden'>
-                            <img
-                              src={blog.thumbnail || 'https://via.placeholder.com/400x250'}
-                              alt={blog.title}
-                              className='h-[200px] w-full object-cover transition-transform duration-300 group-hover:scale-105'
-                            />
-                            <div className='absolute inset-0 bg-black/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
-
-                            {/* Category Badge */}
-                            {blog.category && (
-                              <div className='absolute left-3 top-3'>
-                                <Badge className='bg-blue-500 text-white hover:bg-blue-600'>{blog.category.name}</Badge>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Content */}
-                          <CardContent className='p-5'>
-                            {/* Title */}
-                            <h3 className='mb-3 line-clamp-2 text-base font-bold leading-tight text-gray-900 transition-colors duration-200 group-hover:text-primary'>
-                              {blog.title}
-                            </h3>
-
-                            {/* Meta Info */}
-                            <div className='flex items-center justify-between text-sm text-gray-600'>
-                              <div className='flex items-center gap-2'>
-                                <Avatar className='h-6 w-6'>
-                                  <AvatarImage src={blog.author?.avatar} alt={blog.author?.name} />
-                                  <AvatarFallback className='text-xs'>{blog.author?.name?.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                                <span className='text-xs'>{blog.author?.name}</span>
-                              </div>
-                              <span className='text-xs text-gray-500'>
-                                {blog.createdAt ? new Date(blog.createdAt).toLocaleDateString('vi-VN') : ''}
-                              </span>
-                            </div>
-                          </CardContent>
-                        </Card>
+                        <BlogCard key={blog.blogId} blog={blog} />
                       ))}
                     </div>
                   </>

@@ -1,4 +1,3 @@
-import { Blog, Course, Lesson, Section } from '@/models'
 import { deleteImage, uploadImage } from '@/utils/cloudinary'
 import bcrypt from 'bcryptjs'
 import User from '../models/user.model'
@@ -141,35 +140,6 @@ export const userService = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _, ...userWithoutPassword } = user.toJSON()
     return userWithoutPassword
-  },
-
-  async getPublicProfileByUsername(username: string) {
-    const user = await User.findOne({
-      where: { username },
-      attributes: ['userId', 'fullName', 'username', 'avatar', 'createdAt'],
-      include: [
-        {
-          model: Course,
-          as: 'enrolledCourses',
-          through: { attributes: [] },
-          include: [
-            { model: Section, as: 'sections', include: [{ model: Lesson, as: 'lessons' }] },
-            { model: User, as: 'creator' }
-          ]
-        },
-        {
-          model: Blog,
-          as: 'blogs',
-          include: [{ model: User, as: 'author' }]
-        }
-      ]
-    })
-    if (!user) {
-      throw new Error('Người dùng không tồn tại')
-    }
-
-    console.log('user :>> ', user.toJSON())
-    return user
   }
 }
 

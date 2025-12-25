@@ -22,6 +22,9 @@ export const ROUTES = {
     BLOG: {
       CREATE: '/blog/create',
       EDIT: (slug: string = ':slug') => `/blog/${slug}/edit`
+    },
+    PROFILE: {
+      EDIT: '/profile/edit'
     }
   },
 

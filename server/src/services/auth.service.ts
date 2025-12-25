@@ -1,9 +1,11 @@
+import { Blog, Course, Lesson, Section } from '@/models'
 import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
 import User from '../models/user.model'
 import { LoginAccountInput, RegisterAccountInput } from '../schemas/auth.schema'
 import ApiError from '../utils/ApiError'
+import { deleteImage, uploadImage } from '../utils/cloudinary'
 import { generateAccessToken, generateRefreshToken } from '../utils/jwt'
-import jwt from 'jsonwebtoken'
 
 const register = async (userData: RegisterAccountInput['body']) => {
   const { fullName, username, email, password } = userData
@@ -140,8 +142,28 @@ const updateProfile = async (
 
   // Cập nhật avatar nếu có file
   if (file) {
-    user.avatar = file.path // Giả sử bạn lưu đường dẫn file trong trường avatar
+    try {
+      // Upload ảnh mới lên Cloudinary
+      const result = (await uploadImage(file.buffer, 'f8-clone/avatars')) as any
+
+      // Xóa avatar cũ nếu có
+      if (user.avatarPublicId) {
+        try {
+          await deleteImage(user.avatarPublicId)
+        } catch (error) {
+          console.error('Failed to delete old avatar:', error)
+          throw new ApiError(500, 'Không thể xóa ảnh đại diện cũ')
+        }
+      }
+
+      // Cập nhật URL avatar mới
+      user.avatar = result.secure_url
+    } catch (error) {
+      console.error('Failed to upload avatar:', error)
+      throw new ApiError(500, 'Không thể tải lên ảnh đại diện')
+    }
   }
+
   if (fullName) {
     user.fullName = fullName
   }
@@ -151,7 +173,35 @@ const updateProfile = async (
   if (phone) {
     user.phone = phone
   }
+
   await user.save()
+  return user
+}
+
+const getPublicProfileByUsername = async (username: string) => {
+  const user = await User.findOne({
+    where: { username },
+    attributes: ['userId', 'fullName', 'username', 'avatar', 'createdAt'],
+    include: [
+      {
+        model: Course,
+        as: 'enrolledCourses',
+        through: { attributes: [] },
+        include: [
+          { model: Section, as: 'sections', include: [{ model: Lesson, as: 'lessons' }] },
+          { model: User, as: 'creator' }
+        ]
+      },
+      {
+        model: Blog,
+        as: 'blogs',
+        include: [{ model: User, as: 'author' }]
+      }
+    ]
+  })
+  if (!user) {
+    throw new Error('Người dùng không tồn tại')
+  }
   return user
 }
 
@@ -161,5 +211,6 @@ export default {
   changePassword,
   refreshToken,
   getProfile,
-  updateProfile
+  updateProfile,
+  getPublicProfileByUsername
 }

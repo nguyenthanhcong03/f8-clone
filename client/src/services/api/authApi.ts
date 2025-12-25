@@ -65,13 +65,36 @@ export const authApi = baseApi.injectEndpoints({
         }),
         transformResponse: (response: ApiResponse<User>) => response.data!
       }),
-      updateUser: builder.mutation({
-        query: (body) => ({
-          url: '/auth/profile',
-          method: 'PUT',
-          body
-        }),
-        invalidatesTags: ['User']
+      updateProfile: builder.mutation<User, { fullName?: string; username?: string; phone?: string; avatar?: File }>({
+        query: (data) => {
+          const formData = new FormData()
+
+          if (data.fullName) formData.append('fullName', data.fullName)
+          if (data.username) formData.append('username', data.username)
+          if (data.phone) formData.append('phone', data.phone)
+          if (data.avatar) formData.append('avatar', data.avatar)
+          return {
+            url: '/auth/profile',
+            method: 'PUT',
+            body: formData
+          }
+        },
+        invalidatesTags: ['User'],
+        async onQueryStarted(args, { queryFulfilled, dispatch }) {
+          try {
+            const result = await queryFulfilled
+            console.log('result :>> ', result)
+            // Cập nhật user trong store sau khi update thành công
+            dispatch(setCredentials(result.data.data))
+          } catch (error) {
+            console.error('Update profile failed:', error)
+          }
+        }
+      }),
+      // Lấy thông tin user theo username
+      getPublicProfileByUsername: builder.query({
+        query: (username) => `/auth/public-profile/${username}`,
+        providesTags: (result) => (result?.data ? [{ type: 'User', id: result.data.userId }] : [])
       })
     }
   }
@@ -82,6 +105,7 @@ export const {
   useRegisterMutation,
   useLogoutMutation,
   useGetCurrentUserQuery,
-  useUpdateUserMutation,
-  useGetProfileQuery
+  useUpdateProfileMutation,
+  useGetProfileQuery,
+  useGetPublicProfileByUsernameQuery
 } = authApi

@@ -43,10 +43,7 @@ const changePassword = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const result = await authService.changePassword(userId, currentPassword, newPassword)
-  res.status(200).json({
-    success: true,
-    message: result.message
-  })
+  responseHandler(res, 200, 'Thay đổi mật khẩu thành công', result)
 })
 
 const logout = asyncHandler(async (req: Request, res: Response) => {
@@ -57,10 +54,7 @@ const logout = asyncHandler(async (req: Request, res: Response) => {
     // sameSite: "Strict",
     // maxAge: process.env.REFRESH_TOKEN_COOKIE_EXPIRES,
   })
-  res.status(200).json({
-    success: true,
-    message: 'Đăng xuất thành công'
-  })
+  responseHandler(res, 200, 'Đăng xuất thành công')
 })
 
 const refreshToken = asyncHandler(async (req: Request, res: Response) => {
@@ -82,10 +76,7 @@ const getCurrentUser = asyncHandler(async (req: Request, res: Response) => {
     attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
   })
 
-  res.status(200).json({
-    success: true,
-    data: user
-  })
+  responseHandler(res, 200, 'Lấy thông tin người dùng thành công', user)
 })
 
 const getProfile = asyncHandler(async (req: Request, res: Response) => {
@@ -94,10 +85,7 @@ const getProfile = asyncHandler(async (req: Request, res: Response) => {
     throw new ApiError(401, 'Unauthorized')
   }
   const user = await authService.getProfile(userId)
-  res.status(200).json({
-    success: true,
-    data: user
-  })
+  responseHandler(res, 200, 'Lấy thông tin người dùng thành công', user)
 })
 
 const updateProfile = asyncHandler(async (req: Request, res: Response) => {
@@ -106,11 +94,13 @@ const updateProfile = asyncHandler(async (req: Request, res: Response) => {
     throw new ApiError(401, 'Unauthorized')
   }
   const updatedUser = await authService.updateProfile(userId, req.body, req.file)
-  res.status(200).json({
-    success: true,
-    data: updatedUser,
-    message: 'Cập nhật hồ sơ thành công'
-  })
+  responseHandler(res, 200, 'Cập nhật thông tin người dùng thành công', updatedUser)
+})
+
+const getPublicProfileByUsername = asyncHandler(async (req: Request, res: Response) => {
+  const { username } = req.params
+  const user = await authService.getPublicProfileByUsername(username)
+  responseHandler(res, 200, 'Lấy thông tin người dùng thành công', user)
 })
 
 export default {
@@ -121,5 +111,6 @@ export default {
   refreshToken,
   getCurrentUser,
   getProfile,
-  updateProfile
+  updateProfile,
+  getPublicProfileByUsername
 }
