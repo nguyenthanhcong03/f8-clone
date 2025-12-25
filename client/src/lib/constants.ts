@@ -2,18 +2,27 @@ export const ROUTES = {
   PUBLIC: {
     HOME: '/',
     ROADMAP: '/roadmap',
+    COURSES: {
+      LIST: '/courses',
+      DETAIL: (slug: string = ':slug') => `/courses/${slug}`
+    },
     BLOGS: {
       LIST: '/blogs',
       DETAIL: (slug: string = ':slug') => `/blogs/${slug}`,
       BY_TOPIC: (topicSlug: string = ':topicSlug') => `/blogs/topic/${topicSlug}`
     },
-    COURSE_DETAIL: (slug: string = ':slug') => `/${slug}`
+    PROFILE: (username: string = ':username') => `/${username}`
   },
 
   STUDENT: {
     LEARNING: (slug: string = ':slug') => `/learning/${slug}`,
-    PROFILE: '/profile',
-    LIKED_BLOGS: '/liked-blogs'
+    LIKED_BLOGS: '/liked-blogs',
+    MY_COURSES: '/my-courses',
+    MY_POSTS: '/my-posts',
+    BLOG: {
+      CREATE: '/blog/create',
+      EDIT: (slug: string = ':slug') => `/blog/${slug}/edit`
+    }
   },
 
   ADMIN: {
@@ -32,8 +41,6 @@ export const ROUTES = {
 
     BLOGS: {
       ROOT: '/admin/blogs',
-      CREATE: '/admin/blogs/create',
-      EDIT: (blogId: string = ':blogId') => `/admin/blogs/${blogId}`,
       VIEW: (blogId: string = ':blogId') => `/admin/blogs/view/${blogId}`
     },
 
@@ -41,6 +48,10 @@ export const ROUTES = {
       ROOT: '/admin/blog-categories',
       CREATE: '/admin/blog-categories/create',
       EDIT: (categoryId: string = ':categoryId') => `/admin/blog-categories/edit/${categoryId}`
+    },
+
+    USERS: {
+      ROOT: '/admin/users'
     }
   }
 } as const

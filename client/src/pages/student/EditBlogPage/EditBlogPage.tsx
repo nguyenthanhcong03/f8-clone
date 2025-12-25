@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ROUTES } from '@/lib/constants'
 import { updateBlogSchema, type UpdateBlogInput } from '@/schemas/blog.schema'
-import { useGetAllCategoriesQuery, useGetBlogByIdQuery, useUpdateBlogMutation } from '@/services/api/blogApi'
+import { useGetAllCategoriesQuery, useGetBlogBySlugQuery, useUpdateBlogMutation } from '@/services/api/blogApi'
 import { getErrorMessage } from '@/services/helpers'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Editor } from '@tinymce/tinymce-react'
@@ -17,14 +17,15 @@ import { toast } from 'react-toastify'
 import slugify from 'slugify'
 
 const EditBlogPage = () => {
-  const { blogId } = useParams<{ blogId: string }>()
+  const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
   const editorRef = useRef<any>(null)
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
 
-  const { data: blogData, isLoading: isLoadingBlog } = useGetBlogByIdQuery(blogId!)
+  const { data: blogData, isLoading: isLoadingBlog } = useGetBlogBySlugQuery(slug!)
   const { data: categoriesData } = useGetAllCategoriesQuery({ limit: 50 })
   const categories = categoriesData?.data?.data || []
+  const blog = blogData?.data
 
   const [updateBlog, { isLoading: isUpdating }] = useUpdateBlogMutation()
 
@@ -53,8 +54,7 @@ const EditBlogPage = () => {
 
   // Load blog data
   useEffect(() => {
-    if (blogData?.data) {
-      const blog = blogData.data
+    if (blog) {
       reset({
         title: blog.title,
         slug: blog.slug,
@@ -110,9 +110,8 @@ const EditBlogPage = () => {
         submitData.append('thumbnail', data.thumbnail)
       }
 
-      await updateBlog({ id: blogId!, data: submitData }).unwrap()
+      await updateBlog({ id: blog.blogId, data: submitData }).unwrap()
       toast.success('Cập nhật bài viết thành công')
-      navigate(ROUTES.ADMIN.BLOGS.VIEW(blogId))
     } catch (error) {
       console.error('Update blog error:', error)
       toast.error(getErrorMessage(error) || 'Đã có lỗi xảy ra. Vui lòng thử lại.')
@@ -139,11 +138,11 @@ const EditBlogPage = () => {
             <Button
               variant='ghost'
               size='sm'
-              onClick={() => navigate(ROUTES.ADMIN.BLOGS.VIEW(blogId))}
+              onClick={() => navigate(ROUTES.STUDENT.MY_POSTS)}
               className='text-gray-600 hover:bg-gray-100 hover:text-gray-800'
             >
               <ArrowLeftIcon className='mr-2 h-4 w-4' />
-              Quay lại danh sách
+              Quay lại
             </Button>
 
             <Button

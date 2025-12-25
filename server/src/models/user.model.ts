@@ -4,7 +4,8 @@ import { v4 as uuidv4 } from 'uuid'
 
 interface UserAttributes {
   userId: string
-  name: string
+  fullName: string
+  username: string
   phone?: string
   email: string
   password: string
@@ -17,7 +18,8 @@ type UserCreationAttributes = Optional<UserAttributes, 'userId' | 'phone' | 'ava
 
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
   declare userId: string
-  declare name: string
+  declare fullName: string
+  declare username: string
   declare phone?: string
   declare email: string
   declare password: string
@@ -33,9 +35,14 @@ User.init(
       defaultValue: () => uuidv4(),
       primaryKey: true
     },
-    name: {
+    fullName: {
       type: DataTypes.STRING(100),
       allowNull: false
+    },
+    username: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      unique: true
     },
     phone: {
       type: DataTypes.STRING(15),

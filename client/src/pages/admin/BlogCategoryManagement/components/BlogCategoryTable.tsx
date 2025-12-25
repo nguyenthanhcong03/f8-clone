@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import BlogCategoryFilters from './BlogCategoryFilters'
 import BlogCategoryTableSkeleton from './BlogCategoryTableSkeleton'
+import { ROUTES } from '@/lib/constants'
 
 const BlogCategoryTable = () => {
   const navigate = useNavigate()
@@ -89,7 +90,7 @@ const BlogCategoryTable = () => {
           <h2 className='text-2xl font-bold tracking-tight'>Quản lý thể loại</h2>
           <p className='text-muted-foreground'>Quản lý tất cả thể loại bài viết trên hệ thống</p>
         </div>
-        <Button onClick={() => navigate('create')} className='flex items-center gap-2'>
+        <Button onClick={() => navigate(ROUTES.ADMIN.BLOG_CATEGORIES.CREATE)} className='flex items-center gap-2'>
           <PlusIcon className='h-4 w-4' />
           Tạo thể loại
         </Button>
@@ -146,7 +147,7 @@ const BlogCategoryTable = () => {
                                 variant='ghost'
                                 size='sm'
                                 className='h-8 w-8 p-0'
-                                onClick={() => navigate(`edit/${category.categoryId}`)}
+                                onClick={() => navigate(ROUTES.ADMIN.BLOG_CATEGORIES.EDIT(category.categoryId))}
                               >
                                 <EditIcon className='h-4 w-4' />
                               </Button>

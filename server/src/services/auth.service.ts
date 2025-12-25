@@ -6,7 +6,7 @@ import { generateAccessToken, generateRefreshToken } from '../utils/jwt'
 import jwt from 'jsonwebtoken'
 
 const register = async (userData: RegisterAccountInput['body']) => {
-  const { name, email, password } = userData
+  const { fullName, username, email, password } = userData
 
   // Kiểm tra xem người dùng đã tồn tại chưa
   const existingUser = await User.findOne({ where: { email } })
@@ -20,7 +20,8 @@ const register = async (userData: RegisterAccountInput['body']) => {
 
   // Create user
   const user = await User.create({
-    name,
+    fullName,
+    username,
     email,
     password: hashedPassword
   })
@@ -52,7 +53,8 @@ const login = async (loginData: LoginAccountInput['body']) => {
   // Tạo user payload cho JWT
   const userPayload = {
     userId: user.userId,
-    name: user.name,
+    fullName: user.fullName,
+    username: user.username,
     email: user.email,
     avatar: user.avatar,
     role: user.role
@@ -65,7 +67,8 @@ const login = async (loginData: LoginAccountInput['body']) => {
   return {
     user: {
       userId: user.userId,
-      name: user.name,
+      fullName: user.fullName,
+      username: user.username,
       phone: user.phone,
       email: user.email,
       avatar: user.avatar,
@@ -126,21 +129,24 @@ const getProfile = async (userId: string) => {
 
 const updateProfile = async (
   userId: string,
-  updateData: { name?: string; phone?: string },
+  updateData: { fullName?: string; username?: string; phone?: string },
   file?: Express.Multer.File
 ) => {
   const user = await User.findByPk(userId)
   if (!user) {
     throw new ApiError(404, 'Người dùng không tồn tại')
   }
-  const { name, phone } = updateData
+  const { fullName, username, phone } = updateData
 
   // Cập nhật avatar nếu có file
   if (file) {
     user.avatar = file.path // Giả sử bạn lưu đường dẫn file trong trường avatar
   }
-  if (name) {
-    user.name = name
+  if (fullName) {
+    user.fullName = fullName
+  }
+  if (username) {
+    user.username = username
   }
   if (phone) {
     user.phone = phone

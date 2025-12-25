@@ -15,6 +15,7 @@ import CourseSummaryDialog from './CourseSummaryDialog'
 import CourseTableSkeleton from './CourseTableSkeleton'
 import type { Course } from '@/types/course'
 import { useDeleteCourseMutation, useGetAllCoursesAdminQuery } from '@/services/api/courseApi'
+import { ROUTES } from '@/lib/constants'
 
 const CourseTable = () => {
   const navigate = useNavigate()
@@ -107,7 +108,7 @@ const CourseTable = () => {
           <h2 className='text-2xl font-bold tracking-tight'>Quản lý khóa học</h2>
           <p className='text-muted-foreground'>Quản lý tất cả khóa học trên hệ thống</p>
         </div>
-        <Button onClick={() => navigate('create')} className='flex items-center gap-2'>
+        <Button onClick={() => navigate(ROUTES.ADMIN.COURSES.CREATE)} className='flex items-center gap-2'>
           <PlusIcon className='h-4 w-4' />
           Thêm khóa học
         </Button>
@@ -216,7 +217,7 @@ const CourseTable = () => {
                               <Button
                                 variant='outline'
                                 size='sm'
-                                onClick={() => navigate(`edit-structure/${course.courseId}`)}
+                                onClick={() => navigate(ROUTES.ADMIN.COURSES.EDIT_STRUCTURE(course.courseId))}
                                 className='h-8 w-8 p-0'
                               >
                                 <BookOpenIcon className='h-4 w-4 text-green-600' />
@@ -231,7 +232,7 @@ const CourseTable = () => {
                               <Button
                                 variant='outline'
                                 size='sm'
-                                onClick={() => navigate(`${course.courseId}`)}
+                                onClick={() => navigate(ROUTES.ADMIN.COURSES.EDIT(course.courseId))}
                                 className='h-8 w-8 p-0'
                               >
                                 <EditIcon className='h-4 w-4 text-blue-600' />
@@ -272,7 +273,7 @@ const CourseTable = () => {
                         message='Chưa có khóa học nào'
                         subMessage='Bạn có thể thêm khóa học mới ngay bây giờ'
                         action={
-                          <Button onClick={() => navigate('create')} className='mt-4'>
+                          <Button onClick={() => navigate(ROUTES.ADMIN.COURSES.CREATE)} className='mt-4'>
                             <PlusIcon className='mr-2 h-4 w-4' />
                             Thêm khóa học đầu tiên
                           </Button>

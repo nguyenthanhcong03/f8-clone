@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { ROUTES } from '@/lib/constants'
 import type { Course } from '@/types/course'
 import { PlayCircle, Star, Users } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -11,7 +12,7 @@ interface CourseCardProps {
 const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
   const navigate = useNavigate()
   const handleNavigateToCourseDetail = (slug: string) => {
-    navigate(`${slug}`)
+    navigate(ROUTES.PUBLIC.COURSES.DETAIL(slug))
   }
   const totalSections = course?.sections ? course.sections.length : 0
   const totalLessons = course?.sections && course?.sections.reduce((acc, section) => acc + section.lessons!.length, 0)

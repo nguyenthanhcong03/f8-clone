@@ -198,6 +198,31 @@ export const blogApi = baseApi.injectEndpoints({
               { type: 'Blog', id: 'LIKED_LIST' }
             ]
           : [{ type: 'Blog', id: 'LIKED_LIST' }]
+    }),
+
+    // Lấy danh sách bài viết của tôi
+    getMyBlogs: builder.query<
+      ApiResponse<PaginationResponse<Blog>>,
+      { page?: number; limit?: number; sort?: string; order?: string; status?: string }
+    >({
+      query: (params) => ({
+        url: '/blogs/my-posts',
+        method: 'GET',
+        params: {
+          page: params.page || 1,
+          limit: params.limit || 10,
+          sort: params.sort || 'createdAt',
+          order: params.order || 'DESC',
+          status: params.status
+        }
+      }),
+      providesTags: (result) =>
+        result?.data?.data
+          ? [
+              ...result.data.data.map(({ blogId }) => ({ type: 'Blog' as const, id: blogId })),
+              { type: 'Blog', id: 'MY_POSTS' }
+            ]
+          : [{ type: 'Blog', id: 'MY_POSTS' }]
     })
   })
 })
@@ -217,6 +242,7 @@ export const {
   useCreateBlogMutation,
   useUpdateBlogMutation,
   useDeleteBlogMutation,
+  useGetMyBlogsQuery,
   // Blog Like hooks
   useLikeBlogMutation,
   useUnlikeBlogMutation,

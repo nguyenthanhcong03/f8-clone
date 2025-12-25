@@ -1,12 +1,12 @@
+import courseService from '@/services/course.service'
+import enrollmentService from '@/services/enrollment.service'
+import sectionService from '@/services/section.service'
 import { CreateCourseData } from '@/types/course.types'
 import ApiError from '@/utils/ApiError'
 import asyncHandler from '@/utils/asyncHandler'
+import { uploadImage } from '@/utils/cloudinary'
 import { responseHandler } from '@/utils/responseHandler'
 import { Request, Response } from 'express'
-import courseService from '@/services/course.service'
-import sectionService from '@/services/section.service'
-import uploadService from '@/services/upload.service'
-import enrollmentService from '@/services/enrollment.service'
 import { Op } from 'sequelize'
 
 const createCourse = asyncHandler(async (req: Request, res: Response) => {
@@ -31,7 +31,7 @@ const createCourse = asyncHandler(async (req: Request, res: Response) => {
   // Nếu có file thumbnail được upload
   if (req.file) {
     try {
-      const uploadResult = await uploadService.uploadImage(req.file.buffer, 'course-thumbnails')
+      const uploadResult = await uploadImage(req.file.buffer, 'course-thumbnails')
       courseData.thumbnail = uploadResult.url
       courseData.thumbnailPublicId = uploadResult.publicId
     } catch (error) {

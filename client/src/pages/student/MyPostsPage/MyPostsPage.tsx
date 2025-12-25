@@ -1,18 +1,14 @@
+import BlogItem from '@/components/common/blog-card/BlogItem'
 import TablePagination from '@/components/common/pagination/TablePagination'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import useDebounce from '@/hooks/useDebounce'
-import { ROUTES } from '@/lib/constants'
 import { cn } from '@/lib/utils'
-import { useGetAllBlogsQuery } from '@/services/api/blogApi'
+import { useGetMyBlogsQuery } from '@/services/api/blogApi'
+import { useAppSelector } from '@/store/hook'
 import type { Blog } from '@/types/blog'
-import { formatTimeAgo } from '@/utils/format'
-import { Bookmark, Clock, MoreVertical } from 'lucide-react'
 import React, { useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 
 type StatusTab = 'draft' | 'published'
 const TAB = {
@@ -23,58 +19,30 @@ const TAB = {
 const MyPostsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [currentPage, setCurrentPage] = useState(1)
-  const [searchQuery, setSearchQuery] = useState('')
   const statusTab = (searchParams.get('status') as StatusTab) || TAB.DRAFT
-  const debouncedSearchQuery = useDebounce(searchQuery, 500)
 
-  const { data: blogsData, isLoading: isLoadingBlogs } = useGetAllBlogsQuery({
+  const { data: blogsData, isLoading: isLoadingBlogs } = useGetMyBlogsQuery({
     page: currentPage,
     limit: 10,
     sort: 'createdAt',
     order: 'desc',
-    search: debouncedSearchQuery,
     status: statusTab
   })
+  console.log('blogsData :>> ', blogsData)
 
   const blogs = blogsData?.data?.data || []
+
   const pagination = {
     total: blogsData?.data?.total || 0,
     limit: blogsData?.data?.limit || 10,
     page: blogsData?.data?.page || 1,
-    totalPages: blogsData?.data?.totalPages || 0
+    totalPages: blogsData?.data?.totalPages || 1
   }
 
   const handleTabChange = (tab: StatusTab) => {
     setSearchParams({ status: tab })
     setCurrentPage(1)
   }
-
-  // Helper function to calculate reading time (approx 200 words per minute)
-  const calculateReadingTime = (content: string) => {
-    const text = content.replace(/<[^>]*>/g, '')
-    const words = text.split(/\s+/).length
-    const minutes = Math.ceil(words / 200)
-    return `${minutes} phút đọc`
-  }
-
-  const categoryGroups = [
-    {
-      label: 'Front-end / Mobile apps',
-      tags: ['React', 'React Native', 'Vue', 'Angular', 'Flutter']
-    },
-    {
-      label: 'Back-end / Devops',
-      tags: ['Node.js', 'DevOps', 'Docker', 'Kubernetes']
-    },
-    {
-      label: 'UI / UX / Design',
-      tags: ['UI/UX', 'Design', 'Figma']
-    },
-    {
-      label: 'Others',
-      tags: ['OOP', 'hoc-lap-trinh']
-    }
-  ]
 
   return (
     <div className='container mx-auto px-4 py-8'>
@@ -138,82 +106,7 @@ const MyPostsPage: React.FC = () => {
             <>
               <div className='space-y-6'>
                 {blogs.map((blog: Blog) => (
-                  <Card key={blog.blogId} className='group overflow-hidden transition-shadow hover:shadow-lg'>
-                    <CardContent className='p-6'>
-                      <div className='flex gap-6'>
-                        {/* Left Content */}
-                        <div className='flex-1'>
-                          {/* Author Info */}
-                          <div className='mb-3 flex items-center gap-2'>
-                            <Avatar className='h-6 w-6'>
-                              <AvatarImage src={blog.author?.avatar} alt={blog.author?.name} />
-                              <AvatarFallback>{blog.author?.name?.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            <span className='text-sm font-medium'>{blog.author?.name}</span>
-                          </div>
-
-                          {/* Title */}
-                          <Link to={ROUTES.PUBLIC.BLOGS.DETAIL(blog.slug)}>
-                            <h2 className='mb-3 text-xl font-bold transition-colors group-hover:text-primary md:text-2xl'>
-                              {blog.title}
-                            </h2>
-                          </Link>
-
-                          {/* Excerpt */}
-                          <p
-                            className='mb-4 line-clamp-2 text-sm text-muted-foreground'
-                            dangerouslySetInnerHTML={{
-                              __html: blog.content
-                            }}
-                          />
-
-                          {/* Meta Info */}
-                          <div className='flex flex-wrap items-center gap-3 text-sm text-muted-foreground'>
-                            {blog.category && (
-                              <Badge variant='secondary' className='font-normal'>
-                                {blog.category.name}
-                              </Badge>
-                            )}
-                            <div className='flex items-center gap-1'>
-                              <Clock className='h-4 w-4' />
-                              <span>{formatTimeAgo(blog.publishedAt || blog.createdAt)}</span>
-                            </div>
-                            <span>•</span>
-                            <span>{calculateReadingTime(blog.content)}</span>
-                          </div>
-                        </div>
-
-                        {/* Right Content - Thumbnail & Actions */}
-                        <div className='relative flex shrink-0 flex-col items-end gap-2'>
-                          <div className='flex gap-2'>
-                            <Button variant='ghost' size='icon' className='h-8 w-8'>
-                              <Bookmark className='h-4 w-4' />
-                            </Button>
-                            <Button variant='ghost' size='icon' className='h-8 w-8'>
-                              <MoreVertical className='h-4 w-4' />
-                            </Button>
-                          </div>
-                          <Link to={ROUTES.PUBLIC.BLOGS.DETAIL(blog.slug)} className='block'>
-                            <div className='relative h-32 w-48 overflow-hidden rounded-lg bg-muted'>
-                              {blog.thumbnail ? (
-                                <img
-                                  src={blog.thumbnail}
-                                  alt={blog.title}
-                                  className='h-full w-full object-cover transition-transform duration-300 group-hover:scale-105'
-                                />
-                              ) : (
-                                <div className='flex h-full items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600'>
-                                  <span className='text-3xl font-bold text-white opacity-50'>
-                                    {blog.title.charAt(0)}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          </Link>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <BlogItem blog={blog} isMyBlog />
                 ))}
               </div>
 
@@ -221,8 +114,9 @@ const MyPostsPage: React.FC = () => {
               {pagination.totalPages > 1 && (
                 <div className='mt-8'>
                   <TablePagination
-                    currentPage={pagination.page}
-                    totalPages={pagination.totalPages}
+                    page={currentPage}
+                    pageSize={pagination.limit}
+                    totalItems={pagination.total}
                     onPageChange={setCurrentPage}
                   />
                 </div>

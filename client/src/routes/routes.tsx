@@ -4,8 +4,6 @@ import MainLayout from '@/components/layouts/MainLayout'
 import BlogCategoryManagementPage from '@/pages/admin/BlogCategoryManagement/BlogCategoryManagementPage'
 import { CreateCategoryPage, EditCategoryPage } from '@/pages/admin/BlogCategoryManagement/pages'
 import BlogManagementPage from '@/pages/admin/BlogManagement/BlogManagementPage'
-import CreateBlogPage from '@/pages/admin/BlogManagement/pages/CreateBlogPage'
-import EditBlogPage from '@/pages/admin/BlogManagement/pages/EditBlogPage'
 import ViewBlogPage from '@/pages/admin/BlogManagement/pages/ViewBlogPage'
 import CourseManagementPage from '@/pages/admin/CourseManagement/CourseManagementPage'
 import CreateCoursePage from '@/pages/admin/CourseManagement/pages/AddCoursePage/CreateCoursePage'
@@ -19,11 +17,13 @@ import BlogDetailPage from '@/pages/public/BlogDetailPage/BlogDetailPage'
 import BlogPage from '@/pages/public/BlogPage/BlogPage'
 import CourseDetail from '@/pages/public/CourseDetailPage/CourseDetailPage'
 import HomePage from '@/pages/public/HomePage/HomePage'
+import PublicProfilePage from '@/pages/public/PublicProfilePage/PublicProfilePage'
+import CreateBlogPage from '@/pages/student/CreateBlogPage/CreateBlogPage'
+import EditBlogPage from '@/pages/student/EditBlogPage/EditBlogPage'
 import LearningPage from '@/pages/student/LearningPage/LearningPage'
 import LikedBlogsPage from '@/pages/student/LikedBlogsPage/LikedBlogsPage'
 import MyCoursesPage from '@/pages/student/MyCoursesPage/MyCoursesPage'
 import MyPostsPage from '@/pages/student/MyPostsPage/MyPostsPage'
-import ProfilePage from '@/pages/student/ProfilePage/ProfilePage'
 import { createBrowserRouter, type RouteObject } from 'react-router-dom'
 
 const publicRoutes: RouteObject[] = [
@@ -32,16 +32,18 @@ const publicRoutes: RouteObject[] = [
   { path: 'courses/:slug', element: <CourseDetail /> },
   { path: 'blogs', element: <BlogPage /> },
   { path: 'blogs/:slug', element: <BlogDetailPage /> },
-  { path: 'blogs/topic/:topicSlug', element: <BlogByTopicPage /> }
+  { path: 'blogs/topic/:topicSlug', element: <BlogByTopicPage /> },
+  { path: ':username', element: <PublicProfilePage /> }
 ]
 
 // Khách hàng đã đăng nhập
 const studentRoutes: RouteObject[] = [
   { path: 'learning/:slug', element: <LearningPage /> },
-  { path: 'profile', element: <ProfilePage /> },
   { path: 'liked-blogs', element: <LikedBlogsPage /> },
   { path: 'my-courses', element: <MyCoursesPage /> },
-  { path: 'my-posts', element: <MyPostsPage /> }
+  { path: 'my-posts', element: <MyPostsPage /> },
+  { path: 'blog/create', element: <CreateBlogPage /> },
+  { path: 'blog/:slug/edit', element: <EditBlogPage /> }
 ]
 
 // Admin
@@ -62,8 +64,6 @@ const adminRoutes: RouteObject[] = [
     path: 'blogs',
     children: [
       { index: true, element: <BlogManagementPage /> },
-      { path: 'create', element: <CreateBlogPage /> },
-      { path: ':blogId', element: <EditBlogPage /> },
       { path: 'view/:blogId', element: <ViewBlogPage /> }
     ]
   },

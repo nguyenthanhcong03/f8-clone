@@ -19,7 +19,7 @@ export interface Blog {
   authorId: string
   author?: {
     userId: string
-    name: string
+    fullName: string
     avatar?: string
   }
   thumbnail?: string

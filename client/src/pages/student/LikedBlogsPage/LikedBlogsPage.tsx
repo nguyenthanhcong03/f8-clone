@@ -1,11 +1,12 @@
+import BlogCard from '@/components/common/blog-card/BlogCard'
 import TablePagination from '@/components/common/pagination/TablePagination'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ROUTES } from '@/lib/constants'
+import { formatTimeAgo } from '@/lib/format'
 import { useGetLikedBlogsQuery } from '@/services/api/blogApi'
-import { formatTimeAgo } from '@/utils/format'
 import { BookmarkCheck, Calendar, Heart } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -70,7 +71,7 @@ const LikedBlogsPage = () => {
             <p className='mb-6 text-muted-foreground'>
               Bạn chưa thích bài viết nào. Khám phá và lưu lại những bài viết yêu thích của bạn!
             </p>
-            <Button asChild>
+            <Button>
               <Link to={ROUTES.PUBLIC.BLOGS.LIST}>Khám phá bài viết</Link>
             </Button>
           </div>
@@ -81,64 +82,7 @@ const LikedBlogsPage = () => {
           <>
             <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
               {blogs.map((blog) => (
-                <Link key={blog.blogId} to={`/blog/${blog.slug}`}>
-                  <Card className='group h-full overflow-hidden transition-all hover:shadow-lg'>
-                    {/* Thumbnail */}
-                    <div className='relative aspect-video overflow-hidden bg-muted'>
-                      {blog.thumbnail ? (
-                        <img
-                          src={blog.thumbnail}
-                          alt={blog.title}
-                          className='h-full w-full object-cover transition-transform duration-300 group-hover:scale-105'
-                        />
-                      ) : (
-                        <div className='flex h-full items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600'>
-                          <span className='text-4xl font-bold text-white opacity-50'>{blog.title.charAt(0)}</span>
-                        </div>
-                      )}
-
-                      {/* Category Badge */}
-                      {blog.category && (
-                        <Badge className='absolute left-3 top-3 bg-primary/90 backdrop-blur-sm'>
-                          {blog.category.name}
-                        </Badge>
-                      )}
-                    </div>
-
-                    {/* Content */}
-                    <CardContent className='p-5'>
-                      <h3 className='mb-3 line-clamp-2 text-lg font-semibold transition-colors group-hover:text-primary'>
-                        {blog.title}
-                      </h3>
-
-                      {/* Author */}
-                      {blog.author && (
-                        <div className='mb-3 flex items-center gap-2'>
-                          <div className='h-8 w-8 overflow-hidden rounded-full bg-muted'>
-                            {blog.author.avatar ? (
-                              <img
-                                src={blog.author.avatar}
-                                alt={blog.author.name}
-                                className='h-full w-full object-cover'
-                              />
-                            ) : (
-                              <div className='flex h-full items-center justify-center bg-primary/10 text-sm font-medium text-primary'>
-                                {blog.author.name.charAt(0)}
-                              </div>
-                            )}
-                          </div>
-                          <span className='text-sm text-muted-foreground'>{blog.author.name}</span>
-                        </div>
-                      )}
-
-                      {/* Date */}
-                      <div className='flex items-center gap-1 text-xs text-muted-foreground'>
-                        <Calendar className='h-3 w-3' />
-                        <span>{formatTimeAgo(blog.publishedAt || blog.createdAt)}</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
+                <BlogCard key={blog.blogId} blog={blog} />
               ))}
             </div>
 

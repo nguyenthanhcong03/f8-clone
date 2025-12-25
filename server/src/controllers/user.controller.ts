@@ -1,6 +1,8 @@
 import { Request, Response } from 'express'
 import userService from '../services/user.service'
 import { CreateUserInput, GetUserInput, UpdateUserInput } from '../schemas/user.schema'
+import asyncHandler from '@/utils/asyncHandler'
+import { responseHandler } from '@/utils/responseHandler'
 
 const createUser = async (req: Request<object, object, CreateUserInput['body']>, res: Response) => {
   try {
@@ -176,6 +178,13 @@ const deleteAvatar = async (req: Request<GetUserInput['params']>, res: Response)
     })
   }
 }
+
+const getPublicProfileByUsername = asyncHandler(async (req: Request, res: Response) => {
+  const { username } = req.params
+  const user = await userService.getPublicProfileByUsername(username)
+  responseHandler(res, 200, 'Lấy thông tin người dùng thành công', user)
+})
+
 export default {
   createUser,
   getAllUsers,
@@ -185,5 +194,6 @@ export default {
   getUserByEmail,
   getUsersByRole,
   uploadAvatar,
-  deleteAvatar
+  deleteAvatar,
+  getPublicProfileByUsername
 }

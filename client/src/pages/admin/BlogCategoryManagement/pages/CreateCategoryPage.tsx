@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { ROUTES } from '@/lib/constants'
 import { createCategorySchema, type CreateCategoryInput } from '@/schemas/blog.schema'
 import { useCreateCategoryMutation } from '@/services/api/blogApi'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -53,7 +54,7 @@ const CreateCategoryPage = () => {
     try {
       await createCategory(data).unwrap()
       toast.success('Tạo thể loại thành công!')
-      navigate('/admin/blog-categories')
+      navigate(ROUTES.ADMIN.BLOG_CATEGORIES.ROOT)
     } catch (error: any) {
       console.error('Có lỗi xảy ra khi tạo mới thể loại:', error)
       toast.error(error?.data?.message || 'Có lỗi xảy ra khi tạo thể loại')
@@ -66,7 +67,7 @@ const CreateCategoryPage = () => {
       <div className='flex items-center justify-between'>
         <div className='space-y-1'>
           <div className='flex items-center gap-2'>
-            <Button variant='ghost' size='sm' onClick={() => navigate('/admin/blog-categories')}>
+            <Button variant='ghost' size='sm' onClick={() => navigate(ROUTES.ADMIN.BLOG_CATEGORIES.ROOT)}>
               <ArrowLeftIcon className='h-4 w-4' />
             </Button>
             <h2 className='text-2xl font-bold tracking-tight'>Tạo thể loại mới</h2>
@@ -163,7 +164,7 @@ const CreateCategoryPage = () => {
 
         {/* Actions */}
         <div className='flex items-center justify-end gap-4'>
-          <Button type='button' variant='outline' onClick={() => navigate('/admin/blog-categories')}>
+          <Button type='button' variant='outline' onClick={() => navigate(ROUTES.ADMIN.BLOG_CATEGORIES.ROOT)}>
             Hủy
           </Button>
           <Button type='submit' form='category-form' disabled={isSubmitting || !isDirty}>

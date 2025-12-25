@@ -1,9 +1,9 @@
-import { Enrollment, Lesson, Section, User } from '@/models'
-import Course from '../models/course.model'
-import uploadService from './upload.service'
-import ApiError from '@/utils/ApiError'
 import sequelize from '@/config/database'
+import { Lesson, Section, User } from '@/models'
 import { CreateCourseData } from '@/types/course.types'
+import ApiError from '@/utils/ApiError'
+import { deleteImage, uploadImage } from '@/utils/cloudinary'
+import Course from '../models/course.model'
 
 export const CourseService = {
   async create(data: CreateCourseData) {
@@ -134,7 +134,7 @@ export const CourseService = {
         throw new ApiError(400, 'Không thể xóa khóa học còn chương. Vui lòng xóa tất cả các chương trước.')
 
       if (course.thumbnailPublicId) {
-        await uploadService.deleteFile(course.thumbnailPublicId)
+        await deleteImage(course.thumbnailPublicId)
       }
 
       // Xóa các liên quan (ví dụ Section, Lesson)
@@ -163,11 +163,11 @@ export const CourseService = {
     // Xóa thumbnail cũ nếu có
     const currentPublicId = course.thumbnailPublicId
     if (currentPublicId) {
-      await uploadService.deleteFile(currentPublicId)
+      await deleteImage(currentPublicId)
     }
 
     // Upload thumbnail mới
-    const uploadResult = await uploadService.uploadImage(fileBuffer, 'course-thumbnails')
+    const uploadResult = await uploadImage(fileBuffer, 'course-thumbnails')
 
     // Cập nhật course với thumbnail và publicId mới
     await course.update({
@@ -186,7 +186,7 @@ export const CourseService = {
 
     const currentPublicId = course.thumbnailPublicId
     if (currentPublicId) {
-      await uploadService.deleteFile(currentPublicId)
+      await deleteImage(currentPublicId)
     }
 
     await course.update({

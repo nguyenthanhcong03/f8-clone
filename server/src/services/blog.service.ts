@@ -1,7 +1,6 @@
-import { Blog, BlogCategory, User, BlogLike } from '@/models'
+import { Blog, BlogCategory, BlogLike, User } from '@/models'
 import ApiError from '@/utils/ApiError'
-import uploadService from './upload.service'
-import sequelize from '@/config/database'
+import { deleteImage } from '@/utils/cloudinary'
 
 export const BlogService = {
   // ===== CATEGORY SERVICES =====
@@ -74,7 +73,7 @@ export const BlogService = {
     const { count, rows } = await Blog.findAndCountAll({
       where,
       include: [
-        { model: User, as: 'author', attributes: ['userId', 'name', 'avatar'] },
+        { model: User, as: 'author', attributes: ['userId', 'fullName', 'avatar'] },
         { model: BlogCategory, as: 'category', attributes: ['categoryId', 'name', 'slug'] }
       ],
       limit: options.limit,
@@ -87,7 +86,7 @@ export const BlogService = {
   async getById(blogId: string) {
     const blog = await Blog.findByPk(blogId, {
       include: [
-        { model: User, as: 'author', attributes: ['userId', 'name', 'avatar'] },
+        { model: User, as: 'author', attributes: ['userId', 'fullName', 'avatar'] },
         { model: BlogCategory, as: 'category', attributes: ['categoryId', 'name', 'slug', 'description'] }
       ]
     })
@@ -102,7 +101,7 @@ export const BlogService = {
     const blog = await Blog.findOne({
       where: { slug },
       include: [
-        { model: User, as: 'author', attributes: ['userId', 'name', 'avatar'] },
+        { model: User, as: 'author', attributes: ['userId', 'fullName', 'avatar'] },
         { model: BlogCategory, as: 'category', attributes: ['categoryId', 'name', 'slug', 'description'] }
       ]
     })
@@ -130,7 +129,7 @@ export const BlogService = {
 
     // Xóa thumbnail nếu có
     if (blog.thumbnailPublicId) {
-      await uploadService.deleteFile(blog.thumbnailPublicId)
+      await deleteImage(blog.thumbnailPublicId)
     }
 
     await blog.destroy()
@@ -192,7 +191,7 @@ export const BlogService = {
           attributes: [], // Không cần lấy thuộc tính của User
           through: { attributes: [] } // Không lấy thuộc tính từ bảng trung gian (blogLike)
         },
-        { model: User, as: 'author', attributes: ['userId', 'name', 'avatar'] },
+        { model: User, as: 'author', attributes: ['userId', 'fullName', 'avatar'] },
         { model: BlogCategory, as: 'category', attributes: ['categoryId', 'name', 'slug'] }
       ],
       limit: options.limit,
@@ -206,6 +205,22 @@ export const BlogService = {
   async getBlogLikeCount(blogId: string) {
     const count = await BlogLike.count({ where: { blogId } })
     return count
+  },
+
+  // Lấy danh sách bài viết của tôi (current user)
+  async getMyBlogs(where: any, options: any) {
+    const { count, rows } = await Blog.findAndCountAll({
+      where,
+      include: [
+        { model: User, as: 'author', attributes: ['userId', 'fullName', 'username', 'avatar'] },
+        { model: BlogCategory, as: 'category', attributes: ['categoryId', 'name', 'slug'] }
+      ],
+      limit: options.limit,
+      offset: options.offset,
+      order: options.order,
+      distinct: true
+    })
+    return { total: count, data: rows }
   }
 }
 

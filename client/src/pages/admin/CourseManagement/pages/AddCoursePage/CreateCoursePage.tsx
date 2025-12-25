@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { ROUTES } from '@/lib/constants'
 import { createCourseSchema, type CreateCourseInput } from '@/schemas/course.schema'
 import { useCreateCourseMutation } from '@/services/api/courseApi'
 import { getErrorMessage } from '@/services/helpers'
@@ -67,7 +68,7 @@ const CreateCoursePage = () => {
       await createCourse(formData).unwrap()
 
       toast.success('Tạo khóa học thành công')
-      navigate('/admin/courses')
+      navigate(ROUTES.ADMIN.COURSES.ROOT)
     } catch (error) {
       console.error('Create course error:', error)
       toast.error(getErrorMessage(error) || 'Đã có lỗi xảy ra. Vui lòng thử lại.')
@@ -96,7 +97,7 @@ const CreateCoursePage = () => {
             <Button
               variant='ghost'
               size='sm'
-              onClick={() => navigate('/admin/courses')}
+              onClick={() => navigate(ROUTES.ADMIN.COURSES.ROOT)}
               className='text-gray-600 hover:bg-gray-100 hover:text-gray-800'
             >
               <ArrowLeftIcon className='mr-2 h-4 w-4' />

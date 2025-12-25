@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
+import { ROUTES } from '@/lib/constants'
 import { updateCourseSchema, type UpdateCourseInput } from '@/schemas/course.schema'
 import { useGetCourseByIdQuery, useUpdateCourseMutation } from '@/services/api/courseApi'
 import { getErrorMessage } from '@/services/helpers'
@@ -133,7 +134,7 @@ const EditCoursePage = () => {
             <h3 className='text-lg font-semibold'>Không thể tải khóa học</h3>
             <p className='text-muted-foreground'>Đã xảy ra lỗi khi tải thông tin khóa học</p>
           </div>
-          <Button onClick={() => navigate('/admin/courses')} variant='outline'>
+          <Button onClick={() => navigate(ROUTES.ADMIN.COURSES.ROOT)} variant='outline'>
             <ArrowLeft className='mr-2 h-4 w-4' />
             Quay lại danh sách
           </Button>
@@ -152,7 +153,7 @@ const EditCoursePage = () => {
               <Button
                 variant='ghost'
                 size='sm'
-                onClick={() => navigate('/admin/courses')}
+                onClick={() => navigate(ROUTES.ADMIN.COURSES.ROOT)}
                 className='text-gray-600 hover:bg-gray-100 hover:text-gray-800'
               >
                 <ArrowLeft className='mr-2 h-4 w-4' />

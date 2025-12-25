@@ -136,11 +136,11 @@ const BlogDetailPage = () => {
             {blog.author && (
               <div className='flex items-center gap-2'>
                 <Avatar className='h-10 w-10'>
-                  <AvatarImage src={blog.author.avatar} alt={blog.author.name} />
-                  <AvatarFallback>{blog.author.name.charAt(0)}</AvatarFallback>
+                  <AvatarImage src={blog.author.avatar} alt={blog.author.fullName} />
+                  <AvatarFallback>{blog.author.fullName.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className='font-medium text-foreground'>{blog.author.name}</p>
+                  <p className='font-medium text-foreground'>{blog.author.fullName}</p>
                   <p className='text-xs'>Tác giả</p>
                 </div>
               </div>
@@ -201,11 +201,11 @@ const BlogDetailPage = () => {
               <CardContent className='p-6'>
                 <div className='flex items-start gap-4'>
                   <Avatar className='h-16 w-16'>
-                    <AvatarImage src={blog.author.avatar} alt={blog.author.name} />
-                    <AvatarFallback className='text-xl'>{blog.author.name.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={blog.author.avatar} alt={blog.author.fullName} />
+                    <AvatarFallback className='text-xl'>{blog.author.fullName.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className='flex-1'>
-                    <h3 className='mb-1 text-lg font-semibold'>{blog.author.name}</h3>
+                    <h3 className='mb-1 text-lg font-semibold'>{blog.author.fullName}</h3>
                     <p className='text-sm text-muted-foreground'>
                       Tác giả, lập trình viên với niềm đam mê chia sẻ kiến thức và kinh nghiệm
                     </p>

@@ -1,10 +1,17 @@
 import ApiError from '@/utils/ApiError'
 import asyncHandler from '@/utils/asyncHandler'
+import {
+  cleanupUnusedImages,
+  deleteImage,
+  deleteMultiple,
+  extractCloudinaryUrls,
+  extractPublicIds,
+  uploadImage
+} from '@/utils/cloudinary'
 import { responseHandler } from '@/utils/responseHandler'
 import { Request, Response } from 'express'
 import { Op } from 'sequelize'
 import blogService from '../services/blog.service'
-import uploadService from '../services/upload.service'
 
 // ===== BLOG CATEGORY CONTROLLERS =====
 
@@ -99,7 +106,7 @@ const createBlog = asyncHandler(async (req: Request, res: Response) => {
   // Nếu có file thumbnail được upload
   if (req.file) {
     try {
-      const uploadResult = await uploadService.uploadImage(req.file.buffer, 'blog-thumbnails')
+      const uploadResult = await uploadImage(req.file.buffer, 'blog-thumbnails')
       blogData.thumbnail = uploadResult.url
       blogData.thumbnailPublicId = uploadResult.publicId
     } catch (error) {
@@ -165,6 +172,9 @@ const updateBlog = asyncHandler(async (req: Request, res: Response) => {
   const { blogId } = req.params
   const { title, slug, content, status, categoryId } = req.body
 
+  // Lấy blog hiện tại để so sánh
+  const currentBlog = await blogService.getById(blogId)
+
   // Kiểm tra slug trùng (trừ chính nó)
   if (slug) {
     const existingBlog = await blogService.existsBySlug(slug)
@@ -184,18 +194,23 @@ const updateBlog = asyncHandler(async (req: Request, res: Response) => {
   if (req.file) {
     try {
       // Xóa ảnh cũ nếu có
-      const blog = await blogService.getById(blogId)
-      if (blog.thumbnailPublicId) {
-        await uploadService.deleteFile(blog.thumbnailPublicId)
+      if (currentBlog.thumbnailPublicId) {
+        await deleteImage(currentBlog.thumbnailPublicId)
       }
 
       // Upload ảnh mới
-      const uploadResult = await uploadService.uploadImage(req.file.buffer, 'blog-thumbnails')
+      const uploadResult = await uploadImage(req.file.buffer, 'blog-thumbnails')
+      console.log('uploadResult :>> ', uploadResult)
       blogData.thumbnail = uploadResult.url
       blogData.thumbnailPublicId = uploadResult.publicId
     } catch (error) {
       throw new ApiError(400, 'Lỗi khi upload thumbnail')
     }
+  }
+
+  // Xóa các ảnh không còn sử dụng trong content
+  if (content && currentBlog.content !== content) {
+    await cleanupUnusedImages(currentBlog.content, content)
   }
 
   const updatedBlog = await blogService.update(blogId, blogData)
@@ -204,6 +219,33 @@ const updateBlog = asyncHandler(async (req: Request, res: Response) => {
 
 const deleteBlog = asyncHandler(async (req: Request, res: Response) => {
   const { blogId } = req.params
+
+  // Lấy thông tin blog trước khi xóa
+  const blog = await blogService.getById(blogId)
+
+  // Xóa thumbnail nếu có
+  if (blog.thumbnailPublicId) {
+    try {
+      await deleteImage(blog.thumbnailPublicId)
+    } catch (error) {
+      console.error('Failed to delete thumbnail:', error)
+    }
+  }
+
+  // Xóa tất cả ảnh trong content
+  if (blog.content) {
+    try {
+      const contentUrls = extractCloudinaryUrls(blog.content)
+      if (contentUrls.length > 0) {
+        const publicIds = extractPublicIds(contentUrls)
+        await deleteMultiple(publicIds)
+      }
+    } catch (error) {
+      console.error('Failed to delete content images:', error)
+    }
+  }
+
+  // Xóa blog từ database
   await blogService.deleteBlog(blogId)
   responseHandler(res, 200, 'Xóa bài viết thành công', null)
 })
@@ -256,6 +298,37 @@ const getLikedBlogs = asyncHandler(async (req: Request, res: Response) => {
   responseHandler(res, 200, 'Lấy danh sách bài viết đã like thành công', responseData)
 })
 
+const getMyBlogs = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.user?.userId as string
+  const { page = 1, limit = 10, sort = 'createdAt', order = 'DESC', status } = req.query
+
+  const where: Record<string, unknown> = {
+    authorId: userId
+  }
+
+  // Lọc theo trạng thái
+  if (status && status !== 'all') {
+    where.status = status
+  }
+
+  const offset = (Number(page) - 1) * Number(limit)
+  const response = await blogService.getMyBlogs(where, {
+    offset,
+    limit: Number(limit),
+    order: [[String(sort), String(order).toUpperCase()]]
+  })
+
+  const responseData = {
+    total: response.total,
+    page: Number(page),
+    limit: Number(limit),
+    totalPages: Math.ceil(response.total / Number(limit)),
+    data: response.data
+  }
+
+  responseHandler(res, 200, 'Lấy danh sách bài viết của tôi thành công', responseData)
+})
+
 export default {
   // Category controllers
   createCategory,
@@ -270,6 +343,7 @@ export default {
   getBlogBySlug,
   updateBlog,
   deleteBlog,
+  getMyBlogs,
   // Like controllers
   likeBlog,
   unlikeBlog,

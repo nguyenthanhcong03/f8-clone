@@ -91,9 +91,46 @@ const unenrollFromCourse = async (userId: string, courseId: string): Promise<voi
   await enrollment.destroy()
 }
 
+const getEnrollmentsByUsername = async (username: string): Promise<Enrollment[]> => {
+  // Tìm user theo username
+  const user = await User.findOne({ where: { username } })
+  if (!user) {
+    throw new ApiError(404, 'Người dùng không tồn tại')
+  }
+
+  const enrollments = await Enrollment.findAll({
+    where: {
+      userId: user.userId
+    },
+    include: [
+      {
+        model: Course,
+        as: 'course',
+        attributes: [
+          'courseId',
+          'title',
+          'slug',
+          'thumbnail',
+          'description',
+          'level',
+          'isPaid',
+          'price',
+          'enrollmentCount'
+        ],
+        where: {
+          isPublished: true // Chỉ hiển thị khóa học đã published
+        }
+      }
+    ]
+  })
+
+  return enrollments
+}
+
 export default {
   enrollInCourse,
   isEnrolled,
   getUserEnrollments,
-  unenrollFromCourse
+  unenrollFromCourse,
+  getEnrollmentsByUsername
 }

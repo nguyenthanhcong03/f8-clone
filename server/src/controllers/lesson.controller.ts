@@ -1,7 +1,7 @@
 import lessonService from '@/services/lesson.service'
-import uploadService from '@/services/upload.service'
 import ApiError from '@/utils/ApiError'
 import asyncHandler from '@/utils/asyncHandler'
+import { uploadVideo } from '@/utils/cloudinary'
 import { Request, Response } from 'express'
 
 const createLesson = asyncHandler(async (req: Request, res: Response) => {
@@ -25,7 +25,7 @@ const createLesson = asyncHandler(async (req: Request, res: Response) => {
   // Nếu có file video được upload
   if (req.file) {
     try {
-      const uploadResult = await uploadService.uploadVideo(req.file.buffer, 'lesson-videos')
+      const uploadResult = await uploadVideo(req.file.buffer, 'lesson-videos')
       lessonData.videoUrl = uploadResult.url
       lessonData.videoPublicId = uploadResult.publicId
       console.log('Video uploaded successfully:', uploadResult)
@@ -62,7 +62,7 @@ const updateLesson = asyncHandler(async (req: Request, res: Response) => {
   // Nếu có file thumbnail được upload
   if (req.file) {
     try {
-      const uploadResult = await uploadService.uploadVideo(req.file.buffer, 'lesson-videos')
+      const uploadResult = await uploadVideo(req.file.buffer, 'lesson-videos')
       lessonData.videoUrl = uploadResult.url
       lessonData.videoPublicId = uploadResult.publicId
       lessonData.duration = uploadResult.duration

@@ -11,9 +11,10 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import { ROUTES } from '@/lib/constants'
 import { useLogoutMutation } from '@/services/api/authApi'
 import { useAppSelector } from '@/store/hook'
-import { Bell, BookOpen, Briefcase, FileText, Home, LogOut, Search, User } from 'lucide-react'
+import { Bell, BookOpen, FileText, Home, LogOut, Search, User } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { toast } from 'react-toastify'
@@ -134,8 +135,8 @@ const Header = () => {
                 <div className='flex cursor-pointer items-center gap-2'>
                   <Button variant='ghost' size='icon' className='rounded-full'>
                     <Avatar className='h-8 w-8'>
-                      <AvatarImage src={user.avatar} alt={user.name} />
-                      <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
+                      <AvatarImage src={user.avatar} alt={user.fullName} />
+                      <AvatarFallback>{user.fullName?.charAt(0)}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </div>
@@ -144,31 +145,43 @@ const Header = () => {
                 <div className='px-2 py-1.5'>
                   <div className='flex items-center gap-2'>
                     <Avatar className='h-8 w-8'>
-                      <AvatarImage src={user.avatar} alt={user.name} />
-                      <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
+                      <AvatarImage src={user.avatar} alt={user.fullName} />
+                      <AvatarFallback>{user.fullName?.charAt(0)}</AvatarFallback>
                     </Avatar>
 
                     <div className='flex flex-col'>
-                      <span className='text-sm font-medium'>{user?.name}</span>
+                      <span className='text-sm font-medium'>{user?.fullName}</span>
                       <span className='text-xs text-muted-foreground'>{user?.email}</span>
                     </div>
                   </div>
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link to='/profile' className='flex items-center gap-2'>
+                  <Link to={ROUTES.PUBLIC.PROFILE(user.username)} className='flex items-center gap-2'>
                     <User className='h-4 w-4' />
-                    Thông tin cá nhân
+                    Trang cá nhân
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to='/my-courses' className='flex items-center gap-2'>
+                  <Link to={ROUTES.STUDENT.BLOG.CREATE} className='flex items-center gap-2'>
+                    <BookOpen className='h-4 w-4' />
+                    Viết blog
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to={ROUTES.STUDENT.MY_POSTS} className='flex items-center gap-2'>
+                    <BookOpen className='h-4 w-4' />
+                    Bài viết của tôi
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to={ROUTES.STUDENT.MY_COURSES} className='flex items-center gap-2'>
                     <BookOpen className='h-4 w-4' />
                     Khóa học của tôi
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to='/liked-blogs' className='flex items-center gap-2'>
+                  <Link to={ROUTES.STUDENT.LIKED_BLOGS} className='flex items-center gap-2'>
                     <BookOpen className='h-4 w-4' />
                     Bài viết đã thích
                   </Link>

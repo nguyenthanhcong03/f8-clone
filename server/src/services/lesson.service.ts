@@ -1,8 +1,8 @@
-import { Op } from 'sequelize'
-import Lesson from '../models/lesson.model'
-import uploadService from './upload.service'
 import { Section } from '@/models'
 import ApiError from '@/utils/ApiError'
+import { deleteVideo, uploadVideo } from '@/utils/cloudinary'
+import { Op } from 'sequelize'
+import Lesson from '../models/lesson.model'
 
 export class LessonService {
   async createLesson(lessonData: any) {
@@ -77,7 +77,7 @@ export class LessonService {
     // Xóa video nếu có
     const currentPublicId = lesson.video_public_id
     if (currentPublicId) {
-      await uploadService.deleteVideo(currentPublicId)
+      await deleteVideo(currentPublicId)
     }
 
     await lesson.destroy()
@@ -93,11 +93,11 @@ export class LessonService {
     // Xóa video cũ nếu có
     const currentPublicId = lesson.video_public_id
     if (currentPublicId) {
-      await uploadService.deleteVideo(currentPublicId)
+      await deleteVideo(currentPublicId)
     }
 
     // Upload video mới
-    const uploadResult = await uploadService.uploadVideo(fileBuffer, 'lesson-videos')
+    const uploadResult = await uploadVideo(fileBuffer, 'lesson-videos')
 
     // Cập nhật lesson với video và public_id mới
     await lesson.update({
@@ -116,7 +116,7 @@ export class LessonService {
 
     const currentPublicId = lesson.video_public_id
     if (currentPublicId) {
-      await uploadService.deleteVideo(currentPublicId)
+      await deleteVideo(currentPublicId)
     }
 
     await lesson.update({

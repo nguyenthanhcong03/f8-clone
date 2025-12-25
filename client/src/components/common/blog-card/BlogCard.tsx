@@ -49,10 +49,10 @@ const BlogCard: React.FC<IBlogCardProps> = ({ blog }) => {
             {blog.author && (
               <div className='flex items-center gap-1'>
                 <Avatar className='h-3 w-3'>
-                  <AvatarImage src={blog.author.avatar} alt={blog.author.name} />
-                  <AvatarFallback>{blog.author.name.charAt(0)}</AvatarFallback>
+                  <AvatarImage src={blog.author.avatar} alt={blog.author.fullName} />
+                  <AvatarFallback>{blog.author.fullName.charAt(0)}</AvatarFallback>
                 </Avatar>
-                <span>{blog.author.name}</span>
+                <span>{blog.author.fullName}</span>
               </div>
             )}
             <div className='flex items-center gap-1'>

@@ -53,6 +53,7 @@ export const authApi = baseApi.injectEndpoints({
             dispatch(setIsAuthLoading(false))
             dispatch(setCredentials(result.data))
           } catch (error) {
+            dispatch(setIsAuthLoading(false))
             console.log(error)
           }
         }

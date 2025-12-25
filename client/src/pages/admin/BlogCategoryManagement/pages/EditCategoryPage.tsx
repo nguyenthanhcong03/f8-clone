@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { ROUTES } from '@/lib/constants'
 import { updateCategorySchema, type UpdateCategoryInput } from '@/schemas/blog.schema'
 import { useGetCategoryByIdQuery, useUpdateCategoryMutation } from '@/services/api/blogApi'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -71,7 +72,7 @@ const EditCategoryPage = () => {
     try {
       await updateCategory({ categoryId: categoryId!, data }).unwrap()
       toast.success('Cập nhật thể loại thành công!')
-      navigate('/admin/blog-categories')
+      navigate(ROUTES.ADMIN.BLOG_CATEGORIES.ROOT)
     } catch (error: any) {
       console.error('Update category error:', error)
       toast.error(error?.data?.message || 'Có lỗi xảy ra khi cập nhật thể loại')
@@ -94,7 +95,7 @@ const EditCategoryPage = () => {
       <div className='flex h-screen items-center justify-center'>
         <div className='text-center'>
           <h2 className='text-xl font-semibold'>Không tìm thấy thể loại</h2>
-          <Button className='mt-4' onClick={() => navigate('/admin/blog-categories')}>
+          <Button className='mt-4' onClick={() => navigate(ROUTES.ADMIN.BLOG_CATEGORIES.ROOT)}>
             Quay lại
           </Button>
         </div>
@@ -108,7 +109,7 @@ const EditCategoryPage = () => {
       <div className='flex items-center justify-between'>
         <div className='space-y-1'>
           <div className='flex items-center gap-2'>
-            <Button variant='ghost' size='sm' onClick={() => navigate('/admin/blog-categories')}>
+            <Button variant='ghost' size='sm' onClick={() => navigate(ROUTES.ADMIN.BLOG_CATEGORIES.ROOT)}>
               <ArrowLeftIcon className='h-4 w-4' />
             </Button>
             <h2 className='text-2xl font-bold tracking-tight'>Chỉnh sửa thể loại</h2>
@@ -205,7 +206,7 @@ const EditCategoryPage = () => {
 
         {/* Actions */}
         <div className='flex items-center justify-end gap-4'>
-          <Button type='button' variant='outline' onClick={() => navigate('/admin/blog-categories')}>
+          <Button type='button' variant='outline' onClick={() => navigate(ROUTES.ADMIN.BLOG_CATEGORIES.ROOT)}>
             Hủy
           </Button>
           <Button type='submit' form='category-form' disabled={isSubmitting || !isDirty}>

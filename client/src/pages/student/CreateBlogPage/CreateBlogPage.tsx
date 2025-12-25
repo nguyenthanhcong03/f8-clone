@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ROUTES } from '@/lib/constants'
 import { createBlogSchema, type CreateBlogInput } from '@/schemas/blog.schema'
 import { useCreateBlogMutation, useGetAllCategoriesQuery } from '@/services/api/blogApi'
+import { useUploadImageMutation } from '@/services/api/uploadApi'
 import { getErrorMessage } from '@/services/helpers'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Editor } from '@tinymce/tinymce-react'
@@ -25,6 +26,7 @@ const CreateBlogPage = () => {
   const categories = data?.data?.data || []
 
   const [createBlog, { isLoading: isCreating }] = useCreateBlogMutation()
+  const [uploadImage] = useUploadImageMutation()
 
   const {
     control,
@@ -89,7 +91,7 @@ const CreateBlogPage = () => {
 
       await createBlog(submitData).unwrap()
       toast.success('Tạo bài viết thành công')
-      navigate(ROUTES.ADMIN.BLOGS.ROOT)
+      navigate('/my-posts')
     } catch (error) {
       console.error('Có lỗi xảy ra khi tạo bài viết:', error)
       toast.error(getErrorMessage(error) || 'Đã có lỗi xảy ra. Vui lòng thử lại.')
@@ -105,11 +107,11 @@ const CreateBlogPage = () => {
             <Button
               variant='ghost'
               size='sm'
-              onClick={() => navigate(ROUTES.ADMIN.BLOGS.ROOT)}
+              onClick={() => navigate(ROUTES.STUDENT.MY_POSTS)}
               className='text-gray-600 hover:bg-gray-100 hover:text-gray-800'
             >
               <ArrowLeftIcon className='mr-2 h-4 w-4' />
-              Quay lại danh sách
+              Quay lại
             </Button>
 
             <Button
@@ -347,7 +349,18 @@ const CreateBlogPage = () => {
                           ],
                           toolbar:
                             'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-                          content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+                          content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                          images_upload_handler: async (blobInfo) => {
+                            const formData = new FormData()
+                            formData.append('file', blobInfo.blob())
+                            try {
+                              const data = await uploadImage(formData).unwrap()
+                              return data.data.url
+                            } catch (error) {
+                              console.error('Image upload failed:', error)
+                              return ''
+                            }
+                          }
                         }}
                       />
                       {errors.content && (

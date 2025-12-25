@@ -2,7 +2,8 @@ import jwt from 'jsonwebtoken'
 
 interface UserPayload {
   userId: string
-  name?: string
+  fullName?: string
+  username?: string
   email?: string
   avatar?: string
   role?: 'admin' | 'student'
@@ -12,7 +13,8 @@ export const generateAccessToken = (user: UserPayload): string => {
   return jwt.sign(
     {
       userId: user.userId,
-      name: user.name,
+      fullName: user.fullName,
+      username: user.username,
       email: user.email,
       avatar: user.avatar,
       role: user.role

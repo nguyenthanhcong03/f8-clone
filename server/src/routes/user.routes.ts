@@ -1,32 +1,30 @@
 import { Router } from 'express'
 import userController from '../controllers/user.controller'
-import { validate } from '../middleware/validation.middleware'
-import { createUserSchema, getUserSchema, updateUserSchema, changePasswordSchema } from '../schemas/user.schema'
 import upload from '../middleware/upload.middleware'
+import { validate } from '../middleware/validation.middleware'
+import { createUserSchema, getUserSchema, updateUserSchema } from '../schemas/user.schema'
 
 const router = Router()
 
-router.get('/', userController.getAllUsers.bind(userController))
+router.get('/', userController.getAllUsers)
 
-router.get('/email', userController.getUserByEmail.bind(userController))
+router.get('/email', userController.getUserByEmail)
 
-router.get('/role/:role', userController.getUsersByRole.bind(userController))
+router.get('/role/:role', userController.getUsersByRole)
 
-router.get('/:id', validate(getUserSchema), userController.getUserById.bind(userController))
+// Route để lấy user theo username (phải đặt trước :id để tránh conflict)
+router.get('/public-profile/:username', userController.getPublicProfileByUsername)
 
-router.post('/', validate(createUserSchema), userController.createUser.bind(userController))
+router.post('/', validate(createUserSchema), userController.createUser)
 
-router.put('/:id', validate(updateUserSchema), userController.updateUser.bind(userController))
+router.get('/:id', validate(getUserSchema), userController.getUserById)
 
-router.post(
-  '/:id/avatar',
-  validate(getUserSchema),
-  upload.single('avatar'),
-  userController.uploadAvatar.bind(userController)
-)
+router.put('/:id', validate(updateUserSchema), userController.updateUser)
 
-router.delete('/:id/avatar', validate(getUserSchema), userController.deleteAvatar.bind(userController))
+router.post('/:id/avatar', validate(getUserSchema), upload.single('avatar'), userController.uploadAvatar)
 
-router.delete('/:id', validate(getUserSchema), userController.deleteUser.bind(userController))
+router.delete('/:id/avatar', validate(getUserSchema), userController.deleteAvatar)
+
+router.delete('/:id', validate(getUserSchema), userController.deleteUser)
 
 export default router

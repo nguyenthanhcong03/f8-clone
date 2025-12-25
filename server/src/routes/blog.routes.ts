@@ -52,6 +52,9 @@ router.post(
 // Lấy tất cả blog mà user đã like (đặt trước các routes động)
 router.get('/liked/me', authMiddleware.authRequired, blogController.getLikedBlogs)
 
+// Lấy danh sách bài viết của tôi
+router.get('/my-posts', authMiddleware.authRequired, blogController.getMyBlogs)
+
 // Lấy tất cả blog
 router.get('/', blogController.getAllBlogs)
 

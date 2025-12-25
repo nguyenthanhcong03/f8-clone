@@ -7,6 +7,7 @@ import lessonRoutes from './lesson.routes'
 import enrollmentRoutes from './enrollment.routes'
 import progressRoutes from './progress.routes'
 import blogRoutes from './blog.routes'
+import uploadRoutes from './upload.routes'
 
 const router = Router()
 
@@ -19,5 +20,6 @@ router.use('/lessons', lessonRoutes)
 router.use('/enrollments', enrollmentRoutes)
 router.use('/progress', progressRoutes)
 router.use('/blogs', blogRoutes)
+router.use('/upload', uploadRoutes)
 
 export default router

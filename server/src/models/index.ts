@@ -42,6 +42,14 @@ Course.belongsToMany(User, {
   as: 'enrolledUsers'
 })
 
+// Enrollment - User (Nhiều-Một: Enrollment thuộc về User)
+Enrollment.belongsTo(User, { foreignKey: 'userId', as: 'user' })
+User.hasMany(Enrollment, { foreignKey: 'userId', as: 'enrollments' })
+
+// Enrollment - Course (Nhiều-Một: Enrollment thuộc về Course)
+Enrollment.belongsTo(Course, { foreignKey: 'courseId', as: 'course' })
+Course.hasMany(Enrollment, { foreignKey: 'courseId', as: 'enrollments' })
+
 // User - Progress (Một-Nhiều: User có nhiều bản ghi tiến độ)
 User.hasMany(Progress, { foreignKey: 'userId', as: 'progress' })
 Progress.belongsTo(User, { foreignKey: 'userId', as: 'user' })
