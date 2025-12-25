@@ -5,9 +5,9 @@ import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { ROUTES } from '@/lib/constants'
+import { formatDate } from '@/lib/utils'
 import { useDeleteBlogMutation } from '@/services/api/blogApi'
-import { formatDate } from '@/utils/format'
-import { EyeIcon, PlusIcon, Trash2Icon } from 'lucide-react'
+import { EyeIcon, Trash2Icon } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
@@ -153,16 +153,7 @@ const BlogTable: React.FC<BlogTableProps> = ({ blogs, pagination, page, onPageCh
               ) : (
                 <TableRow>
                   <TableCell colSpan={6} className='h-24 text-center'>
-                    <NoData
-                      message='Chưa có bài viết nào'
-                      subMessage='Bạn có thể tạo bài viết mới ngay bây giờ'
-                      action={
-                        <Button onClick={() => navigate(ROUTES.ADMIN.BLOGS.CREATE)} className='mt-4'>
-                          <PlusIcon className='mr-2 h-4 w-4' />
-                          Tạo bài viết đầu tiên
-                        </Button>
-                      }
-                    />
+                    <NoData message='Chưa có bài viết nào' subMessage='Bạn có thể tạo bài viết mới ngay bây giờ' />
                   </TableCell>
                 </TableRow>
               )}

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { formatCurrency } from '@/lib/utils'
 import { useGetAllCoursesAdminQuery } from '@/services/api/courseApi'
-import { formatCurrency } from '@/utils/format'
-import { BookOpen, Users, DollarSign, TrendingUp } from 'lucide-react'
+import { BookOpen, DollarSign, TrendingUp, Users } from 'lucide-react'
 
 const CourseStats = () => {
   const { data } = useGetAllCoursesAdminQuery({
