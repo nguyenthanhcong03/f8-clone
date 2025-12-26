@@ -6,11 +6,13 @@ export const ROUTES = {
       LIST: '/courses',
       DETAIL: (slug: string = ':slug') => `/courses/${slug}`
     },
+    COURSE_DETAIL: (slug: string = ':slug') => `/courses/${slug}`,
     BLOGS: {
       LIST: '/blogs',
       DETAIL: (slug: string = ':slug') => `/blogs/${slug}`,
       BY_TOPIC: (topicSlug: string = ':topicSlug') => `/blogs/topic/${topicSlug}`
     },
+    BLOG_DETAIL: (slug: string = ':slug') => `/blogs/${slug}`,
     PROFILE: (username: string = ':username') => `/${username}`
   },
 

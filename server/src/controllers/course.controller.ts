@@ -8,6 +8,9 @@ import { uploadImage } from '@/utils/cloudinary'
 import { responseHandler } from '@/utils/responseHandler'
 import { Request, Response } from 'express'
 import { Op } from 'sequelize'
+import Blog from '@/models/blog.model'
+import Course from '@/models/course.model'
+import User from '@/models/user.model'
 
 const createCourse = asyncHandler(async (req: Request, res: Response) => {
   const { title, slug, description, level, isPaid, price, isPublished } = req.body
@@ -240,6 +243,111 @@ const getCourseSections = asyncHandler(async (req: Request, res: Response) => {
   })
 })
 
+const searchCourseAndBlog = asyncHandler(async (req: Request, res: Response) => {
+  const { search, type = 'all', page = 1, limit = 10 } = req.query
+  const pageNum = Number(page)
+  const limitNum = Number(limit)
+  const offset = (pageNum - 1) * limitNum
+
+  const results: any[] = []
+  let totalBlogs = 0
+  let totalCourses = 0
+
+  // Tìm kiếm blogs
+  if (type === 'blog' || type === 'all') {
+    const whereCondition: any = {
+      status: 'draft'
+    }
+
+    if (search) {
+      whereCondition.title = { [Op.like]: `%${search}%` }
+    }
+
+    const { rows: blogs, count } = await Blog.findAndCountAll({
+      where: whereCondition,
+      include: [
+        {
+          model: User,
+          as: 'author',
+          attributes: ['userId', 'username', 'fullName', 'avatar']
+        }
+      ],
+      limit: type === 'blog' ? limitNum : Math.ceil(limitNum / 2),
+      offset: type === 'blog' ? offset : 0,
+      order: [['createdAt', 'DESC']]
+    })
+    console.log('blogs :>> ', blogs)
+
+    totalBlogs = count
+    results.push(
+      ...blogs.map((blog) => ({
+        id: blog.blogId,
+        type: 'blog',
+        title: blog.title,
+        slug: blog.slug,
+        content: blog.content?.substring(0, 150) + '...',
+        thumbnail: blog.thumbnail,
+        // author: blog.get('author'),
+        // publishedAt: blog.publishedAt,
+        likesCount: blog.likesCount
+      }))
+    )
+  }
+
+  // Tìm kiếm courses
+  if (type === 'course' || type === 'all') {
+    const whereCondition: any = {
+      isPublished: true
+    }
+
+    if (search) {
+      whereCondition.title = { [Op.like]: `%${search}%` }
+    }
+
+    const { rows: courses, count } = await Course.findAndCountAll({
+      where: whereCondition,
+      // include: [
+      //   {
+      //     model: User,
+      //     as: 'instructor',
+      //     attributes: ['userId', 'username', 'fullName', 'avatar']
+      //   }
+      // ],
+      limit: type === 'course' ? limitNum : Math.ceil(limitNum / 2),
+      offset: type === 'course' ? offset : 0,
+      order: [['createdAt', 'DESC']]
+    })
+
+    totalCourses = count
+    results.push(
+      ...courses.map((course) => ({
+        id: course.courseId,
+        type: 'course',
+        title: course.title,
+        slug: course.slug,
+        description: course.description,
+        thumbnail: course.thumbnail,
+        level: course.level,
+        isPaid: course.isPaid,
+        price: course.price
+        // instructor: course.get('instructor'),
+        // enrollmentCount: course.enrollmentCount
+      }))
+    )
+  }
+
+  const responseData = {
+    total: type === 'all' ? totalBlogs + totalCourses : type === 'blog' ? totalBlogs : totalCourses,
+    totalBlogs,
+    totalCourses,
+    page: pageNum,
+    limit: limitNum,
+    data: results
+  }
+
+  responseHandler(res, 200, 'Tìm kiếm thành công', responseData)
+})
+
 export default {
   createCourse,
   getAllPublishedCourses,
@@ -250,5 +358,6 @@ export default {
   deleteCourse,
   uploadThumbnail,
   deleteThumbnail,
-  getCourseSections
+  getCourseSections,
+  searchCourseAndBlog
 }

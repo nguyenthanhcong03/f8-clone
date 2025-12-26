@@ -1,10 +1,60 @@
 import type { CreateCourseInput, UpdateCourseInput } from '@/schemas/course.schema'
 import type { ApiResponse, PaginationResponse } from '@/types/api'
 import type { Course } from '@/types/course'
+import type { Blog } from '@/types/blog'
 import { baseApi } from './baseApi'
+
+export interface SearchResult {
+  id: string
+  type: 'blog' | 'course'
+  title: string
+  slug: string
+  thumbnail?: string
+  content?: string
+  description?: string
+  author?: {
+    userId: string
+    username: string
+    fullName: string
+    avatar?: string
+  }
+  instructor?: {
+    userId: string
+    username: string
+    fullName: string
+    avatar?: string
+  }
+  level?: string
+  isPaid?: boolean
+  price?: number
+  publishedAt?: string
+  likesCount?: number
+  enrollmentCount?: number
+}
+
+export interface SearchResponse {
+  total: number
+  totalBlogs: number
+  totalCourses: number
+  page: number
+  limit: number
+  data: SearchResult[]
+}
 
 export const courseApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    // Tìm kiếm khóa học và blog
+    searchCourseAndBlog: builder.query<
+      ApiResponse<SearchResponse>,
+      { search?: string; type?: 'all' | 'blog' | 'course'; page?: number; limit?: number }
+    >({
+      query: (params) => ({
+        url: '/courses/search',
+        method: 'GET',
+        params
+      })
+    }),
+
     // Lấy tất cả khóa học
     getAllPublishedCourses: builder.query<
       ApiResponse<PaginationResponse<Course>>,
@@ -116,6 +166,7 @@ export const courseApi = baseApi.injectEndpoints({
 
 // Export hooks
 export const {
+  useSearchCourseAndBlogQuery,
   useGetAllPublishedCoursesQuery,
   useGetAllCoursesAdminQuery,
   useGetCourseByIdQuery,

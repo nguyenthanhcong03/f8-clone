@@ -7,6 +7,7 @@ const router = Router()
 
 router.get('/', courseController.getAllPublishedCourses)
 router.get('/admin', authMiddleware.authRequired, courseController.getAllCoursesAdmin)
+router.get('/search', courseController.searchCourseAndBlog)
 
 router.get('/slug/:slug', authMiddleware.authOptional, courseController.getCourseBySlug)
 
